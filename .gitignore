@@ -1,0 +1,47 @@
+# KiCad
+*.kicad_pcb-bak
+*.kicad_sch-bak
+*-backups/
+*.lck
+_autosave-*
+fp-info-cache
+*.dsn
+*.ses
+
+# Eagle
+*.b#*
+*.s#*
+*.epf
+
+# Vivado
+*.jou
+*.log
+*.str
+*.backup.*
+.Xil/
+*.xpr
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
+*.cache/
+*.gen/
+
+# Verilator
+obj_dir/
+*.vcd
+
+# Build artifacts
+*.pdf
+*.docx
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+*.swp
+*.swo
+*~

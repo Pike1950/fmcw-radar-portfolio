@@ -1,0 +1,644 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "285c95af-c060-44af-acd8-9aaf05d4fcf3")
+	(paper "A4")
+	(lib_symbols)
+	(junction
+		(at 111.76 38.1)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "622b65d0-e034-40bf-b3f9-ce9200f94b06")
+	)
+	(junction
+		(at 74.93 46.99)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "ba2b7829-114b-4d88-8836-1361e01051aa")
+	)
+	(junction
+		(at 74.93 40.64)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "cd22c69a-03c9-42e3-a651-6e5a3a908cfd")
+	)
+	(wire
+		(pts
+			(xy 74.93 40.64) (xy 115.57 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0067b84d-c247-4397-aeda-ccf6cedd0792")
+	)
+	(wire
+		(pts
+			(xy 72.39 40.64) (xy 74.93 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1d1702d7-b264-4155-8f4f-d0462a1689c2")
+	)
+	(wire
+		(pts
+			(xy 72.39 55.88) (xy 153.67 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1da28342-22d1-4b19-8a01-25bd007ca5b1")
+	)
+	(wire
+		(pts
+			(xy 74.93 46.99) (xy 74.93 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "22a3db12-3c10-495a-aec7-e2854efd9782")
+	)
+	(wire
+		(pts
+			(xy 72.39 38.1) (xy 111.76 38.1)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2ae4fda2-cdae-411d-b638-533ab086c3c2")
+	)
+	(wire
+		(pts
+			(xy 111.76 38.1) (xy 111.76 31.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "31cd84e5-acf0-49ac-a9a8-b54f9095e762")
+	)
+	(wire
+		(pts
+			(xy 138.43 40.64) (xy 153.67 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "425dcdd2-f82b-4937-9025-b4f45b35f7ed")
+	)
+	(wire
+		(pts
+			(xy 138.43 43.18) (xy 153.67 43.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "575dd9f7-9303-450e-afd9-0fae3d5d6131")
+	)
+	(wire
+		(pts
+			(xy 138.43 46.99) (xy 153.67 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6c2f0e49-e843-4c3c-9c20-b7c43a895bd4")
+	)
+	(wire
+		(pts
+			(xy 74.93 53.34) (xy 153.67 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "79a90593-a463-4727-9892-fcbc484abee0")
+	)
+	(wire
+		(pts
+			(xy 111.76 31.75) (xy 153.67 31.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8e842d21-d7c5-498e-b694-387bde526335")
+	)
+	(wire
+		(pts
+			(xy 111.76 46.99) (xy 115.57 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a0cd9ed6-3b10-40b2-b4a0-ea2298d26d1a")
+	)
+	(wire
+		(pts
+			(xy 138.43 49.53) (xy 153.67 49.53)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ae959620-da6c-44d1-88ec-8e990f7270c6")
+	)
+	(wire
+		(pts
+			(xy 111.76 38.1) (xy 115.57 38.1)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b1714e07-fe2c-4ff3-9318-a5506cf29c81")
+	)
+	(wire
+		(pts
+			(xy 74.93 40.64) (xy 74.93 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b42d323e-16ec-43dd-bdbf-a74bf550b747")
+	)
+	(wire
+		(pts
+			(xy 72.39 60.96) (xy 153.67 60.96)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b4e02a88-91e1-41a3-9367-2b9a7240e87f")
+	)
+	(wire
+		(pts
+			(xy 72.39 58.42) (xy 153.67 58.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b79f2c8f-9b35-4270-9dcc-2887cd49e5d1")
+	)
+	(wire
+		(pts
+			(xy 138.43 38.1) (xy 153.67 38.1)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d4ddbcdf-4cec-4f46-92f9-3d106ddc76bb")
+	)
+	(wire
+		(pts
+			(xy 74.93 46.99) (xy 78.74 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e3523a2d-3333-4209-a76d-b58e5a56921f")
+	)
+	(sheet
+		(at 59.69 36.83)
+		(size 12.7 25.4)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "37e4d40d-a350-4c8a-a632-d91c7f41ea0f")
+		(property "Sheetname" "Baseband_Power_Refs"
+			(at 59.69 36.1184 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "Baseband_Power_Refs.kicad_sch"
+			(at 59.69 62.8146 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin "3V3A" passive
+			(at 72.39 38.1 0)
+			(uuid "a4a92040-899d-41fb-aac4-d0d37d5931a4")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "VCM" output
+			(at 72.39 40.64 0)
+			(uuid "7160be4a-0fd7-4582-86e4-6e9e8f7e90d1")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "VREF" output
+			(at 72.39 55.88 0)
+			(uuid "6593a625-9787-4b53-b0b2-3f670d559676")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "3V3D" passive
+			(at 72.39 58.42 0)
+			(uuid "d7c2b1fa-3e8e-45e8-8d5d-dea2523d01bd")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "REF_TEMP" output
+			(at 72.39 60.96 0)
+			(uuid "f7576b6a-d701-4f0f-b158-290ab82a11cb")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(instances
+			(project "Baseband PCB"
+				(path "/285c95af-c060-44af-acd8-9aaf05d4fcf3"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 153.67 29.21)
+		(size 15.24 34.29)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "aca2708f-4650-4972-b2ae-c0f3ad1798dd")
+		(property "Sheetname" "Baseband_FDA_Driver_ADC_SPI_Interface"
+			(at 153.67 28.4984 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "Baseband_FDA_Driver_ADC_SPI_Interface.kicad_sch"
+			(at 153.67 64.0846 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin "LPF_OUT" input
+			(at 153.67 49.53 180)
+			(uuid "9035c80b-89a1-4f30-96a9-12a5cd859e62")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "3V3A" passive
+			(at 153.67 31.75 180)
+			(uuid "4bc27841-f8b5-485b-a4e4-430b122fac09")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "3V3D" passive
+			(at 153.67 58.42 180)
+			(uuid "df32cdd2-066e-4e8a-b3e7-b40871f7da00")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "VCM" input
+			(at 153.67 53.34 180)
+			(uuid "34665ea5-1935-4eb7-84fe-176e82bcf7b1")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "VREF" input
+			(at 153.67 55.88 180)
+			(uuid "6293f6f1-4e8d-4a20-9354-a8a3b86f10d6")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "REF_TEMP" input
+			(at 153.67 60.96 180)
+			(uuid "91532ab7-84d8-4607-9093-0f59a172a4e8")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "CS_PGA" output
+			(at 153.67 38.1 180)
+			(uuid "4ce97cb6-733e-44b5-87bf-cc90d75d0a62")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "SPI_SCLK" output
+			(at 153.67 40.64 180)
+			(uuid "d041c2bb-719c-4078-9187-bd5b7b3b691a")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "SPI_SDI" output
+			(at 153.67 43.18 180)
+			(uuid "a45e96f1-31c7-4060-b5ad-b53db88c4006")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "PGA_OUT" input
+			(at 153.67 46.99 180)
+			(uuid "6f8026eb-271e-4e11-90c1-3643577eebe7")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "Baseband PCB"
+				(path "/285c95af-c060-44af-acd8-9aaf05d4fcf3"
+					(page "5")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 78.74 44.45)
+		(size 33.02 5.08)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "bbc37e27-d513-478d-92a4-9f13edcaf345")
+		(property "Sheetname" "Baseband_IF_Input_Protection_Bias"
+			(at 78.74 43.7384 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "Baseband_IF_Input_Protection_Bias.kicad_sch"
+			(at 78.74 50.1146 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin "VCM" input
+			(at 78.74 46.99 180)
+			(uuid "64797903-c0a6-43a9-888d-4e604d233f99")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "IF_BIASED" output
+			(at 111.76 46.99 0)
+			(uuid "5f17c938-b1b6-4f52-8b51-382292b7c943")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(instances
+			(project "Baseband PCB"
+				(path "/285c95af-c060-44af-acd8-9aaf05d4fcf3"
+					(page "3")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 115.57 36.83)
+		(size 22.86 13.97)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "c8e2962d-047d-46e1-808a-44adee6f06ef")
+		(property "Sheetname" "Baseband_PGA_AntiAlias"
+			(at 115.57 36.1184 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "Baseband_PGA_AntiAlias.kicad_sch"
+			(at 115.57 51.3846 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+				(hide yes)
+			)
+		)
+		(pin "3V3A" passive
+			(at 115.57 38.1 180)
+			(uuid "2037f297-055f-47f3-a492-2573957697db")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "CS_PGA" input
+			(at 138.43 38.1 0)
+			(uuid "f3e83170-1c80-4b22-a610-7ad7a906db33")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "IF_BIASED" input
+			(at 115.57 46.99 180)
+			(uuid "a838354f-d4b6-4e1d-909e-283e126e5457")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "SPI_SCLK" input
+			(at 138.43 40.64 0)
+			(uuid "d6dd24f6-c934-4aca-8d43-74b5d0722f2c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "SPI_SDI" input
+			(at 138.43 43.18 0)
+			(uuid "9a1ab8ef-bdb8-4f94-8734-dd78acbe9038")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "VCM" input
+			(at 115.57 40.64 180)
+			(uuid "c92bc348-1f75-4e00-aa1e-6a947aed0865")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "LPF_OUT" output
+			(at 138.43 49.53 0)
+			(uuid "45bba0cf-bacf-45cd-8f6c-13c1f8f87c82")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "PGA_OUT" output
+			(at 138.43 46.99 0)
+			(uuid "121857b4-12d6-4861-9333-25b48505ac36")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(instances
+			(project "Baseband PCB"
+				(path "/285c95af-c060-44af-acd8-9aaf05d4fcf3"
+					(page "4")
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)

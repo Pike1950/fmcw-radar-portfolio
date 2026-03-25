@@ -1,0 +1,233 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="7" markerHeight="4.5" orient="auto-start-auto">
+      <path d="M 0 0 L 10 3 L 0 6 z" fill="#333"/>
+    </marker>
+    <marker id="ar" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="7" markerHeight="4.5" orient="auto-start-auto">
+      <path d="M 0 0 L 10 3 L 0 6 z" fill="#C00000"/>
+    </marker>
+    <marker id="ab" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="7" markerHeight="4.5" orient="auto-start-auto">
+      <path d="M 0 0 L 10 3 L 0 6 z" fill="#2E75B6"/>
+    </marker>
+  </defs>
+
+  <text x="600" y="30" text-anchor="middle" font-size="20" font-weight="bold" fill="#1F3864">Sheet A: Power + References — Detailed Block Diagram</text>
+  <text x="600" y="48" text-anchor="middle" font-size="12" fill="#888">Current status: 17/22 components placed, 0 wires, 0 hierarchical labels</text>
+  
+  <!-- ===== ROW 1: 5V INPUT → 3V3A ===== -->
+  <text x="30" y="90" font-size="13" font-weight="bold" fill="#1F3864">Power Path: 5V → 3V3A → 3V3D</text>
+  
+  <!-- ST1 -->
+  <rect x="30" y="105" width="100" height="55" rx="5" fill="#FFF3CD" stroke="#B8860B" stroke-width="1.5"/>
+  <text x="80" y="125" text-anchor="middle" font-size="11" font-weight="bold">ST1</text>
+  <text x="80" y="140" text-anchor="middle" font-size="9" fill="#666">Phoenix 2-pos</text>
+  <text x="80" y="152" text-anchor="middle" font-size="9" fill="#666">5V input</text>
+  
+  <!-- F1 -->
+  <rect x="160" y="108" width="80" height="48" rx="5" fill="#E8E8E8" stroke="#666" stroke-width="1.5"/>
+  <text x="200" y="128" text-anchor="middle" font-size="11" font-weight="bold">F1</text>
+  <text x="200" y="142" text-anchor="middle" font-size="9" fill="#666">200mA PTC</text>
+  <text x="200" y="152" text-anchor="middle" font-size="8" fill="#C00000">✓ placed</text>
+  <line x1="130" y1="132" x2="158" y2="132" stroke="#333" stroke-width="1.5" marker-end="url(#a)"/>
+  
+  <!-- C1 (input bulk) -->
+  <rect x="175" y="168" width="50" height="32" rx="3" fill="#FFEEBA" stroke="#B8860B" stroke-width="1"/>
+  <text x="200" y="181" text-anchor="middle" font-size="8" font-weight="bold">C1</text>
+  <text x="200" y="193" text-anchor="middle" font-size="7" fill="#666">10µF 0805</text>
+  <line x1="200" y1="156" x2="200" y2="166" stroke="#888" stroke-width="1"/>
+  
+  <!-- D1 -->
+  <rect x="270" y="108" width="80" height="48" rx="5" fill="#E8E8E8" stroke="#666" stroke-width="1.5"/>
+  <text x="310" y="128" text-anchor="middle" font-size="11" font-weight="bold">D1</text>
+  <text x="310" y="142" text-anchor="middle" font-size="9" fill="#666">BAT54S</text>
+  <text x="310" y="152" text-anchor="middle" font-size="8" fill="#C00000">✓ placed</text>
+  <line x1="240" y1="132" x2="268" y2="132" stroke="#333" stroke-width="1.5" marker-end="url(#a)"/>
+  
+  <!-- C2 (LDO input close) -->
+  <rect x="365" y="168" width="50" height="32" rx="3" fill="#FFEEBA" stroke="#B8860B" stroke-width="1"/>
+  <text x="390" y="181" text-anchor="middle" font-size="8" font-weight="bold">C2</text>
+  <text x="390" y="193" text-anchor="middle" font-size="7" fill="#666">1µF 0402</text>
+  
+  <!-- U_LDO -->
+  <rect x="370" y="105" width="110" height="55" rx="5" fill="#D4EDDA" stroke="#2E8B57" stroke-width="2"/>
+  <text x="425" y="125" text-anchor="middle" font-size="11" font-weight="bold">U_LDO</text>
+  <text x="425" y="140" text-anchor="middle" font-size="9" fill="#666">TPS7A2033</text>
+  <text x="425" y="152" text-anchor="middle" font-size="8" fill="#2E8B57">3.3V out, 4.4µVrms</text>
+  <line x1="350" y1="132" x2="368" y2="132" stroke="#333" stroke-width="1.5" marker-end="url(#a)"/>
+  
+  <line x1="390" y1="160" x2="390" y2="166" stroke="#888" stroke-width="1"/>
+  
+  <!-- C3 (LDO output) -->
+  <rect x="495" y="168" width="50" height="32" rx="3" fill="#FFEEBA" stroke="#B8860B" stroke-width="1"/>
+  <text x="520" y="181" text-anchor="middle" font-size="8" font-weight="bold">C3</text>
+  <text x="520" y="193" text-anchor="middle" font-size="7" fill="#666">1µF 0402</text>
+  
+  <!-- R_SHUNT (MISSING) -->
+  <rect x="505" y="108" width="70" height="48" rx="5" fill="#F8D7DA" stroke="#C00000" stroke-width="2" stroke-dasharray="4,2"/>
+  <text x="540" y="128" text-anchor="middle" font-size="10" font-weight="bold" fill="#C00000">R_SHUNT</text>
+  <text x="540" y="142" text-anchor="middle" font-size="9" fill="#C00000">0Ω (DFT)</text>
+  <text x="540" y="152" text-anchor="middle" font-size="8" fill="#C00000">✗ MISSING</text>
+  <line x1="480" y1="132" x2="503" y2="132" stroke="#C00000" stroke-width="1.5" marker-end="url(#ar)"/>
+  
+  <line x1="520" y1="160" x2="520" y2="166" stroke="#888" stroke-width="1"/>
+  
+  <!-- 3V3A output node -->
+  <rect x="605" y="112" width="70" height="40" rx="5" fill="#F8D7DA" stroke="#C00000" stroke-width="2"/>
+  <text x="640" y="138" text-anchor="middle" font-size="14" font-weight="bold" fill="#C00000">3V3A</text>
+  <line x1="575" y1="132" x2="603" y2="132" stroke="#C00000" stroke-width="2" marker-end="url(#ar)"/>
+  
+  <!-- Annotation: label status -->
+  <rect x="685" y="112" width="130" height="40" rx="4" fill="#FFF3CD" stroke="#B8860B" stroke-width="1"/>
+  <text x="750" y="130" text-anchor="middle" font-size="9" font-weight="bold" fill="#B8860B">local label placed ✓</text>
+  <text x="750" y="145" text-anchor="middle" font-size="9" fill="#B8860B">needs → global label</text>
+  
+  <!-- ===== FERRITE BEAD PATH ===== -->
+  <!-- FB1 -->
+  <rect x="605" y="175" width="70" height="40" rx="5" fill="#E8E8E8" stroke="#666" stroke-width="1.5"/>
+  <text x="640" y="193" text-anchor="middle" font-size="10" font-weight="bold">FB1</text>
+  <text x="640" y="207" text-anchor="middle" font-size="8" fill="#666">220Ω@100M</text>
+  <line x1="640" y1="152" x2="640" y2="173" stroke="#C00000" stroke-width="1.5" marker-end="url(#ar)"/>
+  
+  <!-- C4 + C5 -->
+  <rect x="700" y="178" width="45" height="32" rx="3" fill="#FFEEBA" stroke="#B8860B" stroke-width="1"/>
+  <text x="722" y="191" text-anchor="middle" font-size="8" font-weight="bold">C4</text>
+  <text x="722" y="203" text-anchor="middle" font-size="7" fill="#666">100nF</text>
+  
+  <rect x="755" y="178" width="45" height="32" rx="3" fill="#FFEEBA" stroke="#B8860B" stroke-width="1"/>
+  <text x="777" y="191" text-anchor="middle" font-size="8" font-weight="bold">C5</text>
+  <text x="777" y="203" text-anchor="middle" font-size="7" fill="#666">10µF</text>
+  
+  <!-- 3V3D output -->
+  <rect x="815" y="175" width="65" height="40" rx="5" fill="#FFE0E0" stroke="#C00000" stroke-width="2"/>
+  <text x="847" y="200" text-anchor="middle" font-size="13" font-weight="bold" fill="#C00000">3V3D</text>
+  <line x1="675" y1="195" x2="698" y2="195" stroke="#C00000" stroke-width="1.5" marker-end="url(#ar)"/>
+  <line x1="800" y1="195" x2="813" y2="195" stroke="#C00000" stroke-width="1.5" marker-end="url(#ar)"/>
+  
+  <text x="815" y="228" font-size="9" fill="#B8860B">local label ✓, needs global</text>
+  
+  <!-- ===== ROW 2: VREF PATH ===== -->
+  <text x="30" y="275" font-size="13" font-weight="bold" fill="#1F3864">Reference Path: 3V3A → VREF (2.5V)</text>
+  
+  <!-- C6 -->
+  <rect x="95" y="310" width="50" height="32" rx="3" fill="#FFEEBA" stroke="#B8860B" stroke-width="1"/>
+  <text x="120" y="323" text-anchor="middle" font-size="8" font-weight="bold">C6</text>
+  <text x="120" y="335" text-anchor="middle" font-size="7" fill="#666">1µF 0402</text>
+  
+  <!-- 3V3A input label -->
+  <rect x="30" y="295" width="55" height="28" rx="4" fill="#F8D7DA" stroke="#C00000" stroke-width="1.5"/>
+  <text x="57" y="313" text-anchor="middle" font-size="10" font-weight="bold" fill="#C00000">3V3A</text>
+  <line x1="85" y1="309" x2="100" y2="309" stroke="#C00000" stroke-width="1" marker-end="url(#ar)"/>
+  
+  <!-- U_REF -->
+  <rect x="170" y="290" width="120" height="58" rx="5" fill="#D4EDDA" stroke="#2E8B57" stroke-width="2"/>
+  <text x="230" y="312" text-anchor="middle" font-size="11" font-weight="bold">U_REF</text>
+  <text x="230" y="326" text-anchor="middle" font-size="9" fill="#666">REF5025AIDGKR</text>
+  <text x="230" y="340" text-anchor="middle" font-size="8" fill="#2E8B57">2.500V, 3µVpp noise</text>
+  <line x1="145" y1="309" x2="168" y2="309" stroke="#C00000" stroke-width="1.5" marker-end="url(#ar)"/>
+  <line x1="120" y1="342" x2="120" y2="309" stroke="#888" stroke-width="1"/>
+  
+  <!-- Note: MSOP-8 not SOT-23-5 -->
+  <rect x="170" y="355" width="120" height="24" rx="3" fill="#FFF3CD" stroke="#B8860B" stroke-width="1"/>
+  <text x="230" y="371" text-anchor="middle" font-size="8" fill="#B8860B">Note: MSOP-8 (spec said SOT-23-5)</text>
+  
+  <!-- C7 (REF output) -->
+  <rect x="315" y="310" width="60" height="32" rx="3" fill="#FFEEBA" stroke="#B8860B" stroke-width="1"/>
+  <text x="345" y="323" text-anchor="middle" font-size="8" font-weight="bold">C7</text>
+  <text x="345" y="335" text-anchor="middle" font-size="7" fill="#666">10µF 0805</text>
+  
+  <!-- C8 (REF HF bypass) -->
+  <rect x="385" y="310" width="65" height="32" rx="3" fill="#FFEEBA" stroke="#B8860B" stroke-width="1"/>
+  <text x="417" y="323" text-anchor="middle" font-size="8" font-weight="bold">C8</text>
+  <text x="417" y="335" text-anchor="middle" font-size="7" fill="#666">100nF C0G</text>
+  
+  <line x1="290" y1="319" x2="313" y2="319" stroke="#2E75B6" stroke-width="1.5" marker-end="url(#ab)"/>
+  
+  <!-- VREF output node -->
+  <rect x="470" y="298" width="65" height="38" rx="5" fill="#DCEEFB" stroke="#2E75B6" stroke-width="2"/>
+  <text x="502" y="322" text-anchor="middle" font-size="13" font-weight="bold" fill="#2E75B6">VREF</text>
+  <line x1="450" y1="319" x2="468" y2="319" stroke="#2E75B6" stroke-width="1.5" marker-end="url(#ab)"/>
+  
+  <text x="545" y="312" font-size="9" fill="#C00000" font-weight="bold">→ to Sheet D (ADC VREF pin)</text>
+  <text x="545" y="325" font-size="9" fill="#C00000">needs global label</text>
+  
+  <!-- ===== ROW 3: VCM PATH ===== -->
+  <text x="30" y="420" font-size="13" font-weight="bold" fill="#1F3864">Bias Path: 3V3A → VCM (1.65V)</text>
+  
+  <!-- 3V3A input -->
+  <rect x="30" y="440" width="55" height="28" rx="4" fill="#F8D7DA" stroke="#C00000" stroke-width="1.5"/>
+  <text x="57" y="458" text-anchor="middle" font-size="10" font-weight="bold" fill="#C00000">3V3A</text>
+  
+  <!-- R1 -->
+  <rect x="110" y="440" width="70" height="38" rx="5" fill="#E8E8E8" stroke="#666" stroke-width="1.5"/>
+  <text x="145" y="456" text-anchor="middle" font-size="10" font-weight="bold">R1</text>
+  <text x="145" y="470" text-anchor="middle" font-size="8" fill="#666">10k 0.1%</text>
+  <line x1="85" y1="454" x2="108" y2="454" stroke="#C00000" stroke-width="1.5" marker-end="url(#ar)"/>
+  
+  <!-- Midpoint -->
+  <circle cx="210" cy="459" r="4" fill="#2E75B6"/>
+  <line x1="180" y1="459" x2="206" y2="459" stroke="#333" stroke-width="1.5"/>
+  <text x="210" y="450" text-anchor="middle" font-size="8" fill="#2E75B6">1.65V</text>
+  
+  <!-- R2 -->
+  <rect x="225" y="440" width="70" height="38" rx="5" fill="#E8E8E8" stroke="#666" stroke-width="1.5"/>
+  <text x="260" y="456" text-anchor="middle" font-size="10" font-weight="bold">R2</text>
+  <text x="260" y="470" text-anchor="middle" font-size="8" fill="#666">10k 0.1%</text>
+  <line x1="214" y1="459" x2="223" y2="459" stroke="#333" stroke-width="1.5"/>
+  
+  <!-- GND -->
+  <text x="305" y="462" font-size="10" font-weight="bold" fill="#333">→ GND</text>
+  <line x1="295" y1="459" x2="303" y2="459" stroke="#333" stroke-width="1.5"/>
+  
+  <!-- Buffer line down to OPA320 -->
+  <line x1="210" y1="463" x2="210" y2="510" stroke="#2E75B6" stroke-width="1.5"/>
+  
+  <!-- U_VCM -->
+  <rect x="170" y="510" width="110" height="55" rx="5" fill="#D4EDDA" stroke="#2E8B57" stroke-width="2"/>
+  <text x="225" y="530" text-anchor="middle" font-size="11" font-weight="bold">U_VCM</text>
+  <text x="225" y="545" text-anchor="middle" font-size="9" fill="#666">OPA320 (buffer)</text>
+  <text x="225" y="558" text-anchor="middle" font-size="8" fill="#2E8B57">7 nV/√Hz, RRIO</text>
+  
+  <!-- Missing caps -->
+  <rect x="170" y="575" width="50" height="32" rx="3" fill="#F8D7DA" stroke="#C00000" stroke-width="2" stroke-dasharray="4,2"/>
+  <text x="195" y="588" text-anchor="middle" font-size="8" font-weight="bold" fill="#C00000">C_BYP</text>
+  <text x="195" y="600" text-anchor="middle" font-size="7" fill="#C00000">✗ MISSING</text>
+  
+  <rect x="230" y="575" width="50" height="32" rx="3" fill="#F8D7DA" stroke="#C00000" stroke-width="2" stroke-dasharray="4,2"/>
+  <text x="255" y="588" text-anchor="middle" font-size="8" font-weight="bold" fill="#C00000">C_OUT</text>
+  <text x="255" y="600" text-anchor="middle" font-size="7" fill="#C00000">✗ MISSING</text>
+  
+  <!-- VCM output node -->
+  <rect x="320" y="520" width="60" height="38" rx="5" fill="#DCEEFB" stroke="#2E75B6" stroke-width="2"/>
+  <text x="350" y="544" text-anchor="middle" font-size="13" font-weight="bold" fill="#2E75B6">VCM</text>
+  <line x1="280" y1="537" x2="318" y2="537" stroke="#2E75B6" stroke-width="1.5" marker-end="url(#ab)"/>
+  
+  <text x="395" y="530" font-size="9" fill="#2E75B6" font-weight="bold">→ to Sheet B (R_BIAS)</text>
+  <text x="395" y="543" font-size="9" fill="#2E75B6" font-weight="bold">→ to Sheet D (FDA VOCM)</text>
+  <text x="395" y="556" font-size="9" fill="#C00000">needs global label</text>
+  
+  <!-- ===== ISSUE SUMMARY BOX ===== -->
+  <rect x="550" y="400" width="620" height="340" rx="8" fill="#FFF" stroke="#1F3864" stroke-width="2"/>
+  <rect x="550" y="400" width="620" height="30" rx="8" fill="#1F3864"/>
+  <text x="860" y="420" text-anchor="middle" font-size="12" font-weight="bold" fill="white">Sheet A Review Summary</text>
+  
+  <text x="570" y="450" font-size="11" font-weight="bold" fill="#2E8B57">✓ Correct (15 items):</text>
+  <text x="570" y="465" font-size="10" fill="#333">All 3 ICs placed with correct MPN (TPS7A2033, REF5025, OPA320)</text>
+  <text x="570" y="479" font-size="10" fill="#333">Input protection chain complete (F1 PTC + D1 BAT54S)</text>
+  <text x="570" y="493" font-size="10" fill="#333">Ferrite bead FB1 for analog/digital split, correct part</text>
+  <text x="570" y="507" font-size="10" fill="#333">8 capacitors with correct MPN decodes and appropriate dielectrics</text>
+  <text x="570" y="521" font-size="10" fill="#333">VCM divider resistors: Vishay 10k 0.1% 50ppm (excellent choice)</text>
+  <text x="570" y="535" font-size="10" fill="#333">C8 is C0G dielectric (KEMET C1206C104J4GACTU) — good for VREF</text>
+  
+  <text x="570" y="560" font-size="11" font-weight="bold" fill="#B8860B">⚠ Review Items (2):</text>
+  <text x="570" y="575" font-size="10" fill="#333">U_REF is MSOP-8 (AIDGKR), spec suggested SOT-23-5 (AIDCKR) — MSOP-8 is fine, just larger</text>
+  <text x="570" y="589" font-size="10" fill="#333">C8 is 1206 package — unusually large for a bypass cap; 0402 or 0805 C0G would save space</text>
+  
+  <text x="570" y="614" font-size="11" font-weight="bold" fill="#C00000">✗ Missing (7 items):</text>
+  <text x="570" y="629" font-size="10" fill="#C00000">1. OPA320 supply bypass cap (100nF at V+ pin)</text>
+  <text x="570" y="643" font-size="10" fill="#C00000">2. VCM output decoupling cap (100nF at OPA320 output)</text>
+  <text x="570" y="657" font-size="10" fill="#C00000">3. R_SHUNT (0Ω for current measurement DFT)</text>
+  <text x="570" y="671" font-size="10" fill="#C00000">4. All wiring (zero wires currently)</text>
+  <text x="570" y="685" font-size="10" fill="#C00000">5. Global labels for 3V3A, 3V3D, VREF, VCM (local only right now)</text>
+  <text x="570" y="699" font-size="10" fill="#C00000">6. PWR_FLAG symbols (KiCad ERC requires these on power nets)</text>
+  <text x="570" y="713" font-size="10" fill="#C00000">7. Test points (TP_5V, TP_3V3A, TP_VREF, TP_VCM, TP_GND)</text>
+</svg>

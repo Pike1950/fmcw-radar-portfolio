@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Rev B Schematic Review — Corrected</title>
+<style>
+  :root {
+    --bg: #0d1117; --bg2: #161b22; --border: #30363d;
+    --text: #e6edf3; --dim: #8b949e; --blue: #58a6ff; --green: #3fb950;
+    --red: #f85149; --yellow: #d29922; --purple: #bc8cff; --orange: #f0883e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font: 15px/1.65 'IBM Plex Mono', 'Fira Code', monospace; max-width: 1000px; margin: 0 auto; padding: 2rem; }
+  h1 { font-size: 1.6rem; color: var(--blue); margin-bottom: 0.3rem; }
+  h2 { font-size: 1.2rem; color: var(--green); margin: 2rem 0 0.8rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+  h3 { font-size: 1rem; color: var(--yellow); margin: 1.2rem 0 0.5rem; }
+  p, li { margin-bottom: 0.5rem; }
+  code { background: var(--bg2); padding: 1px 5px; border-radius: 3px; font-size: 0.9em; color: var(--purple); }
+  .err { background: rgba(248,81,73,0.12); border-left: 4px solid var(--red); padding: 0.8rem 1rem; margin: 0.8rem 0; border-radius: 0 6px 6px 0; }
+  .warn { background: rgba(210,153,34,0.1); border-left: 4px solid var(--yellow); padding: 0.8rem 1rem; margin: 0.8rem 0; border-radius: 0 6px 6px 0; }
+  .ok { background: rgba(63,185,80,0.08); border-left: 4px solid var(--green); padding: 0.8rem 1rem; margin: 0.8rem 0; border-radius: 0 6px 6px 0; }
+  .info { background: rgba(88,166,255,0.08); border-left: 4px solid var(--blue); padding: 0.8rem 1rem; margin: 0.8rem 0; border-radius: 0 6px 6px 0; }
+  .retract { background: rgba(188,140,255,0.08); border-left: 4px solid var(--purple); padding: 0.8rem 1rem; margin: 0.8rem 0; border-radius: 0 6px 6px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 0.8rem 0; font-size: 0.85rem; }
+  th, td { border: 1px solid var(--border); padding: 5px 8px; text-align: left; }
+  th { background: var(--bg2); color: var(--blue); }
+  .subtitle { color: var(--dim); font-size: 0.9rem; margin-bottom: 1.5rem; }
+  ol, ul { padding-left: 1.5rem; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; margin: 1rem 0; }
+  .stat { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 0.8rem; text-align: center; }
+  .stat-num { font-size: 1.5rem; font-weight: 700; }
+  .stat-label { font-size: 0.75rem; color: var(--dim); }
+</style>
+</head>
+<body>
+
+<h1>Rev B Schematic Review — Corrected</h1>
+<p class="subtitle">Revised after re-examining actual schematic files &bull; February 17, 2026</p>
+
+<div class="stats">
+  <div class="stat"><div class="stat-num" style="color:var(--red)">4</div><div class="stat-label">ERC ERRORS</div></div>
+  <div class="stat"><div class="stat-num" style="color:var(--yellow)">3</div><div class="stat-label">ERC WARNINGS<br>(non-footprint)</div></div>
+  <div class="stat"><div class="stat-num" style="color:var(--green)">60</div><div class="stat-label">COMPONENTS</div></div>
+  <div class="stat"><div class="stat-num" style="color:var(--purple)">3</div><div class="stat-label">PREVIOUS FALSE FLAGS</div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>0. Corrections to My Previous Review</h2>
+
+<p>My prior review had three false positives. Here's the record straight:</p>
+
+<div class="retract">
+<strong>RETRACTED — Previous #3 (LTC6242 unused sections C/D):</strong> I flagged this as an error, but the LTC6242 is a quad op-amp where you're using sections A and B for the two filter stages, and sections C and D appear to be properly handled. I should not have flagged this without verifying the actual pin connections in your schematic. My parser missed the data because of KiCad 9's multi-line wire format. Apologies for the noise.
+</div>
+
+<div class="retract">
+<strong>RETRACTED — Previous #4 (ADS8881 DIN unconnected):</strong> You are correct. U_ADC1 Pin 9 (DIN) is connected via the net label <code>SPI_SDI</code> on Sheet D, which connects through to J_SPI1 via a hierarchical label. There is no problem with using both a net label and a hierarchical label of the same name on the same sheet — KiCad treats them as the same net. My parser failed to trace this connectivity. The DIN pin is correctly wired.
+</div>
+
+<div class="retract">
+<strong>RETRACTED — Previous #5 (THS4531A PD unconnected):</strong> You are correct. U_FDA1 Pin 7 (~{PD}) is connected to a <code>3V3A</code> passive hierarchical label, which ties it high for always-on operation. This is exactly the correct connection. My parser missed this wire because it didn't handle KiCad 9's multi-line wire syntax.
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>1. Answering: Why GND and not GNDD with a Ferrite Bead?</h2>
+
+<div class="info">
+<p>This is a great question and the answer is central to mixed-signal PCB design.</p>
+
+<p>The ferrite bead splits the <strong>supply rail</strong> (3V3A vs 3V3D) — not the ground. The ground plane stays unified as a single, unbroken copper pour on L2. This is the correct topology for SAR ADC designs, and it's what TI recommends in the ADS8881 datasheet and application notes.</p>
+
+<p><strong>Why split the supply but not the ground?</strong></p>
+
+<p>Digital switching noise on the supply rail is conducted — the MCU draws current pulses from 3V3 every clock edge, and those pulses create voltage ripple. The ferrite bead's 220Ω impedance at 100MHz blocks this conducted noise from reaching the analog supply. That's its entire job.</p>
+
+<p>Ground is different. Ground noise is dominated by return currents flowing through the ground plane. If you split the ground into GNDA and GNDD, you force return currents to flow through whatever narrow bridge connects them, creating a shared impedance that actually <em>couples</em> more noise than a solid plane. A single, solid L2 ground plane gives every return current the lowest-impedance path back to its source, which minimizes ground bounce.</p>
+
+<p>The rule: <strong>one ground, split supplies</strong>. The ferrite bead isolates 3V3A from 3V3D. Both supplies return to the same GND plane. The layout enforces separation — analog components sit over one region of the ground plane, digital components over another, and you control the return current paths by where you place the components and route the traces, not by cutting the ground.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>2. Actual ERC Errors (4 errors from your report)</h2>
+
+<h3>Error 1: <code>[hier_label_mismatch]</code> — Sheet B missing 3V3A hierarchical label</h3>
+
+<div class="err">
+<p><strong>Root sheet</strong> at (78.74, 45.72): The Sheet B symbol (Baseband_IF_Input_Protection_Bias) has a <code>3V3A</code> pin defined on it in the root schematic, but inside Sheet B itself, there is no matching <code>3V3A</code> hierarchical label.</p>
+
+<p>Sheet B currently has only two hierarchical labels: <code>VCM</code> (input) and <code>IF_BIASED</code> (output). The 3V3A pin on the root sheet symbol expects a matching hierarchical label inside Sheet B.</p>
+
+<p><strong>Fix:</strong> Sheet B doesn't actually use 3V3A directly (R_BIAS connects to VCM, not to a supply), so you have two options:</p>
+<ol>
+<li><strong>Remove the 3V3A pin</strong> from Sheet B's symbol on the root schematic (right-click the sheet symbol → Properties → delete the 3V3A pin). This is the cleaner option if Sheet B truly doesn't need the supply rail.</li>
+<li><strong>Add a matching <code>3V3A</code> hierarchical label</strong> inside Sheet B. You'd only do this if Sheet B needs 3V3A for something (e.g., if you later add a bypass cap or pull-up on Sheet B).</li>
+</ol>
+</div>
+
+<h3>Error 2: <code>[power_pin_not_driven]</code> — GND at ST1 area needs PWR_FLAG</h3>
+
+<div class="err">
+<p><strong>Sheet A</strong> at (39.37, 33.02): A <code>power:GND</code> symbol exists here (near the Phoenix terminal ST1) but KiCad sees no power source driving the GND net. This is a common KiCad quirk — the screw terminal connector's pins are likely typed as "passive" in the symbol, so KiCad doesn't recognize that external power enters through them.</p>
+
+<p><strong>Fix:</strong> Place a <code>power:PWR_FLAG</code> symbol on the GND net, right at the ST1 ground pin. Also place one on the 5V input net at ST1 if you get a similar warning there. PWR_FLAG tells KiCad "yes, this net is intentionally powered from an external source." It doesn't affect the netlist or layout — it's purely an ERC annotation.</p>
+</div>
+
+<h3>Error 3: <code>[pin_not_connected]</code> — BAT54S D1 Pin 1 (Anode)</h3>
+
+<div class="err">
+<p><strong>Sheet A</strong> at (80.01, 30.48): The BAT54S Pin 1 is flagged as unconnected. The BAT54S in SOT-23 has three pins. Depending on the SamacSys symbol's pin mapping, Pin 1 might be the common anode or one of the cathodes.</p>
+
+<p><strong>Fix:</strong> Check the symbol's pin assignments against the BAT54S datasheet. In the standard SOT-23 package: Pin 1 = Common Anode, Pin 2 = Cathode 1 (for one diode), Pin 3 = Cathode 2 (for the other diode). For reverse polarity protection, the common anode typically connects to GND and one cathode connects in series with the input. If Pin 1 is the anode and it's truly floating, wire it appropriately. If the SamacSys symbol has a different pin mapping, verify which pin is actually unconnected and whether the protection circuit is complete.</p>
+</div>
+
+<h3>Error 4: <code>[pin_not_connected]</code> — REF5025 U_REF1 Pin 5 (TRIM/NR)</h3>
+
+<div class="err">
+<p><strong>Sheet A</strong> at (138.43, 73.66): The REF5025's TRIM/NR pin is unconnected. The datasheet says this pin can be left floating for default 2.500V output, or connected to an external capacitor for noise reduction.</p>
+
+<p><strong>Fix:</strong> Two options:</p>
+<ol>
+<li><strong>Add a no-connect marker (X)</strong> on Pin 5 if you want the default 2.500V output with no external noise filter. This tells ERC the pin is intentionally unconnected.</li>
+<li><strong>Add a noise reduction capacitor</strong> (the datasheet recommends 1–10 µF for the NR function) between TRIM/NR and GND. This filters the internal bandgap reference noise and can reduce output noise by ~60%. Given that this is a precision ADC application, you may want this — but verify the REF5025 datasheet's NR pin specifications for recommended cap values and settling time impact.</li>
+</ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>3. ERC Warnings (non-footprint)</h2>
+
+<h3>Warning 1: Two unconnected wire endpoints on Sheet D (AINP/AINN stubs)</h3>
+
+<div class="warn">
+<p><strong>Sheet D</strong> at (181.61, 82.55) and (181.61, 85.09): Two short wire stubs extend from the ADC's AINP and AINN pin area outward to x=181.61, but nothing connects at those endpoints — no net label, no junction, no other wire.</p>
+
+<p>The AINP and AINN signals are already connected via net labels elsewhere on the sheet (AINP label at (137.16, 82.55) near R_OUTP, and at (88.9, 66.04) near the FDA; AINN label at (137.16, 85.09) near R_OUTN and at (129.54, 66.04) near R_F2). So the connectivity is complete through the net labels — these stubs are just dangling wire ends that ERC flags as suspicious.</p>
+
+<p><strong>Fix:</strong> Either delete the two short wire stubs (select each wire from 179.07 to 181.61 and delete it), or add <code>AINP</code> and <code>AINN</code> net labels at the stub endpoints. Deleting is cleaner since the connections already exist through labels elsewhere.</p>
+</div>
+
+<h3>Warning 2: VOCM / VCM net name conflict on Sheet D</h3>
+
+<div class="warn">
+<p><strong>Sheet D</strong>: The hierarchical label <code>VCM</code> at (60.96, 76.2) and the net label <code>VOCM</code> at (68.58, 76.2) are on the same wire. KiCad warns that when two different names are on the same net, it picks one — in this case, <code>VOCM</code> wins and will be the net name in the netlist.</p>
+
+<p>This is functionally correct — the VCM signal from Sheet A reaches the FDA's VOCM pin as intended. But the warning means that in your netlist and PCB layout, this net will appear as "VOCM" rather than "VCM". Any other sheets referencing VCM through the hierarchy will see a different net name than what appears locally on Sheet D.</p>
+
+<p><strong>Fix (optional):</strong> If you want a clean ERC, remove the <code>VOCM</code> net labels on Sheet D and just let the hierarchical label <code>VCM</code> name the net. The FDA's VOCM pin connects to whatever net the wire carries — the net label doesn't need to match the pin name. Alternatively, if you prefer the local clarity of seeing "VOCM" near the FDA, you can leave it and accept the warning. It won't cause any electrical problem.</p>
+</div>
+
+<h3>Warning 3: 58 footprint_link_issues</h3>
+
+<div class="warn">
+<p>Every SamacSys component shows <code>The current configuration does not include the footprint library ''</code>. This means the SamacSys footprint library isn't configured in your project's library tables.</p>
+
+<p><strong>Fix:</strong> In KiCad, go to <strong>Preferences → Manage Footprint Libraries</strong>. Add the SamacSys library path (wherever you installed it — typically something like <code>~/SamacSys_PCB_Library/KiCad/SamacSys.pretty</code> or wherever the .pretty folder is). Once the library is in the table, re-run ERC and all 58 warnings should disappear. You'll also need this library configured before you can assign footprints and move to PCB layout.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>4. Summary of Verified-Correct Items</h2>
+
+<div class="ok">
+<strong>Sheet A:</strong> GNDD replaced with GND (confirmed — 0 GNDD references remain). 12 GND symbols, all using <code>power:GND</code>. All 20 components present and annotated.
+</div>
+
+<div class="ok">
+<strong>Sheet B:</strong> Clean — 0 ERC errors on this sheet itself. 5 components, VCM and IF_BIASED hierarchical labels correct.
+</div>
+
+<div class="ok">
+<strong>Sheet C:</strong> Clean — 0 ERC errors. C18 (LTC6242 V− bypass) now present. 15 components total. All filter, PGA, and bypass components in place.
+</div>
+
+<div class="ok">
+<strong>Sheet D:</strong> 20 components. THS4531A PD pin connected to 3V3A. ADS8881 DIN pin connected via SPI_SDI. FDA feedback network (R_F1, R_F2, R_G, R_GND all 1kΩ 0.1%), output RC (33Ω + 470pF), VREF decoupling (10µF + 100nF), AVDD/DVDD decoupling, J_SPI connector — all present and correctly wired.
+</div>
+
+<div class="ok">
+<strong>Root:</strong> All four sheet symbols have correct pins with matching directions. Inter-sheet signals (VCM, VREF, IF_BIASED, LPF_OUT, SPI_SCLK, SPI_SDI, CS_PGA) all have proper source/sink labels. 3V3A and 3V3D use passive direction consistently (except the Sheet B mismatch noted above).
+</div>
+
+<div class="ok">
+<strong>Hierarchical label directions:</strong> Fixed from prior session. All 3V3A labels on Sheet D now use <code>passive</code> consistently.
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<h2>5. Fix Checklist (sorted by priority)</h2>
+
+<table>
+<tr><th>#</th><th>Sheet</th><th>Type</th><th>Fix</th><th>Effort</th></tr>
+<tr><td>1</td><td>Root/B</td><td style="color:var(--red)">Error</td><td>Remove 3V3A pin from Sheet B's symbol on root (or add matching hier label inside Sheet B)</td><td>30 sec</td></tr>
+<tr><td>2</td><td>A</td><td style="color:var(--red)">Error</td><td>Add <code>power:PWR_FLAG</code> on GND net near ST1</td><td>30 sec</td></tr>
+<tr><td>3</td><td>A</td><td style="color:var(--red)">Error</td><td>Fix BAT54S D1 Pin 1 — verify pin mapping and connect or add no-connect</td><td>2 min</td></tr>
+<tr><td>4</td><td>A</td><td style="color:var(--red)">Error</td><td>Add no-connect marker on REF5025 TRIM/NR (Pin 5), or add NR capacitor</td><td>30 sec</td></tr>
+<tr><td>5</td><td>D</td><td style="color:var(--yellow)">Warning</td><td>Delete two dangling wire stubs at (181.61, 82.55) and (181.61, 85.09)</td><td>30 sec</td></tr>
+<tr><td>6</td><td>D</td><td style="color:var(--yellow)">Warning</td><td>Remove VOCM net labels to eliminate name conflict (optional, cosmetic)</td><td>1 min</td></tr>
+<tr><td>7</td><td>All</td><td style="color:var(--yellow)">Warning</td><td>Configure SamacSys footprint library in Preferences → Manage Footprint Libraries</td><td>2 min</td></tr>
+</table>
+
+<p style="margin-top:2rem; font-size:0.8rem; color:var(--dim); text-align:center; border-top:1px solid var(--border); padding-top:1rem;">
+  FMCW Radar Baseband Rev B — Corrected Schematic Review — February 17, 2026
+</p>
+
+</body>
+</html>

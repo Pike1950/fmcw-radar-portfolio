@@ -1,0 +1,277 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="8" markerHeight="5" orient="auto-start-auto">
+      <path d="M 0 0 L 10 3 L 0 6 z" fill="#333"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="8" markerHeight="5" orient="auto-start-auto">
+      <path d="M 0 0 L 10 3 L 0 6 z" fill="#2E75B6"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="8" markerHeight="5" orient="auto-start-auto">
+      <path d="M 0 0 L 10 3 L 0 6 z" fill="#C00000"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="8" markerHeight="5" orient="auto-start-auto">
+      <path d="M 0 0 L 10 3 L 0 6 z" fill="#2E8B57"/>
+    </marker>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="2" dy="2" stdDeviation="2" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+  
+  <!-- Title -->
+  <text x="700" y="35" text-anchor="middle" font-size="22" font-weight="bold" fill="#1F3864">FMCW Radar Baseband Rev B — Inter-Sheet Connection Map</text>
+  <text x="700" y="55" text-anchor="middle" font-size="13" fill="#666">Hierarchical labels (bold) connect sheets. Power rails (red) distribute from Sheet A. Signal path (blue) flows left to right.</text>
+
+  <!-- ============ SHEET A: POWER ============ -->
+  <rect x="30" y="80" width="400" height="340" rx="8" fill="#F8F9FA" stroke="#1F3864" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="30" y="80" width="400" height="32" rx="8" fill="#1F3864"/>
+  <text x="230" y="101" text-anchor="middle" font-size="14" font-weight="bold" fill="white">Sheet A: Power + References</text>
+  
+  <!-- ST1 + F1 + D1 -->
+  <rect x="50" y="128" width="90" height="36" rx="4" fill="#FFF3CD" stroke="#B8860B" stroke-width="1.5"/>
+  <text x="95" y="142" text-anchor="middle" font-size="10" font-weight="bold" fill="#333">5V IN</text>
+  <text x="95" y="155" text-anchor="middle" font-size="8" fill="#666">ST1 → F1 → D1</text>
+  
+  <!-- LDO -->
+  <rect x="165" y="128" width="90" height="36" rx="4" fill="#D4EDDA" stroke="#2E8B57" stroke-width="1.5"/>
+  <text x="210" y="142" text-anchor="middle" font-size="10" font-weight="bold" fill="#333">TPS7A2033</text>
+  <text x="210" y="155" text-anchor="middle" font-size="8" fill="#666">3.3V LDO</text>
+  
+  <!-- Arrow 5V to LDO -->
+  <line x1="140" y1="146" x2="163" y2="146" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  
+  <!-- 3V3A output -->
+  <rect x="280" y="128" width="60" height="36" rx="4" fill="#F8D7DA" stroke="#C00000" stroke-width="1.5"/>
+  <text x="310" y="150" text-anchor="middle" font-size="11" font-weight="bold" fill="#C00000">3V3A</text>
+  
+  <line x1="255" y1="146" x2="278" y2="146" stroke="#C00000" stroke-width="1.5" marker-end="url(#arrow-red)"/>
+  
+  <!-- Ferrite -->
+  <rect x="280" y="180" width="60" height="30" rx="4" fill="#E8E8E8" stroke="#666" stroke-width="1"/>
+  <text x="310" y="199" text-anchor="middle" font-size="9" fill="#333">FB1</text>
+  
+  <line x1="310" y1="164" x2="310" y2="178" stroke="#C00000" stroke-width="1" marker-end="url(#arrow-red)"/>
+  
+  <!-- 3V3D output -->
+  <rect x="355" y="180" width="60" height="30" rx="4" fill="#FFE0E0" stroke="#C00000" stroke-width="1.5"/>
+  <text x="385" y="199" text-anchor="middle" font-size="10" font-weight="bold" fill="#C00000">3V3D</text>
+  
+  <line x1="340" y1="195" x2="353" y2="195" stroke="#C00000" stroke-width="1" marker-end="url(#arrow-red)"/>
+  
+  <!-- REF5025 -->
+  <rect x="50" y="235" width="110" height="36" rx="4" fill="#D4EDDA" stroke="#2E8B57" stroke-width="1.5"/>
+  <text x="105" y="249" text-anchor="middle" font-size="10" font-weight="bold" fill="#333">REF5025</text>
+  <text x="105" y="262" text-anchor="middle" font-size="8" fill="#666">2.500V precision</text>
+  
+  <!-- VREF output -->
+  <rect x="185" y="235" width="60" height="36" rx="4" fill="#DCEEFB" stroke="#2E75B6" stroke-width="1.5"/>
+  <text x="215" y="257" text-anchor="middle" font-size="11" font-weight="bold" fill="#2E75B6">VREF</text>
+  
+  <line x1="160" y1="253" x2="183" y2="253" stroke="#2E75B6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  
+  <!-- 3V3A feeds REF -->
+  <line x1="280" y1="155" x2="270" y2="155" stroke="#C00000" stroke-width="1" stroke-dasharray="4,2"/>
+  <line x1="270" y1="155" x2="270" y2="225" stroke="#C00000" stroke-width="1" stroke-dasharray="4,2"/>
+  <line x1="270" y1="225" x2="53" y2="225" stroke="#C00000" stroke-width="1" stroke-dasharray="4,2"/>
+  <line x1="53" y1="225" x2="53" y2="233" stroke="#C00000" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#arrow-red)"/>
+  
+  <!-- VCM divider + buffer -->
+  <rect x="50" y="295" width="110" height="36" rx="4" fill="#D4EDDA" stroke="#2E8B57" stroke-width="1.5"/>
+  <text x="105" y="309" text-anchor="middle" font-size="10" font-weight="bold" fill="#333">R1/R2 + OPA320</text>
+  <text x="105" y="322" text-anchor="middle" font-size="8" fill="#666">3V3A/2 = 1.65V</text>
+  
+  <!-- VCM output -->
+  <rect x="185" y="295" width="60" height="36" rx="4" fill="#DCEEFB" stroke="#2E75B6" stroke-width="1.5"/>
+  <text x="215" y="317" text-anchor="middle" font-size="11" font-weight="bold" fill="#2E75B6">VCM</text>
+  
+  <line x1="160" y1="313" x2="183" y2="313" stroke="#2E75B6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  
+  <!-- Caps legend -->
+  <text x="280" y="250" font-size="8" fill="#888">C1-C8: bypass/decouple</text>
+  <text x="280" y="262" font-size="8" fill="#888">R1,R2: 10k 0.1% divider</text>
+  <text x="280" y="274" font-size="8" fill="#888">R_SHUNT: 0Ω (DFT)</text>
+
+  <!-- ============ SHEET B: INPUT ============ -->
+  <rect x="30" y="460" width="310" height="200" rx="8" fill="#F8F9FA" stroke="#1F3864" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="30" y="460" width="310" height="32" rx="8" fill="#1F3864"/>
+  <text x="185" y="481" text-anchor="middle" font-size="14" font-weight="bold" fill="white">Sheet B: IF Input + Protection + Bias</text>
+  
+  <!-- SMA -->
+  <rect x="50" y="510" width="55" height="36" rx="4" fill="#FFF3CD" stroke="#B8860B" stroke-width="1.5"/>
+  <text x="77" y="524" text-anchor="middle" font-size="10" font-weight="bold" fill="#333">J_IF</text>
+  <text x="77" y="537" text-anchor="middle" font-size="8" fill="#666">SMA</text>
+  
+  <!-- Protection -->
+  <rect x="120" y="510" width="75" height="36" rx="4" fill="#E8E8E8" stroke="#666" stroke-width="1"/>
+  <text x="157" y="524" text-anchor="middle" font-size="9" font-weight="bold" fill="#333">R_IN + D_ESD</text>
+  <text x="157" y="537" text-anchor="middle" font-size="8" fill="#666">200Ω + TVS</text>
+  
+  <line x1="105" y1="528" x2="118" y2="528" stroke="#2E75B6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  
+  <!-- AC couple + bias -->
+  <rect x="210" y="510" width="75" height="36" rx="4" fill="#E8E8E8" stroke="#666" stroke-width="1"/>
+  <text x="247" y="524" text-anchor="middle" font-size="9" font-weight="bold" fill="#333">C_AC + R_BIAS</text>
+  <text x="247" y="537" text-anchor="middle" font-size="8" fill="#666">100nF + 47k</text>
+  
+  <line x1="195" y1="528" x2="208" y2="528" stroke="#2E75B6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  
+  <!-- VCM input from Sheet A -->
+  <line x1="247" y1="548" x2="247" y2="575" stroke="#2E75B6" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="250" y="570" font-size="9" font-weight="bold" fill="#2E75B6">← VCM (from Sheet A)</text>
+  
+  <!-- Output label -->
+  <rect x="295" y="515" width="36" height="26" rx="3" fill="#DCEEFB" stroke="#2E75B6" stroke-width="1"/>
+  <text x="313" y="532" text-anchor="middle" font-size="8" font-weight="bold" fill="#2E75B6">IF_IN</text>
+  <line x1="285" y1="528" x2="293" y2="528" stroke="#2E75B6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <!-- ============ SHEET C: PGA + FILTER ============ -->
+  <rect x="370" y="460" width="410" height="200" rx="8" fill="#F8F9FA" stroke="#1F3864" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="370" y="460" width="410" height="32" rx="8" fill="#1F3864"/>
+  <text x="575" y="481" text-anchor="middle" font-size="14" font-weight="bold" fill="white">Sheet C: PGA + Anti-Alias Filter</text>
+  
+  <!-- PGA113 -->
+  <rect x="395" y="510" width="90" height="42" rx="4" fill="#D4EDDA" stroke="#2E8B57" stroke-width="1.5"/>
+  <text x="440" y="527" text-anchor="middle" font-size="10" font-weight="bold" fill="#333">PGA113</text>
+  <text x="440" y="540" text-anchor="middle" font-size="8" fill="#666">1–200× (SPI)</text>
+  
+  <!-- Filter stage 1 -->
+  <rect x="505" y="510" width="85" height="42" rx="4" fill="#E8E8E8" stroke="#666" stroke-width="1"/>
+  <text x="547" y="527" text-anchor="middle" font-size="9" font-weight="bold" fill="#333">SK Stage 1</text>
+  <text x="547" y="540" text-anchor="middle" font-size="8" fill="#666">15 kHz, Q=1.31</text>
+  
+  <line x1="485" y1="531" x2="503" y2="531" stroke="#2E75B6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  
+  <!-- Filter stage 2 -->
+  <rect x="610" y="510" width="85" height="42" rx="4" fill="#E8E8E8" stroke="#666" stroke-width="1"/>
+  <text x="652" y="527" text-anchor="middle" font-size="9" font-weight="bold" fill="#333">SK Stage 2</text>
+  <text x="652" y="540" text-anchor="middle" font-size="8" fill="#666">15 kHz, Q=0.54</text>
+  
+  <line x1="590" y1="531" x2="608" y2="531" stroke="#2E75B6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  
+  <!-- Filter op-amp label -->
+  <text x="547" y="565" text-anchor="middle" font-size="9" fill="#888">LTC6242 (quad)</text>
+  
+  <!-- Output -->
+  <rect x="710" y="515" width="52" height="26" rx="3" fill="#DCEEFB" stroke="#2E75B6" stroke-width="1"/>
+  <text x="736" y="532" text-anchor="middle" font-size="8" font-weight="bold" fill="#2E75B6">LPF_OUT</text>
+  <line x1="695" y1="531" x2="708" y2="531" stroke="#2E75B6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  
+  <!-- SPI from Sheet D -->
+  <text x="420" y="580" font-size="9" font-weight="bold" fill="#2E8B57">CS_PGA, SCLK, SDI ← (from MCU / Sheet D)</text>
+  <line x1="440" y1="554" x2="440" y2="570" stroke="#2E8B57" stroke-width="1" stroke-dasharray="3,2"/>
+  
+  <!-- Power from Sheet A -->
+  <text x="395" y="640" font-size="9" fill="#C00000">3V3A (from Sheet A) — powers PGA + LTC6242</text>
+  <text x="395" y="652" font-size="9" fill="#2E75B6">VCM (from Sheet A) — biases filter stages at 1.65V</text>
+
+  <!-- ============ SHEET D: FDA + ADC ============ -->
+  <rect x="810" y="460" width="560" height="200" rx="8" fill="#F8F9FA" stroke="#1F3864" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="810" y="460" width="560" height="32" rx="8" fill="#1F3864"/>
+  <text x="1090" y="481" text-anchor="middle" font-size="14" font-weight="bold" fill="white">Sheet D: FDA Driver + ADC + SPI Interface</text>
+  
+  <!-- FDA -->
+  <rect x="835" y="510" width="100" height="42" rx="4" fill="#D4EDDA" stroke="#2E8B57" stroke-width="1.5"/>
+  <text x="885" y="527" text-anchor="middle" font-size="10" font-weight="bold" fill="#333">THS4531A</text>
+  <text x="885" y="540" text-anchor="middle" font-size="8" fill="#666">SE→Diff, G=1</text>
+  
+  <!-- Output RC -->
+  <rect x="955" y="510" width="75" height="42" rx="4" fill="#E8E8E8" stroke="#666" stroke-width="1"/>
+  <text x="992" y="527" text-anchor="middle" font-size="9" font-weight="bold" fill="#333">RC Filter</text>
+  <text x="992" y="540" text-anchor="middle" font-size="8" fill="#666">33Ω + 470pF</text>
+  
+  <line x1="935" y1="531" x2="953" y2="531" stroke="#2E75B6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  
+  <!-- ADC -->
+  <rect x="1050" y="505" width="100" height="52" rx="4" fill="#D4EDDA" stroke="#2E8B57" stroke-width="1.5"/>
+  <text x="1100" y="524" text-anchor="middle" font-size="10" font-weight="bold" fill="#333">ADS8881</text>
+  <text x="1100" y="537" text-anchor="middle" font-size="8" fill="#666">18-bit SAR</text>
+  <text x="1100" y="549" text-anchor="middle" font-size="8" fill="#666">100 kS/s</text>
+  
+  <line x1="1030" y1="531" x2="1048" y2="531" stroke="#2E75B6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  
+  <!-- AINP/AINM labels -->
+  <text x="1042" y="522" font-size="7" fill="#2E75B6">AINP</text>
+  <text x="1042" y="544" font-size="7" fill="#2E75B6">AINM</text>
+  
+  <!-- MCU header -->
+  <rect x="1190" y="505" width="80" height="52" rx="4" fill="#FFF3CD" stroke="#B8860B" stroke-width="1.5"/>
+  <text x="1230" y="524" text-anchor="middle" font-size="10" font-weight="bold" fill="#333">J_SPI</text>
+  <text x="1230" y="537" text-anchor="middle" font-size="8" fill="#666">→ MCU</text>
+  <text x="1230" y="549" text-anchor="middle" font-size="8" fill="#666">2×5 header</text>
+  
+  <line x1="1150" y1="531" x2="1188" y2="531" stroke="#2E8B57" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+  <text x="1160" y="524" font-size="7" fill="#2E8B57">SDO</text>
+  
+  <!-- VOCM from Sheet A -->
+  <text x="870" y="570" font-size="9" font-weight="bold" fill="#2E75B6">VOCM ← VCM (from Sheet A, 1.65V)</text>
+  <line x1="885" y1="554" x2="885" y2="562" stroke="#2E75B6" stroke-width="1" stroke-dasharray="3,2"/>
+  
+  <!-- VREF from Sheet A -->
+  <text x="1065" y="580" font-size="9" font-weight="bold" fill="#2E75B6">VREF ← (from Sheet A, 2.5V)</text>
+  <line x1="1100" y1="559" x2="1100" y2="572" stroke="#2E75B6" stroke-width="1" stroke-dasharray="3,2"/>
+  
+  <!-- Power labels -->
+  <text x="835" y="645" font-size="9" fill="#C00000">3V3A (from Sheet A) — powers FDA + ADC</text>
+  <text x="835" y="657" font-size="9" fill="#2E8B57">SPI signals: CONVST, SCLK, SDO, CS_ADC, CS_PGA</text>
+
+  <!-- ============ INTER-SHEET SIGNAL CONNECTIONS ============ -->
+  
+  <!-- Sheet B output -> Sheet C input (IF_IN) -->
+  <line x1="331" y1="528" x2="393" y2="531" stroke="#2E75B6" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <text x="356" y="520" font-size="9" font-weight="bold" fill="#2E75B6">IF_IN</text>
+  
+  <!-- Sheet C output -> Sheet D input (LPF_OUT) -->
+  <line x1="762" y1="528" x2="833" y2="531" stroke="#2E75B6" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <text x="790" y="520" font-size="9" font-weight="bold" fill="#2E75B6">LPF_OUT</text>
+  
+  <!-- Power distribution arrows from Sheet A -->
+  <!-- 3V3A to Sheet B -->
+  <path d="M 310 420 L 310 440 L 185 440 L 185 458" stroke="#C00000" stroke-width="1.5" fill="none" stroke-dasharray="6,3" marker-end="url(#arrow-red)"/>
+  <text x="200" y="438" font-size="8" fill="#C00000">3V3A</text>
+  
+  <!-- 3V3A to Sheet C -->
+  <path d="M 310 420 L 310 440 L 575 440 L 575 458" stroke="#C00000" stroke-width="1.5" fill="none" stroke-dasharray="6,3" marker-end="url(#arrow-red)"/>
+  <text x="450" y="438" font-size="8" fill="#C00000">3V3A</text>
+  
+  <!-- 3V3A to Sheet D -->
+  <path d="M 310 420 L 310 440 L 1090 440 L 1090 458" stroke="#C00000" stroke-width="1.5" fill="none" stroke-dasharray="6,3" marker-end="url(#arrow-red)"/>
+  <text x="900" y="438" font-size="8" fill="#C00000">3V3A</text>
+  
+  <!-- VCM to Sheet B -->
+  <path d="M 215 331 L 215 380 L 60 380 L 60 458" stroke="#2E75B6" stroke-width="1.2" fill="none" stroke-dasharray="4,2" marker-end="url(#arrow-blue)"/>
+  <text x="70" y="390" font-size="8" fill="#2E75B6">VCM</text>
+  
+  <!-- VCM to Sheet D (FDA VOCM) -->
+  <path d="M 245 313 L 260 313 L 260 380 L 855 380 L 855 458" stroke="#2E75B6" stroke-width="1.2" fill="none" stroke-dasharray="4,2" marker-end="url(#arrow-blue)"/>
+  
+  <!-- VREF to Sheet D (ADC) -->
+  <path d="M 245 253 L 260 253 L 260 370 L 1120 370 L 1120 458" stroke="#2E75B6" stroke-width="1.2" fill="none" stroke-dasharray="4,2" marker-end="url(#arrow-blue)"/>
+  <text x="680" y="368" font-size="8" fill="#2E75B6">VREF (2.5V)</text>
+  
+  <!-- 3V3D to Sheet D (MCU header) -->
+  <path d="M 385 210 L 400 210 L 400 390 L 1230 390 L 1230 458" stroke="#C00000" stroke-width="1" fill="none" stroke-dasharray="4,2" marker-end="url(#arrow-red)"/>
+  <text x="800" y="398" font-size="8" fill="#C00000">3V3D (to MCU/SPI pull-ups)</text>
+
+  <!-- ============ LEGEND ============ -->
+  <rect x="30" y="700" width="1340" height="170" rx="8" fill="#FAFAFA" stroke="#CCC" stroke-width="1"/>
+  <text x="700" y="722" text-anchor="middle" font-size="14" font-weight="bold" fill="#1F3864">Connection Legend &amp; Hierarchical Labels Required</text>
+  
+  <!-- Color legend -->
+  <line x1="60" y1="745" x2="100" y2="745" stroke="#C00000" stroke-width="2" stroke-dasharray="6,3"/>
+  <text x="110" y="749" font-size="11" fill="#333">Power rails (3V3A, 3V3D) — global labels from Sheet A</text>
+  
+  <line x1="60" y1="768" x2="100" y2="768" stroke="#2E75B6" stroke-width="2" stroke-dasharray="4,2"/>
+  <text x="110" y="772" font-size="11" fill="#333">Reference/bias (VREF, VCM) — global labels from Sheet A</text>
+  
+  <line x1="60" y1="791" x2="100" y2="791" stroke="#2E75B6" stroke-width="2"/>
+  <text x="110" y="795" font-size="11" fill="#333">Analog signal path (IF_IN → PGA_OUT → LPF_OUT → AINP/AINM) — hierarchical labels between sheets</text>
+  
+  <line x1="60" y1="814" x2="100" y2="814" stroke="#2E8B57" stroke-width="2"/>
+  <text x="110" y="818" font-size="11" fill="#333">Digital/SPI (SCLK, SDO, CS_ADC, CS_PGA, CONVST) — global labels, active on Sheets C and D</text>
+  
+  <!-- Required hierarchical labels list -->
+  <text x="60" y="848" font-size="11" font-weight="bold" fill="#1F3864">Required global labels for inter-sheet connectivity:</text>
+  <text x="60" y="862" font-size="10" fill="#333">Sheet A exports: 3V3A, 3V3D, VREF, VCM, GND</text>
+  <text x="500" y="862" font-size="10" fill="#333">Sheet B exports: IF_IN (biased signal to PGA)</text>
+  <text x="60" y="876" font-size="10" fill="#333">Sheet C exports: PGA_OUT (test), LPF_OUT (filtered signal to FDA)</text>
+  <text x="500" y="876" font-size="10" fill="#333">Sheet D exports: SCLK, SDI_PGA, SDO_ADC, CS_PGA, CS_ADC, CONVST</text>
+</svg>
