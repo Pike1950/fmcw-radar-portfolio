@@ -81,6 +81,8 @@
   /* SVG wrap responsive centering */
   .svg-wrap { width: 100%; overflow-x: auto; margin: 0.8rem 0; background: var(--card); border-radius: 8px; border: 1px solid var(--border); padding: 1rem; }
   .svg-wrap svg { display: block; margin: 0 auto; width: 100%; height: auto; }
+  .fig-caption { text-align: center; font-size: 0.82rem; font-style: italic; color: var(--dim); margin-top: 0.4rem; margin-bottom: 1rem; }
+  .tbl-caption { font-size: 0.82rem; font-style: italic; color: var(--dim); margin-top: 0.3rem; margin-bottom: 1rem; }
 </style>
 </head>
 <body>
@@ -196,32 +198,64 @@
   <details>
     <summary>Table of Figures &amp; Tables</summary>
     <ul>
-      <li><span class="fig-type">Fig.</span> <a href="#s1-2">§1.2 Beat frequency comparison chart (30/125/600 MHz bandwidth)</a></li>
-      <li><span class="fig-type">Fig.</span> <a href="#s1-7">§1.7 Adaptive chirp modes - sweep bandwidth switching</a></li>
-      <li><span class="fig-type">Fig.</span> <a href="#s2-2">§2.2 System-level signal flow diagram</a></li>
-      <li><span class="fig-type">Fig.</span> <a href="#s3">§3.1 Sheet A power architecture block diagram</a></li>
-      <li><span class="fig-type">Fig.</span> <a href="#s3">§3.1.3 Trace impedance vs placement distance (100nF at 1/2/5/10mm)</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s1-2">§1.2 System parameters - chirp, modulation, VCO, power</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s1-3">§1.3 Beat frequency per bandwidth at representative ranges</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s1-7">§1.7 Adaptive chirp modes comparison (narrow/medium/wide)</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s1-7">§1.7 Chain Home historical parallel mapping</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s1-7">§1.7 FCC regulatory landscape - five unlicensed radar bands</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s1-7">§1.7 ISM band upgrade system impact assessment</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s2-5">§2.5 Component selection - Rev A vs Rev B</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s3">§3.1.3 Trace impedance budget vs placement rules</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s3">§3.6 Component summary - Sheet A</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s4-4">§4.4 ESD protection parameters (TPD1E10B06)</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s4-7">§4.7 Inter-sheet connections - Sheet B</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s4-8">§4.8 Component summary - Sheet B</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s5-2">§5.2 PGA113 gain table (8 settings, output levels)</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s5-4">§5.4 Two-stage Sallen-Key parameters (Q, R, C values)</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s5-5">§5.5 Unused op-amp section configuration</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s5-6">§5.6 Inter-sheet connections - Sheet C</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s5-7">§5.7 Component summary - Sheet C</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s6-2">§6.2 FDA feedback network (R_G, R_GND, R_F1, R_F2)</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s6-4">§6.4 J_DFT 20-pin pinout with signal types and isolation</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s6-5">§6.5 Inter-sheet connections - Sheet D</a></li>
-      <li><span class="fig-type">Table</span> <a href="#s6-6">§6.6 Component summary - Sheet D</a></li>
+      <li style="margin-top:0.5rem; color:var(--teal); font-weight:600; font-size:0.85rem;">Figures</li>
+      <li><span class="fig-type">Fig.</span> <a href="#fig-1-7">§1.7 Adaptive chirp sweep bandwidth modes</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">Time-division narrow/medium/wide cycling diagram</em></li>
+      <li><span class="fig-type">Fig.</span> <a href="#fig-2-2">§2.2 System signal flow</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">SMA → ESD → PGA → Filter → FDA → ADC → SPI block chain</em></li>
+      <li><span class="fig-type">Fig.</span> <a href="#fig-3-1">§3.1.3 Trace impedance vs placement distance</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">100nF C0G at 1mm/2mm/5mm/10mm trace lengths, log-log impedance chart</em></li>
+      <li><span class="fig-type">Fig.</span> <a href="#fig-4-1">§4.1 Sheet B signal flow</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">J_IF → R_IN → D_ESD → C_AC → R_BIAS → IF_BIASED</em></li>
+      <li><span class="fig-type">Fig.</span> <a href="#fig-5-1">§5.1 Sheet C signal flow</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">IF_BIASED → PGA113 → R_FILT_ISO → Stage 1 (Q=1.306) → Stage 2 (Q=0.541) → LPF_OUT</em></li>
+      <li><span class="fig-type">Fig.</span> <a href="#fig-6-1">§6.1 Sheet D signal flow</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">LPF_OUT → R_G → THS4531A → RC settle → ADS8881 → SPI → J_DFT</em></li>
+
+      <li style="margin-top:0.8rem; color:var(--teal); font-weight:600; font-size:0.85rem;">Tables — §1 FMCW Principles</li>
+      <li><span class="fig-type">Table</span> <a href="#tbl-1-2">§1.2 System parameters</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">Chirp rate, bandwidth, VCO, power limits for §15.245 and §15.247</em></li>
+      <li><span class="fig-type">Table</span> <a href="#tbl-1-3a">§1.3 Beat frequency scale factors</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">Hz/m conversion at 30/125/600 MHz bandwidth</em></li>
+      <li><span class="fig-type">Table</span> <a href="#tbl-1-3b">§1.3 Beat frequency vs range comparison</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">Frequencies and FFT bin placement at 50/200/500/1000/5000 m</em></li>
+      <li><span class="fig-type">Table</span> <a href="#tbl-1-3c">§1.3 Range resolution by bandwidth</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">ΔR = c/(2B) for 30/125/600 MHz</em></li>
+      <li><span class="fig-type">Table</span> <a href="#tbl-1-5">§1.5 RF front-end components</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">Antennas, VCO, LNA, mixers, PA with specifications</em></li>
+      <li><span class="fig-type">Table</span> <a href="#tbl-1-6">§1.6 Baseband signal challenges</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">Problem/solution mapping for amplitude, DC offset, noise, aliasing, format</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s1-7">§1.7 Adaptive chirp modes</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">Narrow/medium/wide: bandwidth, resolution, max range, beat sensitivity</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s1-7">§1.7 Chain Home historical parallel</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">CH/CHL/CHEL mapped to narrow/medium/wide modes</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s1-7">§1.7 Multi-channel staggered filter bandwidths</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">Academic concept: 3 RX channels with different anti-alias cutoffs</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s1-7">§1.7 Baseband design implications</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">Anti-alias filter, PGA, ADC, and FDA behavior under mode changes</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s1-7">§1.7 FCC regulatory landscape</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">Five unlicensed radar bands: §15.245, §15.247, UWB, 60 GHz, 76-81 GHz</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s1-7">§1.7 ISM band upgrade impact assessment</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">Per-subsystem change status for 30 MHz → 125 MHz upgrade</em></li>
+
+      <li style="margin-top:0.8rem; color:var(--teal); font-weight:600; font-size:0.85rem;">Tables — §2 System Overview</li>
+      <li><span class="fig-type">Table</span> <a href="#s2-2">§2.2 Component map</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">All ICs by sheet with function, package, and key specs</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s2-4">§2.4 Signal budget</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">Voltage, noise, and dynamic range at each stage</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s2-5">§2.5 Component selection rationale</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">Each IC traced to a specific system requirement</em></li>
+
+      <li style="margin-top:0.8rem; color:var(--teal); font-weight:600; font-size:0.85rem;">Tables — §3 Sheet A</li>
+      <li><span class="fig-type">Table</span> <a href="#s3">§3.1.3 Trace impedance at 10/50 MHz vs trace length</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">100nF C0G worked example: 1mm to 10mm</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s3">§3.1.3 Placement rules from impedance budget</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">100nF ≤2mm, 1µF ≤5mm, 10µF ≤10mm with derivation</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s3">§3.3 Ferrite bead impedance vs frequency</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">BLM18PG221SN1D at DC/1M/10M/100M/1G Hz</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s3">§3.4 REF5025 specifications</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">Accuracy, drift, noise, load regulation with system implications</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s3">§3.6 Component summary - Sheet A</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">16 components with part numbers and first-principles roles</em></li>
+
+      <li style="margin-top:0.8rem; color:var(--teal); font-weight:600; font-size:0.85rem;">Tables — §4 Sheet B</li>
+      <li><span class="fig-type">Table</span> <a href="#s4-4">§4.4 ESD protection parameters</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">TPD1E10B06: package, capacitance, clamping voltage, ESD rating, leakage</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s4-7">§4.7 Inter-sheet connections - Sheet B</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">VCM in, IF_BIASED out</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s4-8">§4.8 Component summary - Sheet B</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">7 components with first-principles roles</em></li>
+
+      <li style="margin-top:0.8rem; color:var(--teal); font-weight:600; font-size:0.85rem;">Tables — §5 Sheet C</li>
+      <li><span class="fig-type">Table</span> <a href="#s5-2">§5.2 PGA113 gain settings</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">8 gain codes (1x-200x) with output levels at two input amplitudes</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s5-4">§5.4 Sallen-Key stage parameters</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">Stage 1 (Q=1.306) and Stage 2 (Q=0.541): R, C values and character</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s5-5">§5.5 Unused op-amp configuration</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">Sections C and D: unity follower with +IN to GND</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s5-6">§5.6 Inter-sheet connections - Sheet C</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">8 signals: IF_BIASED, VCM, 3V3A, SPI bus, PGA_OUT, LPF_OUT</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s5-7">§5.7 Component summary - Sheet C</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">19 components including PGA113, LTC6242, filter passives, DFT</em></li>
+
+      <li style="margin-top:0.8rem; color:var(--teal); font-weight:600; font-size:0.85rem;">Tables — §6 Sheet D</li>
+      <li><span class="fig-type">Table</span> <a href="#s6-2">§6.2 FDA feedback network</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">R_G, R_GND, R_F1, R_F2: from/to connections and function</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s6-4">§6.4 J_DFT 20-pin pinout</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">All 20 pins: signal, type, isolation, and purpose</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s6-5">§6.5 Inter-sheet connections - Sheet D</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">10 signals including LPF_OUT, VCM, VREF, SPI bus</em></li>
+      <li><span class="fig-type">Table</span> <a href="#s6-6">§6.6 Component summary - Sheet D</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">~25 components: THS4531A, ADS8881, RC settle, J_DFT, isolation Rs</em></li>
+
+      <li style="margin-top:0.8rem; color:var(--teal); font-weight:600; font-size:0.85rem;">Tables — Appendix A</li>
+      <li><span class="fig-type">Table</span> <a href="#sA">A.1 Signal integrity references</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">Bogatin, Johnson &amp; Graham, Ott</em></li>
+      <li><span class="fig-type">Table</span> <a href="#sA">A.2 Mixed-signal grounding references</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">Ott, Archambeault, TI app notes</em></li>
+      <li><span class="fig-type">Table</span> <a href="#sA">A.3 Decoupling references</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">Murata SimSurfing, Smith, Novak</em></li>
+      <li><span class="fig-type">Table</span> <a href="#sA">A.4 Active filter design references</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">TI FilterPro, Analog Devices, Horowitz &amp; Hill</em></li>
+      <li><span class="fig-type">Table</span> <a href="#sA">A.5 FDA &amp; ADC interface references</a><br><em style="color:var(--dim); font-size:0.8rem; padding-left:55px;">TI SBAA335, SLOA264, Kester</em></li>
     </ul>
   </details>
 </nav>
@@ -285,6 +319,7 @@
   <tr><td>Max transmit power (§15.245)</td><td>—</td><td>75 mW (18.75 dBm)</td><td>FCC §15.245 maximum for 5.785–5.815 GHz. Current operating limit.</td></tr>
   <tr style="background:#1a2a1a;"><td>Max transmit power (§15.247)</td><td>—</td><td><strong>1 W (30 dBm)</strong></td><td>FCC §15.247 spread spectrum in ISM band. 13 dB increase → ~2× detection range.</td></tr>
 </table>
+<p class="tbl-caption" id="tbl-1-2">Table 1.2: System parameters - chirp rate, bandwidth, VCO, and power limits</p>
 
 <div class="callout callout-red">
   <strong><span class="tag tag-risk">RISK</span> Critical distinction: VCO tuning range ≠ sweep bandwidth</strong>
@@ -332,6 +367,7 @@
     <tr style="background:#1a2a1a;"><td><strong>ISM (proposed)</strong></td><td><strong>125 MHz</strong></td><td><strong>0.167 Hz/m</strong></td><td><strong>§15.247</strong></td></tr>
     <tr><td>Wide (lab/shielded)</td><td>600 MHz</td><td>0.8 Hz/m</td><td>Experimental / shielded</td></tr>
   </table>
+<p class="tbl-caption" id="tbl-1-3a">Table 1.3a: Beat frequency scale factors by bandwidth</p>
 
   <p>Comparative beat frequencies and FFT bin placement (512-point FFT, 100 kS/s → 195 Hz/bin):</p>
   <table>
@@ -345,6 +381,7 @@
     <tr><td>5,000 m</td><td>200 Hz</td><td><strong>833 Hz</strong></td><td>4.0 kHz</td><td>1</td><td><strong>4</strong></td><td>20</td></tr>
     <tr><td>18,750 m</td><td>750 Hz</td><td><strong>3.13 kHz</strong></td><td>15.0 kHz</td><td>3</td><td><strong>16</strong></td><td>77</td></tr>
   </table>
+<p class="tbl-caption" id="tbl-1-3b">Table 1.3b: Beat frequency and FFT bin placement at representative ranges</p>
   <p>Key observations:</p>
   <ul style="padding-left: 1.5rem;">
     <li><strong>30 MHz (narrow):</strong> Beat frequencies are extremely low - useful targets within the power-limited range (~200 m) fall below FFT bin resolution. Best suited for very long-range detection where targets are at km-scale distances, or as a coarse search mode.</li>
@@ -368,6 +405,7 @@
   <tr style="background:#1a2a1a;"><td><strong>ISM (proposed)</strong></td><td><strong>125 MHz</strong></td><td><strong>1.2 m</strong></td><td><strong>FCC §15.247</strong></td></tr>
   <tr><td>Wide (lab/shielded)</td><td>600 MHz</td><td>0.25 m</td><td>Experimental / shielded</td></tr>
 </table>
+<p class="tbl-caption" id="tbl-1-3c">Table 1.3c: Range resolution by bandwidth</p>
 
 <div class="callout">
   <strong><span class="tag tag-tradeoff">TRADEOFF</span> Bandwidth vs. range resolution</strong>
@@ -446,6 +484,7 @@
     <td>400 MHz Cortex-M7 with FPU, DMA for DAC waveform generation (~100 Hz triangular sweep), and CMSIS-DSP libraries for FFT and Kalman filtering.</td>
   </tr>
 </table>
+<p class="tbl-caption" id="tbl-1-5">Table 1.5: RF front-end components and specifications</p>
 
 <div class="callout callout-teal">
   <strong><span class="tag tag-physics">PHYSICS</span> Why 3 receivers for angular detection</strong>
@@ -503,6 +542,7 @@
     <td>Precision biasing (VCM = 1.650V), output matching resistors, and reference voltage (REF5025) set the operating point</td>
   </tr>
 </table>
+<p class="tbl-caption" id="tbl-1-6">Table 1.6: Baseband signal challenges - problem/solution mapping</p>
 
 <div class="callout callout-green">
   <strong>Key insight: the baseband is a <em>signal conditioning</em> system, not a signal processing system</strong>
@@ -530,6 +570,7 @@
     <td><strong>Wide</strong></td><td>600 MHz</td><td>0.25 m</td><td>18.75 km</td><td>0.8 Hz/m</td><td>Precision tracking - fine-grained range measurement. Best match for sub-km detection with 5 ms ramp.</td>
   </tr>
 </table>
+<p class="tbl-caption" id="tbl-1-7a">Table 1.7a: Adaptive chirp modes - bandwidth, resolution, max range</p>
 
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> Implementation: it's a firmware change, not a hardware change</strong>
@@ -542,7 +583,7 @@
 
 <p>Taking adaptive chirp one step further: instead of manually switching modes, the system can automatically cycle through multiple sweep bandwidths on successive chirp periods, creating a <strong>multi-scale radar</strong> from a single hardware platform:</p>
 
-<div class="signal-flow" style="flex-direction: column; align-items: stretch;">
+<div id="fig-1-7" class="signal-flow" style="flex-direction: column; align-items: stretch;">
   <div style="display:flex; align-items:center; gap:0.5rem; margin:0.3rem 0;">
     <div class="block" style="background:#1a2a1a; min-width:120px;">Sweep 1<br><small>30 MHz (narrow)</small></div>
     <div class="arrow">→</div>
@@ -555,6 +596,7 @@
     <div style="color:var(--dim);">⋯</div>
   </div>
 </div>
+<p class="fig-caption" id="fig-1-7">Figure 1.7: Time-division multi-scale radar - narrow/medium/wide cycling</p>
 
 <p>Each sweep period is ~10 ms (one triangular cycle at ~100 Hz), so a three-mode cycle takes ~30 ms. The FPGA tags each ADC data frame with its sweep mode and routes it to the appropriate FFT pipeline. The result is three simultaneous range profiles at three different resolutions, updated every 30 ms (~33 complete cycles per second).</p>
 
@@ -579,6 +621,7 @@
     <td><strong>Chain Home Extra Low (CHEL)</strong></td><td>3 GHz (S-band, magnetron)</td><td>~50 km</td><td>~100 m (fine)</td><td>Very-low-altitude tracking - detect aircraft down to 15 m altitude</td>
   </tr>
 </table>
+<p class="tbl-caption" id="tbl-1-7b">Table 1.7b: Chain Home historical parallel - CH/CHL/CHEL mapping</p>
 
 <p>The British needed three separate hardware systems because the technology of 1940 could not make one system operate across such different frequencies. Each system required different antennas (110 m steel towers for CH, rotatable arrays for CHL, parabolic dishes for CHEL), different transmitters, and different receivers.</p>
 
@@ -605,6 +648,7 @@
     <td>RX3 (wide)</td><td>40 kHz</td><td>40 kHz</td><td>0–50 km</td><td>Worst (−4 dB vs. RX2)</td>
   </tr>
 </table>
+<p class="tbl-caption" id="tbl-1-7c">Table 1.7c: Multi-channel staggered filter bandwidths (academic concept)</p>
 
 <p>All three channels see the same reflected signal (same chirp, same target, same beat frequency), but each channel's filter passes a different range window. Since noise power scales with bandwidth (N = e<sub>n</sub>² × BW), the narrow channel has ~9 dB better SNR than the wide channel for targets within its range window.</p>
 
@@ -628,6 +672,7 @@
   <tr><td>DFT infrastructure</td><td>Valuable - characterize each mode's noise floor independently</td><td>J_DFT header, 17 TPs, 5 MMCX, 6 isolation R's</td></tr>
   <tr><td>Digital filter (FPGA)</td><td>Enables virtual multi-channel from single hardware</td><td>Future Phase 4B enhancement</td></tr>
 </table>
+<p class="tbl-caption" id="tbl-1-7d">Table 1.7d: Baseband design implications under mode changes</p>
 
 <div class="callout callout-green">
   <strong>Design philosophy: build the foundation right, and advanced modes emerge naturally</strong>
@@ -656,6 +701,7 @@
     <td>76–81 GHz</td><td>Part 95 Subpart M</td><td>5 GHz</td><td>100 W (50 dBm)</td><td>3 cm</td><td>Automotive/airport radar only. Highest permitted power. Industry standard for ADAS (TI AWR series, Infineon, NXP). Licensed-by-rule.</td>
   </tr>
 </table>
+<p class="tbl-caption" id="tbl-1-7e">Table 1.7e: FCC regulatory landscape - five unlicensed radar bands</p>
 
 <h4>1.7.7 Proposed Upgrade: 5.725–5.850 GHz ISM Band (§15.247)</h4>
 
@@ -683,6 +729,7 @@
   <tr><td>DAC waveform</td><td>Wider amplitude swing for 125 MHz sweep vs. 30 MHz</td><td style="color:var(--amber);">Firmware only</td></tr>
   <tr><td>FCC compliance</td><td>Verify FMCW chirp qualifies under §15.247 spread spectrum rules</td><td style="color:var(--amber);">Regulatory research</td></tr>
 </table>
+<p class="tbl-caption" id="tbl-1-7f">Table 1.7f: ISM band upgrade - per-subsystem impact assessment</p>
 
 <div class="callout callout-green">
   <strong><span class="tag tag-decision">DECISION</span> Baseband design validated by band upgrade analysis</strong>
@@ -863,6 +910,7 @@
     <td>Supply rails</td><td>3V3A (analog), 3V3D (digital)</td><td>Split via ferrite bead FB1</td>
   </tr>
 </table>
+<p class="tbl-caption" id="tbl-2-2">Table 2.2: Component map - all ICs by sheet</p>
 
 <h3 id="s2-5">2.5 Why These Specific Components</h3>
 
@@ -915,6 +963,7 @@
     <td><span class="tag tag-physics">PHYSICS</span> The Rev A design used a 64-pin QFP ADC that suffered solder bridges during assembly. The ADS8881 in an 8-pin SOIC (DGS variant: 10-pin VSSOP) dramatically reduces assembly risk while providing 18-bit resolution. The SPI interface matches the PGA113's SPI bus, allowing a shared bus with chip-select isolation.</td>
   </tr>
 </table>
+<p class="tbl-caption" id="tbl-2-4">Table 2.4: Signal budget - voltage, noise, and dynamic range at each stage</p>
 
 <h3 id="s2-6">2.6 Rev A vs Rev B: What Changed and Why</h3>
 
@@ -1079,6 +1128,7 @@
     <tr style="background:rgba(210,153,34,0.08);"><td>5 mm</td><td>5.0 nH</td><td>5.8 nH</td><td>0.33Ω</td><td>1.7Ω</td><td>6.6 MHz</td></tr>
     <tr style="background:rgba(248,81,73,0.08);"><td>10 mm</td><td>10.0 nH</td><td>10.8 nH</td><td>0.58Ω</td><td><strong>3.3Ω</strong></td><td>4.8 MHz</td></tr>
   </table>
+<p class="tbl-caption" id="tbl-2-5">Table 2.5: Component selection rationale - each IC traced to a requirement</p>
   <p>At 50 MHz with a 10mm trace, the impedance at the power pin is 3.3Ω. The capacitor's own impedance at 50 MHz is only 0.03Ω (near its SRF), but the trace inductance contributes 3.3Ω in series, making the cap <strong>100x less effective</strong> than its intrinsic impedance would suggest. The trace is the bottleneck, not the cap.</p>
   <p>At 2mm, the trace contributes 0.78Ω at 50 MHz. Still not ideal, but the cap is at least partially effective. This is why the schematic notes specify "≤2mm from pin" for bypass caps.</p>
 </div>
@@ -1154,6 +1204,7 @@
   <text x="685" y="247" fill="#f85149" font-size="7.5" font-weight="600">3.3Ω vs cap's 0.03Ω = 100x worse</text>
 </svg>
 </div>
+<p class="fig-caption" id="fig-3-1">Figure 3.1.3: 100nF C0G bypass cap impedance at 1mm, 2mm, 5mm, and 10mm trace lengths</p>
 
 <div class="callout callout-teal">
   <strong><span class="tag tag-decision">DECISION</span> Placement rules derived from impedance budget</strong>
@@ -1164,6 +1215,7 @@
     <tr><td>1µF output (C3)</td><td>0.5-5 MHz</td><td>0.03-0.3Ω</td><td>~1Ω</td><td>~5mm at 5 MHz</td><td><strong>≤5mm</strong></td></tr>
     <tr><td>10µF bulk (C1, C5)</td><td>DC-2 MHz</td><td>0.08-1Ω</td><td>~3Ω</td><td>~15mm at 2 MHz</td><td><strong>≤10mm</strong></td></tr>
   </table>
+<p class="tbl-caption" id="tbl-3-1a">Table 3.1.3a: 100nF bypass cap impedance at 10/50 MHz vs trace length</p>
   <p>The rule is: the higher the frequency the cap must serve, the shorter the trace must be. This is not a qualitative guideline - it is a quantitative result of the trace inductance (1 nH/mm) versus the capacitor's impedance at the frequencies of interest. The "≤2mm" callout on every bypass cap in this design is derived from this analysis, not copied from a reference design.</p>
 </div>
 
@@ -1208,6 +1260,7 @@
     <tr><td>100 MHz</td><td>~220 Ω</td><td>Maximum impedance - blocks most digital switching noise</td></tr>
     <tr><td>1 GHz</td><td>~150 Ω</td><td>Still effective at GHz frequencies (parasitic coupling)</td></tr>
   </table>
+<p class="tbl-caption" id="tbl-3-1b">Table 3.1.3b: Placement rules derived from trace impedance budget</p>
   <p>The SPI clock (SCLK) on the 3V3D side has a rise time of ~5 ns, giving a knee frequency of f<sub>knee</sub> = 0.35 / 5 ns = 70 MHz. At 70 MHz, the ferrite bead presents ~180 Ω. Combined with the decoupling capacitor on the 3V3D side (C9, 100 nF), this forms a low-pass filter with a cutoff of:</p>
   <span class="eq">f<sub>-3dB</sub> = 1 / (2π × |Z<sub>FB</sub>| × C<sub>3V3D</sub>) ≈ 1 / (2π × 180 × 100×10⁻⁹) ≈ 8.8 kHz</span>
   <p>This means digital switching noise above ~9 kHz is attenuated on the 3V3D side before it can propagate back through the bead to 3V3A. At the SPI clock frequency (~1–10 MHz), attenuation is >20 dB; at the clock's harmonic content (70 MHz+), attenuation is >40 dB.</p>
@@ -1234,6 +1287,7 @@
     <tr><td>Noise (10 Hz–10 kHz)</td><td>8 µV<sub>RMS</sub></td><td>8 µV × 3.6 (crest factor) = 29 µV<sub>pp</sub> ≈ 1.5 LSBs. This is the dominant reference noise contribution. Still acceptable - it adds less than 0.3 bits of effective noise.</td></tr>
     <tr><td>Load regulation</td><td>±0.25 mV/mA</td><td>ADS8881 reference input draws ~100 µA average → 25 µV shift. Negligible.</td></tr>
   </table>
+<p class="tbl-caption" id="tbl-3-3">Table 3.3: Ferrite bead impedance vs frequency (BLM18PG221SN1D)</p>
 </div>
 
 <h4>VREF Decoupling: C5 + C4</h4>
@@ -1297,6 +1351,7 @@
   <tr><td><code>R_SHUNT</code></td><td>CRF0805-J_-000ELF</td><td>0Ω jumper</td><td>Optional current measurement shunt. Can be replaced with current sense resistor during characterization.</td></tr>
   <tr><td colspan="4" style="color:var(--dim);">+ 9 test points: TP_5V, TP_3V3A, TP_VREF, TP_VCM, TP_TEMP, TP_GND (×4)</td></tr>
 </table>
+<p class="tbl-caption" id="tbl-3-4">Table 3.4: REF5025 voltage reference specifications</p>
 
 <!-- ================================================================ -->
 <h2 id="s4">4. Sheet B — IF Input, Protection &amp; Bias</h2>
@@ -1321,6 +1376,7 @@
   <div class="arrow">→</div>
   <div class="block">IF_BIASED<br><small>→ Sheet C</small></div>
 </div>
+<p class="fig-caption" id="fig-4-1">Figure 4.1: Sheet B signal flow - SMA input through ESD protection, AC coupling, and DC bias</p>
 
 <p>Two test points provide visibility: <strong>TP_IF_RAW</strong> (after R_IN, before ESD) monitors the raw input signal, and <strong>TP_PGA_IN</strong> (at the IF_BIASED output) confirms the DC bias is correct before the signal enters the PGA.</p>
 
@@ -1365,6 +1421,7 @@
   <tr><td>ESD rating</td><td>±16 kV HBM, ±750V CDM</td><td>Exceeds IEC 61000-4-2 Level 4 (±8 kV contact, ±15 kV air). Sufficient for bench handling without a wrist strap.</td></tr>
   <tr><td>Leakage current</td><td>1 nA typical</td><td>At our signal frequencies, 1 nA leakage is negligible - it would require a 1 GΩ impedance to produce even 1 mV of error.</td></tr>
 </table>
+<p class="tbl-caption" id="tbl-3-6">Table 3.6: Component summary - Sheet A (16 components)</p>
 
 <div class="callout callout-teal">
   <strong><span class="tag tag-decision">DECISION</span> Shunt topology, not series</strong>
@@ -1424,6 +1481,7 @@
   <tr><td style="color:var(--green); font-weight:600;">VCM</td><td>Input</td><td>Sheet A (OPA320 output)</td><td>R_BIAS (bias reference)</td><td>Sets DC operating point at 1.65V</td></tr>
   <tr><td style="color:var(--blue); font-weight:600;">IF_BIASED</td><td>Output</td><td>C_AC/R_BIAS junction</td><td>Sheet C (PGA113 CH0 input)</td><td>AC-coupled, DC-biased IF signal</td></tr>
 </table>
+<p class="tbl-caption" id="tbl-4-4">Table 4.4: TPD1E10B06 ESD protection parameters</p>
 
 <p>Sheet B requires no power supply connections - it is entirely passive. All 7 components (J_IF, R_IN, D_ESD, C_AC, R_BIAS, TP_IF_RAW, TP_PGA_IN) are either passive or connectors. This makes Sheet B the easiest to validate during bringup: with VCM confirmed on Sheet A, measuring 1.65V DC at TP_PGA_IN confirms the entire bias network is working correctly.</p>
 
@@ -1439,6 +1497,7 @@
   <tr><td><code>TP_IF_RAW</code></td><td>—</td><td>1.5mm test pad</td><td>DFT: probe raw input after R_IN, before ESD.</td></tr>
   <tr><td><code>TP_PGA_IN</code></td><td>—</td><td>1.5mm test pad</td><td>DFT: verify DC bias = 1.65V before PGA113 input.</td></tr>
 </table>
+<p class="tbl-caption" id="tbl-4-7">Table 4.7: Inter-sheet connections - Sheet B</p>
 
 <div class="callout callout-green">
   <strong>Design philosophy: the simplest sheet demonstrates the most discipline</strong>
@@ -1466,6 +1525,7 @@
   <div class="arrow">→</div>
   <div class="block">LPF_OUT<br><small>→ Sheet D</small></div>
 </div>
+<p class="fig-caption" id="fig-5-1">Figure 5.1: Sheet C signal flow - PGA variable gain through 4th-order Sallen-Key filter</p>
 
 <h3 id="s5-2">5.2 Programmable Gain Amplifier: PGA113 (U_PGA)</h3>
 
@@ -1493,6 +1553,7 @@
   <tr><td>0x06</td><td>100×</td><td>500 mVpp</td><td>5 mVpp</td><td>Weak/distant targets</td></tr>
   <tr><td>0x07</td><td>200×</td><td>1.0 Vpp</td><td>10 mVpp</td><td>Maximum sensitivity</td></tr>
 </table>
+<p class="tbl-caption" id="tbl-4-8">Table 4.8: Component summary - Sheet B (7 components)</p>
 
 <div class="callout callout-red">
   <strong><span class="tag tag-decision">DECISION</span> DVDD (Pin 10) connects to 3V3A, NOT 3V3D</strong>
@@ -1545,6 +1606,7 @@
   <tr><td><strong>Stage 1</strong></td><td>Section A (Pins 1,2,3)</td><td>1.306</td><td>R3=1.62kΩ, R4=5.76kΩ</td><td>C13=11nF, C14=1.1nF</td><td>High-Q - provides the "knee" of the Butterworth rolloff, with slight peaking near f<sub>c</sub></td></tr>
   <tr><td><strong>Stage 2</strong></td><td>Section B (Pins 5,6,7)</td><td>0.541</td><td>R5=17.4kΩ, R6=536Ω</td><td>C15=11nF, C16=1.1nF</td><td>Low-Q - overdamped response that flattens the peaking from Stage 1</td></tr>
 </table>
+<p class="tbl-caption" id="tbl-5-2">Table 5.2: PGA113 gain settings - 8 codes with output levels</p>
 
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> Why the Q values are different</strong>
@@ -1584,6 +1646,7 @@
   <tr><td>C (Pins 10, 11, 12)</td><td>OUT_C (10) → −IN_C (11), +IN_C (12) → GND</td><td>Unity follower with stable input. Draws quiescent current but cannot oscillate.</td></tr>
   <tr><td>D (Pins 14, 15, 16)</td><td>OUT_D (16) → −IN_D (15), +IN_D (14) → GND</td><td>Same treatment. Leaving inputs floating would allow oscillation at the op-amp's GBW, coupling noise into the supply and ground.</td></tr>
 </table>
+<p class="tbl-caption" id="tbl-5-4">Table 5.4: Sallen-Key two-stage parameters (Q, R, C values)</p>
 
 <h3 id="s5-6">5.6 Inter-Sheet Connections</h3>
 
@@ -1598,6 +1661,7 @@
   <tr><td style="color:var(--blue); font-weight:600;">PGA_OUT</td><td>Output</td><td>PGA113 VOUT (Pin 5)</td><td>Sheet D (J_DFT, via hier label)</td><td>DFT monitoring of PGA output</td></tr>
   <tr><td style="color:var(--blue); font-weight:600;">LPF_OUT</td><td>Output</td><td>LTC6242 OUT_B (Pin 7)</td><td>Sheet D (FDA input)</td><td>Filtered signal to FDA</td></tr>
 </table>
+<p class="tbl-caption" id="tbl-5-5">Table 5.5: Unused op-amp section configuration</p>
 
 <h3 id="s5-7">5.7 Component Summary — Sheet C</h3>
 
@@ -1623,6 +1687,7 @@
   <tr><td><code>J_MMCX_PGA</code></td><td>—</td><td>MMCX, DNP</td><td>DFT: high-quality probe point at PGA output.</td></tr>
   <tr><td><code>J_MMCX_LPF</code></td><td>—</td><td>MMCX, DNP</td><td>DFT: high-quality probe point at filter output. Used for Bode plot.</td></tr>
 </table>
+<p class="tbl-caption" id="tbl-5-6">Table 5.6: Inter-sheet connections - Sheet C (8 signals)</p>
 
 <div class="callout callout-green">
   <strong>Design philosophy: the filter is the system's immune system</strong>
@@ -1650,6 +1715,7 @@
   <div class="arrow">→</div>
   <div class="block">SPI → J_DFT<br><small>→ FPGA/MCU</small></div>
 </div>
+<p class="fig-caption" id="fig-6-1">Figure 6.1: Sheet D signal flow - FDA differential conversion, ADC digitization, SPI interface</p>
 
 <h3 id="s6-2">6.2 Fully Differential Amplifier: THS4531A (U_FDA)</h3>
 
@@ -1672,6 +1738,7 @@
   <tr><td>R_F1 (Rf1)</td><td>1kΩ</td><td>VOUT+ (Pin 4)</td><td>VIN− (Pin 1)</td><td>Feedback from non-inverting output to inverting input</td></tr>
   <tr><td>R_F2 (Rf2)</td><td>1kΩ</td><td>VOUT− (Pin 5)</td><td>VIN+ (Pin 8)</td><td>Feedback from inverting output to non-inverting input</td></tr>
 </table>
+<p class="tbl-caption" id="tbl-5-7">Table 5.7: Component summary - Sheet C (19 components)</p>
 
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> Gain and impedance balance</strong>
@@ -1738,6 +1805,7 @@
   <tr><td>19</td><td>3V3D</td><td>Power monitor</td><td>Direct</td><td>Digital supply (post-ferrite)</td></tr>
   <tr><td>20</td><td>GND</td><td>Ground</td><td>—</td><td>—</td></tr>
 </table>
+<p class="tbl-caption" id="tbl-6-2">Table 6.2: FDA cross-coupled feedback network</p>
 
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> Why 10kΩ isolation resistors on analog monitor pins</strong>
@@ -1760,6 +1828,7 @@
   <tr><td style="color:var(--purple); font-weight:600;">SPI_SDI</td><td>Output</td><td>J_DFT Pin 10</td><td>Sheet C (PGA113)</td><td>Shared SPI data</td></tr>
   <tr><td style="color:var(--purple); font-weight:600;">CS_PGA</td><td>Output</td><td>J_DFT Pin 11</td><td>Sheet C (PGA113 ~CS)</td><td>PGA chip select</td></tr>
 </table>
+<p class="tbl-caption" id="tbl-6-4">Table 6.4: J_DFT 20-pin pinout with signal types and isolation</p>
 
 <h3 id="s6-6">6.6 Component Summary — Sheet D</h3>
 
@@ -1786,6 +1855,7 @@
   <tr><td><code>TP_FDA_OUTP, TP_FDA_OUTN</code></td><td>—</td><td>1.5mm pads (×2)</td><td>DFT: FDA differential outputs.</td></tr>
   <tr><td><code>J_MMCX (×3)</code></td><td>—</td><td>MMCX, DNP</td><td>DFT: high-quality probe points (FDA_OUTP, FDA_OUTN, LPF). All DNP by default.</td></tr>
 </table>
+<p class="tbl-caption" id="tbl-6-5">Table 6.5: Inter-sheet connections - Sheet D (10 signals)</p>
 
 <div class="callout callout-green">
   <strong>Design philosophy: the interface defines the system</strong>
@@ -1818,6 +1888,7 @@
     <td>§3 (decoupling, supply splitting), §7 (layout, grounding)</td>
   </tr>
 </table>
+<p class="tbl-caption" id="tbl-6-6">Table 6.6: Component summary - Sheet D</p>
 
 <h3>A.2 Mixed-Signal Grounding &amp; Layout</h3>
 <table>
@@ -1848,6 +1919,7 @@
     <td>All sheets</td>
   </tr>
 </table>
+<p class="tbl-caption" id="tbl-a1">Table A.1: Signal integrity and first-principles references</p>
 
 <h3>A.3 Decoupling &amp; Passive Component Impedance</h3>
 <table>
@@ -1863,6 +1935,7 @@
     <td>§6 (ADS8881 decoupling)</td>
   </tr>
 </table>
+<p class="tbl-caption" id="tbl-a2">Table A.2: Mixed-signal grounding and layout references</p>
 
 <h3>A.4 Active Filter Design</h3>
 <table>
@@ -1878,6 +1951,7 @@
     <td>§5 (filter), §6 (ADC)</td>
   </tr>
 </table>
+<p class="tbl-caption" id="tbl-a3">Table A.3: Decoupling and passive component impedance references</p>
 
 <h3>A.5 FDA &amp; ADC Interface Design</h3>
 <table>
@@ -1898,6 +1972,7 @@
     <td>§6 (SPI timing), Phase 4</td>
   </tr>
 </table>
+<p class="tbl-caption" id="tbl-a4">Table A.4: Active filter design references</p>
 
 <h3>A.6 FMCW Radar Fundamentals</h3>
 <table>
@@ -1918,6 +1993,7 @@
     <td>§1 (FMCW principles)</td>
   </tr>
 </table>
+<p class="tbl-caption" id="tbl-a5">Table A.5: FDA and ADC interface design references</p>
 
 <h3>A.7 Suggested Reading Order</h3>
 <div class="callout callout-green">
