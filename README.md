@@ -60,14 +60,14 @@ This project is one track of a broader engineering portfolio spanning processor 
 
 | Repository | Description | Status |
 |-----------|-------------|--------|
-| [32-bit RISC Pipelined Processor](https://github.com/Pike1950/BradW_ECE4375_RISC_Pipeline) | 4-stage pipelined CPU refactored from Verilog to SystemVerilog. Data forwarding, hazard detection, 25 opcodes, signed multiply program. Targeting Tang Primer 25K (Gowin GW5A) for FPGA synthesis. | SV conversion complete, synthesis in progress |
-| *scpi-instrument-platform* (planned) | Modular SCPI-compliant test instrument platform. Pi 5 orchestration, Pico 2 W measurement modules (DIO, voltage, SMU-lite), FPGA modules (logic analyzer, protocol exerciser, frequency counter). PyVISA + USB-TMC automation. | Architecture defined |
+| [32-bit RISC Pipelined Processor](https://github.com/Pike1950/BradW_ECE4375_RISC_Pipeline) | 4-stage pipelined CPU refactored from Verilog to SystemVerilog. Data forwarding, hazard detection, 25 opcodes, signed multiply program. Tang Primer 25K (Gowin GW5A) is in hand; FPGA synthesis phase requires clock edge standardization, BSRAM memory fitting, and PLL clock generation. | SV conversion complete (14/14 CRs done), synthesis next |
+| *scpi-instrument-platform* (planned) | Modular SCPI-compliant test instrument platform. Pi 5 orchestration, Pico 2 W measurement modules (DIO, voltage, SMU-lite), FPGA modules on Tang Primer 25K (logic analyzer, protocol exerciser, frequency counter). PyVISA + USB-TMC automation. | Architecture defined |
 
 ## Key Documents
 
 | Document | Description |
 |----------|-------------|
-| [Design Rationale](https://pike1950.github.io/fmcw-radar-portfolio/docs/design-rationale/RevB_Design_Rationale.html) | First-principles analysis of every design decision. FMCW operating principles, system overview, Sheet A component-level analysis with physics-based justification. Includes adaptive chirp modes, ISM band upgrade path, and Chain Home historical parallel. |
+| [Design Rationale](https://pike1950.github.io/fmcw-radar-portfolio/docs/design-rationale/RevB_Design_Rationale.html) | First-principles analysis of every design decision. Covers FMCW operating principles (§1), system overview (§2), and Sheet A power analysis (§3). Includes three-band beat frequency comparison (30/125/600 MHz), adaptive chirp modes with Chain Home historical parallel, FCC regulatory landscape across five unlicensed radar bands, and a proposed ISM band upgrade path (§15.247). |
 | [Block Diagrams](https://pike1950.github.io/fmcw-radar-portfolio/docs/block-diagrams/RevB_Block_Diagrams.html) | Pin tables, signal maps, DFT reference, inter-sheet signal summary, hierarchical label directions. The "what" companion to the Design Rationale's "why." |
 | [Schematic Review](https://pike1950.github.io/fmcw-radar-portfolio/docs/analysis/SchematicReview.html) | Systematic review of all four schematic sheets. |
 | [Filter Analysis](https://pike1950.github.io/fmcw-radar-portfolio/docs/analysis/SheetC_Filter_Analysis.html) | Sheet C anti-alias filter analysis with transfer function derivation. |
@@ -80,12 +80,13 @@ This project is one track of a broader engineering portfolio spanning processor 
 - **DFT-first methodology** — 17 test points, 5 MMCX probe connectors (DNP), 6× 10kΩ isolation resistors, and a 2×10 DFT header were designed before the signal chain, not as an afterthought.
 
 ### System-Level Analysis
-- **Chirp rate correction** — Identified a fundamental parameter mismatch in Rev A: the 10 kHz chirp rate yielded only 5 ADC samples per ramp at 100 kSPS — insufficient for FFT-based range extraction. Rev B specifies ~100 Hz chirp rate (500 samples/ramp, 512-point FFT).
-- **ISM band upgrade path** — Documented a firmware-only upgrade from 30 MHz / 75 mW (FCC §15.245) to 125 MHz / 1W (FCC §15.247 ISM), improving range resolution from 5.0 m to 1.2 m with zero baseband hardware changes.
-- **Adaptive chirp modes** — Multi-scale radar operation via time-division sweep bandwidth switching, analogous to the British Chain Home / Chain Home Low layered defense concept from WWII.
+- **Chirp rate correction** — Identified a fundamental parameter mismatch in Rev A: the 10 kHz chirp rate yielded only 5 ADC samples per ramp at 100 kSPS — insufficient for FFT-based range extraction. Rev B specifies ~100 Hz chirp rate (500 samples/ramp, 512-point FFT). Derived from first principles with sample-count-per-ramp analysis.
+- **ISM band upgrade path** — Documented a firmware-only upgrade from 30 MHz / 75 mW (FCC §15.245) to 125 MHz / 1W (FCC §15.247 ISM), improving range resolution from 5.0 m to 1.2 m with zero baseband hardware changes. Full system impact assessment showing every subsystem's change status.
+- **FCC regulatory landscape** — Comparative analysis of five unlicensed radar bands (§15.245, §15.247 ISM, UWB 3.1–10.6 GHz, 60 GHz, 76–81 GHz automotive) with bandwidth, power limits, resolution, and hardware implications for each.
+- **Adaptive chirp modes** — Multi-scale radar operation via time-division sweep bandwidth switching (narrow/medium/wide), analogous to the British Chain Home / Chain Home Low / Chain Home Extra Low layered defense concept from WWII. Includes multi-channel staggered filter bandwidth analysis (academic concept for 3-RX architecture).
 
 ### Digital Design (In Progress)
-- **FPGA digital backend** (planned) — SystemVerilog modules for the radar's digital subsystem, targeting Gowin GW5A (Tang Primer 25K) or GW1NR-9 (Tang Nano 9K):
+- **FPGA digital backend** (planned) — SystemVerilog modules for the radar's digital subsystem, targeting Gowin GW1NR-9 (Tang Nano 9K, ~$20, 8,640 LUTs) for the radar backend:
   - SPI master controllers for ADS8881 (ADC readout) and PGA113 (gain control)
   - DDS chirp waveform generator for VCO sweep control
   - Configurable FIR digital filter (supplements the analog anti-alias filter)
@@ -98,7 +99,10 @@ This project is one track of a broader engineering portfolio spanning processor 
 - **EDA:** KiCad 9 (schematic, PCB layout), Eagle 9.5 (Rev A reference)
 - **Simulation:** LTspice (analog), Verilator (digital), GTKWave (waveforms)
 - **HDL:** SystemVerilog (digital backend, verification)
-- **FPGA Targets:** Gowin GW5A (Tang Primer 25K), Gowin GW1NR-9 (Tang Nano 9K), Lattice iCE40UP5K (Pico-Ice)
+- **FPGA Targets:**
+  - *Radar digital backend:* Gowin GW1NR-9 (Tang Nano 9K, ~$20) — SPI controller, DDS, FIR filter
+  - *RISC processor synthesis:* Gowin GW5A (Tang Primer 25K, ~$35, in hand) — 23K LUT4, 1008Kb BSRAM, 3 PMOD ports
+  - *Phase 2 (high-speed interfaces):* Alinx AX7325B (Kintex-7, ~$350-450, Vivado, PCIe Gen2 x8, 4× SFP+) or Tang Mega 138K Pro (~$200, PCIe 3.0 x4, dual SFP+)
 - **Documentation:** HTML with first-principles analysis, SVG block diagrams
 - **Test Automation:** PyVISA (planned integration with SCPI instrument platform)
 
@@ -135,4 +139,4 @@ This is a personal engineering portfolio project. The FMCW radar design originat
 
 ## Contact
 
-Bradley Ward — [bradw858@gmail.com](mailto:bradw858@gmail.com) — [LinkedIn](https://linkedin.com/in/bradley-ward-/)
+Bradley Ward — [bradw858@gmail.com](mailto:bradw858@gmail.com) — [LinkedIn](https://linkedin.com/in/bradley-ward-49087766/)
