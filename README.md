@@ -67,9 +67,11 @@ This project is one track of a broader engineering portfolio spanning processor 
 
 | Document | Description |
 |----------|-------------|
-| [Design Rationale](docs/design-rationale/RevB_Design_Rationale.html) | First-principles analysis of every design decision. FMCW operating principles, system overview, Sheet A component-level analysis with physics-based justification. Includes adaptive chirp modes, ISM band upgrade path, and Chain Home historical parallel. |
-| [Block Diagrams](docs/block-diagrams/RevB_Block_Diagrams.html) | Pin tables, signal maps, DFT reference, inter-sheet signal summary, hierarchical label directions. The "what" companion to the Design Rationale's "why." |
-| [Project Evolution](docs/Project_Evolution.html) | Complete project history: where it was (Rev A), where it is (Rev B), where it's going (layout, FPGA, portfolio). Includes roadmap and materials inventory. |
+| [Design Rationale](https://pike1950.github.io/fmcw-radar-portfolio/docs/design-rationale/RevB_Design_Rationale.html) | First-principles analysis of every design decision. FMCW operating principles, system overview, Sheet A component-level analysis with physics-based justification. Includes adaptive chirp modes, ISM band upgrade path, and Chain Home historical parallel. |
+| [Block Diagrams](https://pike1950.github.io/fmcw-radar-portfolio/docs/block-diagrams/RevB_Block_Diagrams.html) | Pin tables, signal maps, DFT reference, inter-sheet signal summary, hierarchical label directions. The "what" companion to the Design Rationale's "why." |
+| [Project Evolution](https://pike1950.github.io/fmcw-radar-portfolio/docs/Project_Evolution.html) | Complete project history: where it was (Rev A), where it is (Rev B), where it's going (layout, FPGA, portfolio). Includes roadmap and materials inventory. |
+| [Schematic Review](https://pike1950.github.io/fmcw-radar-portfolio/docs/analysis/SchematicReview.html) | Systematic review of all four schematic sheets. |
+| [Filter Analysis](https://pike1950.github.io/fmcw-radar-portfolio/docs/analysis/SheetC_Filter_Analysis.html) | Sheet C anti-alias filter analysis with transfer function derivation. |
 
 ## Technical Highlights
 
