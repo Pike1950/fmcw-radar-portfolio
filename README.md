@@ -135,4 +135,4 @@ This is a personal engineering portfolio project. The FMCW radar design originat
 
 ## Contact
 
-Bradley Ward — [bradw858@gmail.com](mailto:bradw858@gmail.com) — [LinkedIn](https://linkedin.com/in/bradley-ward-49087766/)
+Bradley Ward — [bradw858@gmail.com](mailto:bradw858@gmail.com) — [LinkedIn](https://linkedin.com/in/bradley-ward-/)
