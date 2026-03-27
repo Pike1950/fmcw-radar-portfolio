@@ -7,10 +7,10 @@
   :root {
     --bg: #0d1117; --bg2: #161b22; --border: #30363d;
     --text: #e6edf3; --dim: #8b949e; --blue: #58a6ff; --green: #3fb950;
-    --red: #f85149; --yellow: #d29922; --purple: #bc8cff; --orange: #f0883e;
+    --red: #f85149; --yellow: #d29922; --purple: #bc8cff; --orange: #f0883e; --doc-width: 2000px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font: 15px/1.65 'IBM Plex Mono', 'Fira Code', monospace; max-width: 1000px; margin: 0 auto; padding: 2rem; }
+  body { background: var(--bg); color: var(--text); font: 15px/1.65 'IBM Plex Mono', 'Fira Code', monospace; max-width: var(--doc-width); margin: 0 auto; padding: 2rem; }
   h1 { font-size: 1.6rem; color: var(--blue); margin-bottom: 0.3rem; }
   h2 { font-size: 1.2rem; color: var(--green); margin: 2rem 0 0.8rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
   h3 { font-size: 1rem; color: var(--yellow); margin: 1.2rem 0 0.5rem; }
@@ -30,9 +30,14 @@
   .stat { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 0.8rem; text-align: center; }
   .stat-num { font-size: 1.5rem; font-weight: 700; }
   .stat-label { font-size: 0.75rem; color: var(--dim); }
+  .width-control { position:fixed; top:12px; right:16px; z-index:1000; display:flex; align-items:center; gap:8px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:6px 14px; font-size:0.75rem; color:var(--dim); box-shadow:0 2px 8px rgba(0,0,0,0.4); }
+  .width-control label { white-space:nowrap; }
+  .width-control input[type=range] { width:120px; accent-color:var(--red); cursor:pointer; }
+  .width-control span { min-width:42px; text-align:right; color:var(--text); font-family:monospace; font-size:0.8rem; }
 </style>
 </head>
 <body>
+<div class="width-control"><label>Width:</label><input type="range" id="widthSlider" min="800" max="2000" value="2000" step="50" oninput="document.documentElement.style.setProperty('--doc-width',this.value+'px');document.getElementById('widthVal').textContent=this.value+'px'"><span id="widthVal">2000px</span></div>
 
 <h1>Rev B Schematic Review — Corrected</h1>
 <p class="subtitle">Revised after re-examining actual schematic files &bull; February 17, 2026</p>

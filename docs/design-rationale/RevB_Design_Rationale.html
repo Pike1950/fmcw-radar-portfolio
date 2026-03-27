@@ -8,7 +8,7 @@
   :root { --bg: #1a1a2e; --card: #16213e; --accent: #0f3460; --highlight: #e94560;
            --text: #d4d4d4; --heading: #f0f0f0; --dim: #888; --green: #4ade80;
            --amber: #fbbf24; --blue: #60a5fa; --red: #f87171; --teal: #2dd4bf;
-           --code-bg: #0d1117; --border: #333; --doc-width: 1100px; }
+           --code-bg: #0d1117; --border: #333; --doc-width: 2000px; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg);
          color: var(--text); line-height: 1.7; max-width: var(--doc-width); margin: 0 auto; padding: 2rem; }
@@ -68,9 +68,9 @@
 
 <div class="width-control">
   <label>Width:</label>
-  <input type="range" id="widthSlider" min="800" max="2000" value="1100" step="50"
+  <input type="range" id="widthSlider" min="800" max="2000" value="2000" step="50"
     oninput="document.documentElement.style.setProperty('--doc-width', this.value+'px'); document.getElementById('widthVal').textContent=this.value+'px'">
-  <span id="widthVal">1100px</span>
+  <span id="widthVal">2000px</span>
 </div>
 
 <h1>FMCW Radar Baseband Rev B — Design Rationale &amp; First-Principles Analysis</h1>

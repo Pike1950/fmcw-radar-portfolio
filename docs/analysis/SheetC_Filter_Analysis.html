@@ -5,9 +5,9 @@
 <title>Sheet C Filter Analysis — Current Wiring vs Correct Sallen-Key</title>
 <style>
   :root { --bg:#0e1117; --s:#161b22; --s2:#1c2129; --bd:#30363d; --t:#e6edf3; --dim:#8b949e;
-    --blue:#58a6ff; --green:#3fb950; --orange:#d29922; --red:#f85149; --purple:#bc8cff; --cyan:#39d2c0; }
+    --blue:#58a6ff; --green:#3fb950; --orange:#d29922; --red:#f85149; --purple:#bc8cff; --cyan:#39d2c0; --doc-width:2000px; }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:-apple-system,'Segoe UI',Helvetica,sans-serif; background:var(--bg); color:var(--t); padding:2rem; max-width:1100px; margin:0 auto; line-height:1.6; }
+  body { font-family:-apple-system,'Segoe UI',Helvetica,sans-serif; background:var(--bg); color:var(--t); padding:2rem; max-width:var(--doc-width); margin:0 auto; line-height:1.6; }
   h1 { font-size:1.6rem; color:var(--blue); margin-bottom:0.3rem; }
   .sub { font-size:0.9rem; color:var(--dim); margin-bottom:2rem; }
   h2 { font-size:1.3rem; color:var(--t); margin:2rem 0 0.8rem; padding-bottom:0.4rem; border-bottom:1px solid var(--bd); }
@@ -25,9 +25,14 @@
   .yes { color:var(--green); font-weight:700; }
   .no { color:var(--red); font-weight:700; }
   .fix { color:var(--orange); font-weight:600; }
+  .width-control { position:fixed; top:12px; right:16px; z-index:1000; display:flex; align-items:center; gap:8px; background:var(--s); border:1px solid var(--bd); border-radius:8px; padding:6px 14px; font-size:0.75rem; color:var(--dim); box-shadow:0 2px 8px rgba(0,0,0,0.4); }
+  .width-control label { white-space:nowrap; }
+  .width-control input[type=range] { width:120px; accent-color:var(--red); cursor:pointer; }
+  .width-control span { min-width:42px; text-align:right; color:var(--t); font-family:monospace; font-size:0.8rem; }
 </style>
 </head>
 <body>
+<div class="width-control"><label>Width:</label><input type="range" id="widthSlider" min="800" max="2000" value="2000" step="50" oninput="document.documentElement.style.setProperty('--doc-width',this.value+'px');document.getElementById('widthVal').textContent=this.value+'px'"><span id="widthVal">2000px</span></div>
 
 <h1>Sheet C — 4th-Order Filter Wiring Analysis</h1>
 <p class="sub">Extracted from KiCad schematic &nbsp;|&nbsp; 9 nets traced, 29 wires, 13 components</p>

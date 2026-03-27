@@ -18,10 +18,10 @@
     --accent-red: #f85149;
     --accent-purple: #bc8cff;
     --accent-cyan: #39d2c0;
-    --accent-pink: #f778ba;
+    --accent-pink: #f778ba; --doc-width: 2000px;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; padding: 2rem; max-width: 1100px; margin: 0 auto; }
+  body { font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; padding: 2rem; max-width: var(--doc-width); margin: 0 auto; }
   h1 { font-size: 1.8rem; font-weight: 700; color: var(--accent-blue); margin-bottom: 0.3rem; }
   .subtitle { font-size: 0.95rem; color: var(--text-dim); margin-bottom: 2rem; }
   h2 { font-size: 1.4rem; font-weight: 600; color: var(--text); margin: 2.5rem 0 0.8rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); }
@@ -80,10 +80,16 @@
   table:not(.pin-table):not(.conn-table):not(.dft-table) th { background: #1f3864; color: #fff; padding: 6px 8px; text-align: left; font-weight: 600; font-size: 0.8rem; }
   table:not(.pin-table):not(.conn-table):not(.dft-table) td { padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
 
+  .width-control { position:fixed; top:12px; right:16px; z-index:1000; display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:6px 14px; font-size:0.75rem; color:var(--text-dim); box-shadow:0 2px 8px rgba(0,0,0,0.4); }
+  .width-control label { white-space:nowrap; }
+  .width-control input[type=range] { width:120px; accent-color:var(--accent-red); cursor:pointer; }
+  .width-control span { min-width:42px; text-align:right; color:var(--text); font-family:monospace; font-size:0.8rem; }
+
   @media print { body { background: #fff; color: #000; } .sheet-section { border-color: #ccc; background: #f8f8f8; } }
 </style>
 </head>
 <body>
+<div class="width-control"><label>Width:</label><input type="range" id="widthSlider" min="800" max="2000" value="2000" step="50" oninput="document.documentElement.style.setProperty('--doc-width',this.value+'px');document.getElementById('widthVal').textContent=this.value+'px'"><span id="widthVal">2000px</span></div>
 
 <h1>FMCW Radar Baseband Rev B — Block Diagrams</h1>
 <p class="subtitle">IC Pin Wiring · Connector Selection · DFT Reference &nbsp;|&nbsp; February 16, 2026 &nbsp;|&nbsp; Rev B.3</p>
