@@ -101,9 +101,9 @@
         <li><a href="#s3">3.6 Component Summary — Sheet A</a></li>
       </ul>
     </li>
-    <li><a href="#s4">4. Sheet B — IF Input, Protection &amp; Bias</a> <em>(forthcoming)</em></li>
-    <li><a href="#s5">5. Sheet C — PGA + Anti-Alias Filter</a> <em>(forthcoming)</em></li>
-    <li><a href="#s6">6. Sheet D — FDA Driver, ADC &amp; SPI Interface</a> <em>(forthcoming)</em></li>
+    <li><a href="#s4">4. Sheet B — IF Input, Protection &amp; Bias</a></li>
+    <li><a href="#s5">5. Sheet C — PGA + Anti-Alias Filter</a></li>
+    <li><a href="#s6">6. Sheet D — FDA Driver, ADC &amp; SPI Interface</a></li>
     <li><a href="#s7">7. Layout Design Rationale</a> <em>(forthcoming)</em></li>
     <li><a href="#sA">Appendix A: References &amp; Further Reading</a></li>
   </ul>
@@ -1065,6 +1065,500 @@
   <tr><td><code>R_SHUNT</code></td><td>CRF0805-J_-000ELF</td><td>0Ω jumper</td><td>Optional current measurement shunt. Can be replaced with current sense resistor during characterization.</td></tr>
   <tr><td colspan="4" style="color:var(--dim);">+ 9 test points: TP_5V, TP_3V3A, TP_VREF, TP_VCM, TP_TEMP, TP_GND (×4)</td></tr>
 </table>
+
+<!-- ================================================================ -->
+<h2 id="s4">4. Sheet B — IF Input, Protection &amp; Bias</h2>
+<!-- ================================================================ -->
+
+<p>Sheet B is the simplest sheet in the design — only 7 components, no ICs, no supply rails. Its job is deceptively simple: accept the mixer's IF output, protect the downstream electronics, and DC-bias the signal to VCM (1.65V) for single-supply processing. Despite its simplicity, every component has a physics-based reason for its value.</p>
+
+<h3 id="s4-1">4.1 Signal Flow</h3>
+
+<p>The signal path from connector to output is entirely passive and linear:</p>
+
+<div class="signal-flow">
+  <div class="block">J_IF<br><small>SMA 132289</small></div>
+  <div class="arrow">→</div>
+  <div class="block">R_IN<br><small>200Ω</small></div>
+  <div class="arrow">→</div>
+  <div class="block">D_ESD<br><small>TPD1E10B06</small></div>
+  <div class="arrow">→</div>
+  <div class="block">C_AC<br><small>100nF C0G</small></div>
+  <div class="arrow">→</div>
+  <div class="block">R_BIAS<br><small>47kΩ to VCM</small></div>
+  <div class="arrow">→</div>
+  <div class="block">IF_BIASED<br><small>→ Sheet C</small></div>
+</div>
+
+<p>Two test points provide visibility: <strong>TP_IF_RAW</strong> (after R_IN, before ESD) monitors the raw input signal, and <strong>TP_PGA_IN</strong> (at the IF_BIASED output) confirms the DC bias is correct before the signal enters the PGA.</p>
+
+<h3 id="s4-2">4.2 Input Connector: J_IF (SMA 132289)</h3>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-decision">DECISION</span> Edge-mount SMA, not through-hole BNC</strong>
+  <p>The Amphenol 132289 is a 50Ω edge-mount SMA connector. SMA is chosen over BNC or MMCX for the primary input because: (1) the RF front end uses SMA on its mixer output, so no adapter is needed; (2) the 50Ω impedance is matched to the coax and mixer output impedance; (3) the edge-mount footprint minimizes the stub length between the connector and the first component (R_IN), reducing reflections at higher frequencies.</p>
+  <p>At our signal frequencies (DC to 15 kHz), impedance matching is electrically irrelevant — the wavelength at 15 kHz is 20 km, so the entire PCB is an infinitesimal fraction of a wavelength. The SMA choice is about mechanical compatibility and good practice, not electrical necessity.</p>
+</div>
+
+<h3 id="s4-3">4.3 Current Limiting: R_IN (200Ω)</h3>
+
+<p>R_IN is the first component in the signal path after the SMA connector. It serves two purposes:</p>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Purpose 1: Current limiting for ESD protection</strong>
+  <p>The TPD1E10B06 ESD diode clamps voltages above V<sub>clamp</sub> (typically 8.5V for a 5V-rated device) by shunting current to ground. Without a series resistor, a fast transient could deliver unlimited current into the diode before clamping activates. R_IN limits the peak current during an ESD event:</p>
+  <p>At 8 kV HBM (Human Body Model): I<sub>peak</sub> = V<sub>ESD</sub> / (R<sub>body</sub> + R_IN) = 8000 / (1500 + 200) = 4.7 A. Without R_IN: 8000 / 1500 = 5.3 A. The 200Ω reduces peak current by ~11%, which helps but is secondary to the ESD diode's own current handling capability (19A peak for TPD1E10B06).</p>
+</div>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Purpose 2: Signal attenuation context</strong>
+  <p>R_IN forms a voltage divider with the PGA113 input impedance. The PGA113 input impedance is very high (~10 GΩ in the datasheet's equivalent circuit), so the attenuation from R_IN is negligible: V<sub>out</sub>/V<sub>in</sub> = 10G / (10G + 200) ≈ 1.000. The 200Ω is effectively transparent to the signal.</p>
+  <p>However, R_IN does form a low-pass filter with any parasitic capacitance at the D_ESD input. The TPD1E10B06 has ~0.5 pF junction capacitance. The resulting pole is at f = 1/(2π × 200 × 0.5p) = 1.6 GHz — far above our 15 kHz signal band. No signal degradation.</p>
+</div>
+
+<div class="callout">
+  <strong><span class="tag tag-tradeoff">TRADEOFF</span> R_IN value: 200Ω is a compromise</strong>
+  <p>Lower values (50Ω) provide better impedance matching to the coax but less current limiting. Higher values (1kΩ+) provide better protection but start to form a significant voltage divider with the downstream bias network. At 200Ω, the current limiting is modest, the signal attenuation is negligible, and the parasitic LP filter pole is well above the signal band. This is a standard value seen in many TI reference designs for mixed-signal inputs.</p>
+</div>
+
+<h3 id="s4-4">4.4 ESD Protection: D_ESD (TPD1E10B06DPYR)</h3>
+
+<p>The TPD1E10B06 is a single-channel ESD protection diode from TI, chosen specifically for low-capacitance analog signal paths.</p>
+
+<table>
+  <tr><th>Parameter</th><th>Value</th><th>Why It Matters</th></tr>
+  <tr><td>Package</td><td>X1SON-2 (0402 size)</td><td>Minimal PCB footprint, short trace to signal path</td></tr>
+  <tr><td>Junction capacitance</td><td>0.5 pF typical</td><td>Negligible loading on 15 kHz signal. A 10 pF diode would form a 80 MHz pole with 200Ω — still fine, but 0.5 pF gives two decades of margin.</td></tr>
+  <tr><td>Clamping voltage</td><td>8.5V at 1A (5V device)</td><td>Protects PGA113 inputs (abs max ±0.3V beyond supply, so 3.6V max). The PGA113 is further protected by its own internal diodes.</td></tr>
+  <tr><td>ESD rating</td><td>±16 kV HBM, ±750V CDM</td><td>Exceeds IEC 61000-4-2 Level 4 (±8 kV contact, ±15 kV air). Sufficient for bench handling without a wrist strap.</td></tr>
+  <tr><td>Leakage current</td><td>1 nA typical</td><td>At our signal frequencies, 1 nA leakage is negligible — it would require a 1 GΩ impedance to produce even 1 mV of error.</td></tr>
+</table>
+
+<div class="callout callout-teal">
+  <strong><span class="tag tag-decision">DECISION</span> Shunt topology, not series</strong>
+  <p>D_ESD connects from signal to GND (shunt). In normal operation, the diode is reverse-biased and invisible — its only effect is 0.5 pF of parasitic capacitance. During an ESD event, the diode forward-biases and clamps the voltage. This is the correct topology for a unidirectional TVS on a signal that swings around a DC bias (VCM = 1.65V). The diode sees at most ~1.65V in normal operation — well below its breakdown voltage.</p>
+</div>
+
+<h3 id="s4-5">4.5 AC Coupling: C_AC (100nF, C0G/NP0)</h3>
+
+<p>C_AC blocks any DC component from the mixer output and passes only the AC beat frequency signal.</p>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Why AC coupling is needed</strong>
+  <p>The HMC218BMS8GE mixer's IF output has an undefined DC bias — it depends on the LO drive level, mixer balance, and temperature. The baseband signal chain is biased at VCM = 1.65V (set by Sheet A). If the mixer's DC output were, say, 0.3V, connecting it directly would force the PGA113 input to 0.3V instead of 1.65V, wasting most of the ADC's input range on a DC offset.</p>
+  <p>C_AC strips the DC component and passes only the AC beat frequency (DC to ~15 kHz). R_BIAS (downstream) then re-biases the signal to VCM.</p>
+</div>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> High-pass corner frequency</strong>
+  <p>C_AC and R_BIAS form a high-pass filter. The corner frequency is:</p>
+  <p style="font-family:monospace; margin:0.5rem 0;">f<sub>HP</sub> = 1 / (2π × R_BIAS × C_AC) = 1 / (2π × 47kΩ × 100nF) = <strong>33.9 Hz</strong></p>
+  <p>This means the signal is attenuated by 3 dB at 33.9 Hz and by 20 dB/decade below that. At DC, the signal is completely blocked (as intended). At the minimum useful beat frequency (~0.04 Hz at 30 MHz BW for a 1 m target), the attenuation is significant — but targets at 1 m are well within the "too close to resolve" zone anyway. At the ISM band's more practical detection range of 200+ m (33 Hz at 125 MHz BW), the signal passes with essentially no attenuation.</p>
+</div>
+
+<div class="callout">
+  <strong><span class="tag tag-tradeoff">TRADEOFF</span> C0G/NP0 dielectric, not X7R</strong>
+  <p>C0G (also called NP0) ceramic capacitors have zero voltage coefficient — their capacitance does not change with applied DC bias. X7R capacitors lose 30–80% of their rated capacitance at their rated voltage. For a 100nF cap in the signal path, the capacitance must be stable to keep the HP corner frequency predictable. If C_AC were X7R and lost 50% capacitance, f<sub>HP</sub> would shift from 33.9 Hz to 67.8 Hz — potentially attenuating near-range targets.</p>
+  <p>The tradeoff: C0G caps are larger and more expensive than X7R at the same capacitance. 100nF in C0G is available in 0805 or 1206 size. For a signal-path cap that defines a filter corner, the size and cost penalty is justified.</p>
+</div>
+
+<h3 id="s4-6">4.6 DC Bias: R_BIAS (47kΩ to VCM)</h3>
+
+<p>After AC coupling strips the DC component, R_BIAS re-establishes the DC operating point at VCM (1.65V) for the single-supply signal chain.</p>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> How the bias works</strong>
+  <p>With no signal applied, C_AC is charged to VCM through R_BIAS. The signal side of C_AC sits at 1.65V — exactly mid-supply. When an AC signal arrives through C_AC, it swings symmetrically around 1.65V. The PGA113 sees a signal centered at VCM regardless of the mixer's DC output.</p>
+  <p>R_BIAS must be large enough to avoid loading the signal. The signal source impedance (mixer output through R_IN) is ~200Ω. R_BIAS at 47kΩ is 235× larger, so the voltage divider ratio is 47k / (47k + 200) ≈ 0.996 — less than 0.04 dB of signal loss. The bias network is essentially invisible to the signal.</p>
+</div>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Current draw from VCM buffer</strong>
+  <p>R_BIAS draws a DC current from the VCM rail: I = VCM / R_BIAS = 1.65V / 47kΩ = 35 µA. This is negligible for the OPA320 buffer (output current capability: ±20 mA). Even with three RX channels (future expansion), the total VCM load from bias resistors would be 105 µA — still negligible.</p>
+  <p>This is why the VCM buffer exists on Sheet A: if the VCM were an unbuffered resistor divider, R_BIAS would form a voltage divider with the source impedance (5kΩ from two 10kΩ resistors in parallel), pulling VCM down by 35µA × 5kΩ/(5kΩ+47kΩ) ≈ 3.4 mV. With the OPA320 buffer (output impedance ~1Ω), the pull-down is 35µA × 1Ω = 0.035 mV — 100× less error.</p>
+</div>
+
+<div class="callout">
+  <strong><span class="tag tag-tradeoff">TRADEOFF</span> R_BIAS value: 47kΩ is a compromise</strong>
+  <p>Higher values (100kΩ+) reduce signal loading further but increase the time constant for DC settling: τ = R_BIAS × C_AC = 47kΩ × 100nF = 4.7 ms. After power-on or a large transient, the bias takes ~5τ = 23.5 ms to settle within 1% of VCM. At 100kΩ, settling would take 50 ms. At 10kΩ, settling is fast (5 ms) but signal loading increases to 2% (0.2 dB). 47kΩ provides sub-25 ms settling with negligible signal loading.</p>
+</div>
+
+<h3 id="s4-7">4.7 Inter-Sheet Connections</h3>
+
+<p>Sheet B has only two hierarchical label connections — the minimum required for signal flow:</p>
+
+<table>
+  <tr><th>Signal</th><th>Direction</th><th>From</th><th>To</th><th>Purpose</th></tr>
+  <tr><td style="color:var(--green); font-weight:600;">VCM</td><td>Input</td><td>Sheet A (OPA320 output)</td><td>R_BIAS (bias reference)</td><td>Sets DC operating point at 1.65V</td></tr>
+  <tr><td style="color:var(--blue); font-weight:600;">IF_BIASED</td><td>Output</td><td>C_AC/R_BIAS junction</td><td>Sheet C (PGA113 CH0 input)</td><td>AC-coupled, DC-biased IF signal</td></tr>
+</table>
+
+<p>Sheet B requires no power supply connections — it is entirely passive. All 7 components (J_IF, R_IN, D_ESD, C_AC, R_BIAS, TP_IF_RAW, TP_PGA_IN) are either passive or connectors. This makes Sheet B the easiest to validate during bringup: with VCM confirmed on Sheet A, measuring 1.65V DC at TP_PGA_IN confirms the entire bias network is working correctly.</p>
+
+<h3 id="s4-8">4.8 Component Summary — Sheet B</h3>
+
+<table>
+  <tr><th>Ref Des</th><th>Part Number</th><th>Value / Type</th><th>First-Principles Role</th></tr>
+  <tr><td><code>J_IF</code></td><td>Amphenol 132289</td><td>SMA edge-mount, 50Ω</td><td>Signal input from RF mixer. Impedance-matched to coax.</td></tr>
+  <tr><td><code>R_IN</code></td><td>—</td><td>200Ω 0402</td><td>Current limiting for ESD. Transparent to signal (attenuation &lt; 0.001 dB).</td></tr>
+  <tr><td><code>D_ESD</code></td><td>TPD1E10B06DPYR</td><td>ESD TVS, 0.5 pF</td><td>Clamps transients &gt; 8.5V to protect PGA113. ±16 kV HBM rated.</td></tr>
+  <tr><td><code>C_AC</code></td><td>—</td><td>100nF C0G 0805</td><td>AC coupling. Blocks mixer DC offset, passes beat frequencies. Forms 33.9 Hz HP with R_BIAS.</td></tr>
+  <tr><td><code>R_BIAS</code></td><td>—</td><td>47kΩ 0402</td><td>DC bias to VCM (1.65V). τ = 4.7 ms settling. 35 µA draw from VCM buffer.</td></tr>
+  <tr><td><code>TP_IF_RAW</code></td><td>—</td><td>1.5mm test pad</td><td>DFT: probe raw input after R_IN, before ESD.</td></tr>
+  <tr><td><code>TP_PGA_IN</code></td><td>—</td><td>1.5mm test pad</td><td>DFT: verify DC bias = 1.65V before PGA113 input.</td></tr>
+</table>
+
+<div class="callout callout-green">
+  <strong>Design philosophy: the simplest sheet demonstrates the most discipline</strong>
+  <p>Sheet B has no ICs, no feedback loops, no gain stages. But every passive component has a quantified purpose: R_IN limits current to 4.7A during ESD, C_AC sets f<sub>HP</sub> = 33.9 Hz with C0G stability, R_BIAS draws 35 µA from a buffered VCM to establish a 1.65V bias with 23.5 ms settling. Two test points (TP_IF_RAW, TP_PGA_IN) provide before/after visibility for the entire input conditioning stage. This is what DFT-first design looks like: even a 7-component sheet gets test infrastructure.</p>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="s5">5. Sheet C — PGA + Anti-Alias Filter</h2>
+<!-- ================================================================ -->
+
+<p>Sheet C contains the two most critical analog blocks in the signal chain: the programmable gain amplifier (PGA113) that scales the signal to fill the ADC's input range, and the 4th-order Sallen-Key Butterworth low-pass filter (LTC6242) that removes out-of-band noise before sampling. Together, these 19 components determine the system's dynamic range, noise floor, and alias rejection.</p>
+
+<h3 id="s5-1">5.1 Signal Flow</h3>
+
+<div class="signal-flow">
+  <div class="block">IF_BIASED<br><small>from Sheet B</small></div>
+  <div class="arrow">→</div>
+  <div class="block">PGA113<br><small>G: 1–200×</small></div>
+  <div class="arrow">→</div>
+  <div class="block">R_FILT_ISO<br><small>0Ω (DFT)</small></div>
+  <div class="arrow">→</div>
+  <div class="block">Stage 1<br><small>SK Q=1.306</small></div>
+  <div class="arrow">→</div>
+  <div class="block">Stage 2<br><small>SK Q=0.541</small></div>
+  <div class="arrow">→</div>
+  <div class="block">LPF_OUT<br><small>→ Sheet D</small></div>
+</div>
+
+<h3 id="s5-2">5.2 Programmable Gain Amplifier: PGA113 (U_PGA)</h3>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Why variable gain is necessary</strong>
+  <p>The radar's received signal power varies as R⁻⁴ (the radar range equation). A target at 10 m returns 10,000× more power than the same target at 100 m. Without variable gain, the ADC would either clip on close targets or waste resolution on far targets. The PGA113 provides 8 discrete gain settings (1×, 2×, 5×, 10×, 20×, 50×, 100×, 200×) that span a 46 dB range — enough to keep the signal within the ADC's optimal input window regardless of target distance.</p>
+  <p>The gain is set digitally via SPI (from the FPGA/MCU through J_DFT on Sheet D), allowing the system to implement adaptive gain control: start at low gain, check the ADC output, and increase gain until the signal fills the desired fraction of the ADC range.</p>
+</div>
+
+<h4>PGA113 Transfer Function</h4>
+
+<p>The PGA113 output is defined by:</p>
+<span class="eq">V<sub>OUT</sub> = G × (V<sub>IN</sub> − V<sub>REF</sub>) + V<sub>REF</sub></span>
+
+<p>With V<sub>REF</sub> connected to VCM (1.65V), the output swings symmetrically around VCM regardless of gain setting. This is critical for single-supply operation: the signal stays centered in the ADC's linear range at every gain step.</p>
+
+<table>
+  <tr><th>Gain Code</th><th>Gain</th><th>Output with 5 mVpp input</th><th>Output with 50 µVpp input</th><th>Use Case</th></tr>
+  <tr><td>0x00</td><td>1×</td><td>5 mVpp</td><td>50 µVpp</td><td>Close/strong targets, system test</td></tr>
+  <tr><td>0x01</td><td>2×</td><td>10 mVpp</td><td>100 µVpp</td><td>—</td></tr>
+  <tr><td>0x02</td><td>5×</td><td>25 mVpp</td><td>250 µVpp</td><td>—</td></tr>
+  <tr><td>0x03</td><td>10×</td><td>50 mVpp</td><td>500 µVpp</td><td>General purpose</td></tr>
+  <tr><td>0x04</td><td>20×</td><td>100 mVpp</td><td>1 mVpp</td><td>—</td></tr>
+  <tr><td>0x05</td><td>50×</td><td>250 mVpp</td><td>2.5 mVpp</td><td>—</td></tr>
+  <tr><td>0x06</td><td>100×</td><td>500 mVpp</td><td>5 mVpp</td><td>Weak/distant targets</td></tr>
+  <tr><td>0x07</td><td>200×</td><td>1.0 Vpp</td><td>10 mVpp</td><td>Maximum sensitivity</td></tr>
+</table>
+
+<div class="callout callout-red">
+  <strong><span class="tag tag-decision">DECISION</span> DVDD (Pin 10) connects to 3V3A, NOT 3V3D</strong>
+  <p>Despite the "D" in DVDD, this pin powers the PGA113's analog output stage — the final amplifier that drives VOUT (Pin 5). Connecting it to the noisy post-ferrite 3V3D rail would inject MCU switching noise directly into the signal path. Both AVDD (Pin 1) and DVDD (Pin 10) connect to 3V3A with individual 100nF 0402 bypass caps (C11, C12) placed within 2 mm of the pins.</p>
+  <p>DVDD also powers the SPI interface logic, but SPI transactions draw only µA during the brief command window. The SPI clock noise that couples through DVDD into the analog supply is attenuated by the bypass cap's low impedance at SPI frequencies (100nF at 10 MHz SCLK → Z = 0.16Ω). The analog output stage dominates the DVDD current draw.</p>
+</div>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> PGA113 SPI interface</strong>
+  <p>The PGA113 uses a simple 16-bit SPI protocol: 8-bit register address + 8-bit gain/channel code. A gain change command is 0x2A followed by the gain code (bits 7:4) and channel select (bits 3:0). The SPI clock maximum is 10 MHz. With only 16 bits per command, a gain change takes 1.6 µs at full speed — fast enough to change gain between chirp ramps (~5 ms apart) with negligible dead time.</p>
+  <p>The SPI bus is shared with the ADS8881 ADC (on Sheet D). The PGA113 is selected by CS_PGA (active low), while the ADC uses a separate ~CS line. The 33Ω SCLK damping resistor (R_SCLK_DAMP1 on Sheet D) is placed near the ADC, not the PGA, because the ADC is more sensitive to clock edge ringing.</p>
+</div>
+
+<h3 id="s5-3">5.3 Isolation Resistor: R_FILT_ISO (0Ω)</h3>
+
+<div class="callout callout-teal">
+  <strong><span class="tag tag-decision">DECISION</span> DFT isolation between PGA and filter</strong>
+  <p>R_FILT_ISO is a 0Ω 0402 jumper between PGA_OUT and the filter input. In normal operation it is a wire. During debug, removing this resistor isolates the PGA from the filter, enabling independent characterization of each block:</p>
+  <p>With R_FILT_ISO removed: inject a test signal directly into the filter input (via TP_LPF_OUT or a bodge wire) to measure the filter's transfer function without the PGA. Or, measure PGA_OUT at TP_PGA_OUT without the filter loading it.</p>
+  <p>With R_FILT_ISO installed: the signal chain operates normally with negligible insertion loss (0Ω is effectively a wire).</p>
+</div>
+
+<h3 id="s5-4">5.4 Anti-Alias Filter: 4th-Order Sallen-Key Butterworth</h3>
+
+<p>The anti-alias filter is the most important analog block in the baseband. Its job is absolute: <strong>remove all signal content above the Nyquist frequency (50 kHz at 100 kS/s) before the ADC samples it</strong>. Any noise or signal above Nyquist that reaches the ADC is aliased irrecoverably into the passband — no digital filter can undo aliasing after the fact.</p>
+
+<h4>Why 4th-Order Butterworth?</h4>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Filter order determines alias rejection</strong>
+  <p>The ADC (ADS8881) has 18-bit resolution, which corresponds to a dynamic range of 6.02 × 18 + 1.76 = 110 dB. For aliased noise to be below 1 LSB, the filter must attenuate signals at Nyquist (50 kHz) by at least the ADC's dynamic range. In practice, we need the filter attenuation at 50 kHz to exceed the noise floor, not the full dynamic range — but more attenuation is always better.</p>
+  <p>A 4th-order filter rolls off at 80 dB/decade (24 dB/octave). With a 15 kHz cutoff, the attenuation at 50 kHz is:</p>
+  <p style="font-family:monospace; margin:0.5rem 0;">A(50 kHz) = 80 × log₁₀(50/15) = 80 × 0.523 = <strong>41.8 dB</strong></p>
+  <p>This provides 41.8 dB of alias rejection — sufficient for the practical dynamic range of the system (limited by PGA noise and mixer noise to roughly 70–80 dB, not the full 110 dB of the ADC).</p>
+</div>
+
+<div class="callout">
+  <strong><span class="tag tag-tradeoff">TRADEOFF</span> Why Butterworth, not Chebyshev or Bessel?</strong>
+  <p><strong>Butterworth:</strong> Maximally flat passband magnitude. No ripple in the passband, which means the gain is constant across the signal band (DC to ~15 kHz). The phase response has moderate nonlinearity, but for FFT-based radar processing, phase linearity is less critical than magnitude flatness — the FFT primarily uses magnitude to determine range.</p>
+  <p><strong>Chebyshev (rejected):</strong> Steeper rolloff per order but has passband ripple. A 4th-order Chebyshev with 1 dB ripple would give ~55 dB at 50 kHz — better alias rejection. But the 1 dB passband variation means the gain changes across the signal band, distorting the relative amplitudes of beat frequencies from different targets. For radar, flat passband is more important than steep rolloff.</p>
+  <p><strong>Bessel (rejected):</strong> Maximally flat group delay (best phase linearity) but the weakest rolloff — only ~30 dB at 50 kHz for a 4th-order design. Insufficient alias rejection.</p>
+</div>
+
+<h4>Two-Stage Cascaded Design</h4>
+
+<p>The 4th-order Butterworth is implemented as two cascaded 2nd-order Sallen-Key stages. Each stage uses one section of the LTC6242 quad op-amp in unity-gain configuration. The two stages have different Q values that, when cascaded, produce the flat Butterworth response:</p>
+
+<table>
+  <tr><th>Stage</th><th>Op-Amp Section</th><th>Q Factor</th><th>R Values</th><th>C Values</th><th>Character</th></tr>
+  <tr><td><strong>Stage 1</strong></td><td>Section A (Pins 1,2,3)</td><td>1.306</td><td>R3=1.62kΩ, R4=5.76kΩ</td><td>C13=11nF, C14=1.1nF</td><td>High-Q — provides the "knee" of the Butterworth rolloff, with slight peaking near f<sub>c</sub></td></tr>
+  <tr><td><strong>Stage 2</strong></td><td>Section B (Pins 5,6,7)</td><td>0.541</td><td>R5=17.4kΩ, R6=536Ω</td><td>C15=11nF, C16=1.1nF</td><td>Low-Q — overdamped response that flattens the peaking from Stage 1</td></tr>
+</table>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Why the Q values are different</strong>
+  <p>A 4th-order Butterworth has poles at angles of ±22.5° and ±67.5° from the negative real axis in the s-plane. The Q factor of each 2nd-order section is determined by the pole angle: Q = 1/(2·cos(θ)). For θ = 22.5°: Q = 1/(2·cos(22.5°)) = 1/(2×0.924) = 0.541. For θ = 67.5°: Q = 1/(2·cos(67.5°)) = 1/(2×0.383) = 1.306.</p>
+  <p>The high-Q stage (1.306) produces a ~2 dB peak near the cutoff frequency. The low-Q stage (0.541) has a gentle, overdamped rolloff. When multiplied together, the peaks and dips cancel exactly, producing the maximally-flat Butterworth response. This is only true for these specific Q values — using identical Q in both stages would produce a different (non-Butterworth) response shape.</p>
+</div>
+
+<h4>Sallen-Key Topology</h4>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> How Sallen-Key works</strong>
+  <p>Each stage uses a unity-gain Sallen-Key low-pass topology. The op-amp is configured as a voltage follower (−IN tied to OUT, gain = 1). Two series resistors and two capacitors form the frequency-selective network:</p>
+  <p><strong>C_shunt</strong> (C13, C15): connects from the R-R junction (Node A) to GND. This is the "expected" capacitor in an RC low-pass — it shunts high-frequency signals to ground.</p>
+  <p><strong>C_feedback</strong> (C14, C16): connects from the R-R junction (Node B) to the op-amp output. This is the critical component — it creates positive feedback that controls the Q factor. Without C_feedback, the circuit is just a passive 2-pole RC with Q = 0.5 (overdamped). C_feedback adds the energy storage needed to achieve Q > 0.5.</p>
+  <p>The relationship: larger C_feedback → higher Q → more peaking near f<sub>c</sub> → sharper rolloff. The component values are calculated from the Butterworth Q requirements using standard Sallen-Key design equations.</p>
+</div>
+
+<div class="callout callout-red">
+  <strong><span class="tag tag-risk">RISK</span> C_feedback must NOT go to GND — the Rev A wiring error</strong>
+  <p>In the initial Rev B schematic wiring, C14 Pin 2 was accidentally connected to GND instead of OUT_A. This converts the Sallen-Key into a passive 3-pole RC filter with no Q control — the Butterworth response shape is lost, and attenuation at 50 kHz drops from −41.8 dB to approximately −20 dB. This error was caught during the schematic review (see <a href="https://pike1950.github.io/fmcw-radar-portfolio/docs/analysis/SheetC_Filter_Analysis.html">Filter Analysis</a>) and corrected. The corrected wiring routes C14.Pin2 to OUT_A and C16.Pin2 to OUT_B.</p>
+</div>
+
+<h4>Component Value Selection</h4>
+
+<div class="callout callout-teal">
+  <strong><span class="tag tag-decision">DECISION</span> C0G/NP0 capacitors for all filter caps</strong>
+  <p>All four filter capacitors (C13, C14, C15, C16) use C0G (NP0) dielectric. C0G has zero voltage coefficient and zero temperature coefficient (±30 ppm/°C) — the capacitance does not change with applied voltage or temperature. X7R capacitors can lose 30–80% of rated capacitance at DC bias, which would shift the filter's cutoff frequency and Q unpredictably.</p>
+  <p>For a filter that defines the system's anti-alias performance, capacitor stability is not optional — it's a requirement. The tradeoff is size: 11nF in C0G requires 0805 or 1206 package, while X7R would fit in 0402. The larger footprint is an acceptable price for predictable filter response.</p>
+</div>
+
+<h3 id="s5-5">5.5 Unused Op-Amp Sections</h3>
+
+<p>The LTC6242 is a quad op-amp. Only Sections A and B are used for the filter. Sections C and D must be configured to prevent oscillation:</p>
+
+<table>
+  <tr><th>Section</th><th>Configuration</th><th>Rationale</th></tr>
+  <tr><td>C (Pins 10, 11, 12)</td><td>OUT_C (10) → −IN_C (11), +IN_C (12) → GND</td><td>Unity follower with stable input. Draws quiescent current but cannot oscillate.</td></tr>
+  <tr><td>D (Pins 14, 15, 16)</td><td>OUT_D (16) → −IN_D (15), +IN_D (14) → GND</td><td>Same treatment. Leaving inputs floating would allow oscillation at the op-amp's GBW, coupling noise into the supply and ground.</td></tr>
+</table>
+
+<h3 id="s5-6">5.6 Inter-Sheet Connections</h3>
+
+<table>
+  <tr><th>Signal</th><th>Direction</th><th>From</th><th>To</th><th>Purpose</th></tr>
+  <tr><td style="color:var(--blue); font-weight:600;">IF_BIASED</td><td>Input</td><td>Sheet B</td><td>PGA113 CH0 (Pin 3)</td><td>DC-biased IF signal at VCM</td></tr>
+  <tr><td style="color:var(--green); font-weight:600;">VCM</td><td>Input</td><td>Sheet A</td><td>PGA113 VREF (Pin 4)</td><td>Output reference voltage</td></tr>
+  <tr><td style="color:var(--orange); font-weight:600;">3V3A</td><td>Input (×3 passive)</td><td>Sheet A</td><td>PGA113 AVDD/DVDD, LTC6242 V+</td><td>Analog supply</td></tr>
+  <tr><td style="color:var(--purple); font-weight:600;">SPI_SCLK</td><td>Input</td><td>Sheet D (J_DFT)</td><td>PGA113 SCLK (Pin 7)</td><td>SPI clock</td></tr>
+  <tr><td style="color:var(--purple); font-weight:600;">SPI_SDI</td><td>Input</td><td>Sheet D (J_DFT)</td><td>PGA113 DIO (Pin 8)</td><td>SPI data</td></tr>
+  <tr><td style="color:var(--purple); font-weight:600;">CS_PGA</td><td>Input</td><td>Sheet D (J_DFT)</td><td>PGA113 ~CS (Pin 9)</td><td>PGA chip select (active low)</td></tr>
+  <tr><td style="color:var(--blue); font-weight:600;">PGA_OUT</td><td>Output</td><td>PGA113 VOUT (Pin 5)</td><td>Sheet D (J_DFT, via hier label)</td><td>DFT monitoring of PGA output</td></tr>
+  <tr><td style="color:var(--blue); font-weight:600;">LPF_OUT</td><td>Output</td><td>LTC6242 OUT_B (Pin 7)</td><td>Sheet D (FDA input)</td><td>Filtered signal to FDA</td></tr>
+</table>
+
+<h3 id="s5-7">5.7 Component Summary — Sheet C</h3>
+
+<table>
+  <tr><th>Ref Des</th><th>Part Number</th><th>Value / Type</th><th>First-Principles Role</th></tr>
+  <tr><td><code>U_PGA</code></td><td>PGA113AIDGSR</td><td>PGA, MSOP-10</td><td>Variable gain (1–200×) to fill ADC range regardless of target distance. SPI-controlled, 46 dB gain range.</td></tr>
+  <tr><td><code>U_FILT</code></td><td>LTC6242HVCGN#PBF</td><td>Quad Op-Amp, SSOP-16</td><td>4th-order Butterworth LPF. Sections A+B for filter, C+D as unity followers (unused).</td></tr>
+  <tr><td><code>C11</code></td><td>—</td><td>100nF 0402</td><td>PGA113 AVDD bypass. ≤2mm from Pin 1.</td></tr>
+  <tr><td><code>C12</code></td><td>—</td><td>100nF 0402</td><td>PGA113 DVDD bypass. ≤2mm from Pin 10. On 3V3A, NOT 3V3D.</td></tr>
+  <tr><td><code>R_FILT_ISO</code></td><td>—</td><td>0Ω 0402</td><td>DFT isolation between PGA and filter. Remove to characterize independently.</td></tr>
+  <tr><td><code>R3</code></td><td>—</td><td>1.62kΩ 0402</td><td>Stage 1 series R (first). Sets f<sub>c</sub> and Q with R4, C13, C14.</td></tr>
+  <tr><td><code>R4</code></td><td>—</td><td>5.76kΩ 0402</td><td>Stage 1 series R (second).</td></tr>
+  <tr><td><code>C13</code></td><td>—</td><td>11nF C0G</td><td>Stage 1 shunt cap. Node A → GND.</td></tr>
+  <tr><td><code>C14</code></td><td>—</td><td>1.1nF C0G</td><td>Stage 1 feedback cap. Node B → OUT_A. Controls Q=1.306.</td></tr>
+  <tr><td><code>R5</code></td><td>—</td><td>17.4kΩ 0402</td><td>Stage 2 series R (first).</td></tr>
+  <tr><td><code>R6</code></td><td>—</td><td>536Ω 0402</td><td>Stage 2 series R (second).</td></tr>
+  <tr><td><code>C15</code></td><td>—</td><td>11nF C0G</td><td>Stage 2 shunt cap. Node A' → GND.</td></tr>
+  <tr><td><code>C16</code></td><td>—</td><td>1.1nF C0G</td><td>Stage 2 feedback cap. Node B' → OUT_B. Controls Q=0.541.</td></tr>
+  <tr><td><code>C17</code></td><td>—</td><td>100nF 0402</td><td>LTC6242 V+ bypass.</td></tr>
+  <tr><td><code>C18</code></td><td>—</td><td>100nF 0402</td><td>LTC6242 V− bypass (GND side, for symmetry).</td></tr>
+  <tr><td><code>TP_PGA_OUT</code></td><td>—</td><td>1.5mm test pad</td><td>DFT: probe PGA output before filter.</td></tr>
+  <tr><td><code>TP_LPF_OUT</code></td><td>—</td><td>1.5mm test pad</td><td>DFT: probe filter output before FDA.</td></tr>
+  <tr><td><code>J_MMCX_PGA</code></td><td>—</td><td>MMCX, DNP</td><td>DFT: high-quality probe point at PGA output.</td></tr>
+  <tr><td><code>J_MMCX_LPF</code></td><td>—</td><td>MMCX, DNP</td><td>DFT: high-quality probe point at filter output. Used for Bode plot.</td></tr>
+</table>
+
+<div class="callout callout-green">
+  <strong>Design philosophy: the filter is the system's immune system</strong>
+  <p>Every dB of alias rejection the filter provides is a dB of signal integrity preserved for the FFT. The 4th-order Butterworth at 15 kHz provides 41.8 dB at Nyquist — enough that aliased noise is below the system's practical noise floor. The C0G capacitors ensure this performance is stable across temperature and voltage. The DFT infrastructure (TP_PGA_OUT, TP_LPF_OUT, J_MMCX_PGA, J_MMCX_LPF, R_FILT_ISO) enables independent characterization of the PGA and filter, so any performance shortfall can be isolated to a specific block during bringup.</p>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="s6">6. Sheet D — FDA Driver, ADC &amp; SPI Interface</h2>
+<!-- ================================================================ -->
+
+<p>Sheet D is the most complex sheet in the design — 35 components including two ICs, the primary DFT header, and the SPI interface that connects the analog signal chain to the digital world. It performs three functions: single-ended to differential conversion (THS4531A FDA), 18-bit digitization (ADS8881 SAR ADC), and external test access (J_DFT header with 6× isolation resistors).</p>
+
+<h3 id="s6-1">6.1 Signal Flow</h3>
+
+<div class="signal-flow">
+  <div class="block">LPF_OUT<br><small>from Sheet C</small></div>
+  <div class="arrow">→</div>
+  <div class="block">R_G (1kΩ)<br><small>gain resistor</small></div>
+  <div class="arrow">→</div>
+  <div class="block">THS4531A<br><small>FDA, G=1</small></div>
+  <div class="arrow">→</div>
+  <div class="block">R_OUTP/M<br><small>33Ω + C_DIFF</small></div>
+  <div class="arrow">→</div>
+  <div class="block">ADS8881<br><small>18-bit SAR</small></div>
+  <div class="arrow">→</div>
+  <div class="block">SPI → J_DFT<br><small>→ FPGA/MCU</small></div>
+</div>
+
+<h3 id="s6-2">6.2 Fully Differential Amplifier: THS4531A (U_FDA)</h3>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Why single-ended to differential conversion is required</strong>
+  <p>The ADS8881 is a differential-input ADC: it digitizes the voltage difference between AINP and AINN. The signal from the filter (LPF_OUT) is single-ended — it swings around VCM with respect to GND. A fully differential amplifier (FDA) converts this single-ended signal into a balanced differential pair centered at VCM, which:</p>
+  <p><strong>1. Rejects common-mode noise.</strong> Any noise that appears equally on both AINP and AINN (supply noise, ground bounce, EMI) is rejected by the ADC's differential input. The CMRR of the ADS8881 is >80 dB — common-mode noise is attenuated by 10,000×.</p>
+  <p><strong>2. Doubles the signal swing.</strong> A single-ended signal swinging ±1V around VCM becomes a differential signal of ±2V (AINP goes +1V while AINN goes −1V). This fills more of the ADC's input range, improving effective resolution.</p>
+  <p><strong>3. Sets the output common mode.</strong> The VOCM pin (connected to VCM = 1.65V) forces both outputs to sit at 1.65V with zero differential signal. This is exactly the mid-scale input the ADC expects.</p>
+</div>
+
+<h4>FDA Feedback Network</h4>
+
+<p>The THS4531A uses a cross-coupled feedback topology with four resistors:</p>
+
+<table>
+  <tr><th>Resistor</th><th>Value</th><th>From</th><th>To</th><th>Function</th></tr>
+  <tr><td>R_G</td><td>1kΩ</td><td>LPF_OUT</td><td>VIN+ (Pin 8)</td><td>Gain-setting input resistor (non-inverting path)</td></tr>
+  <tr><td>R_GND</td><td>1kΩ</td><td>GND</td><td>VIN− (Pin 1)</td><td>Balancing resistor (inverting path). Sets impedance symmetry.</td></tr>
+  <tr><td>R_F1 (Rf1)</td><td>1kΩ</td><td>VOUT+ (Pin 4)</td><td>VIN− (Pin 1)</td><td>Feedback from non-inverting output to inverting input</td></tr>
+  <tr><td>R_F2 (Rf2)</td><td>1kΩ</td><td>VOUT− (Pin 5)</td><td>VIN+ (Pin 8)</td><td>Feedback from inverting output to non-inverting input</td></tr>
+</table>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Gain and impedance balance</strong>
+  <p>The differential gain is G<sub>diff</sub> = R<sub>f</sub> / R<sub>g</sub> = 1kΩ / 1kΩ = <strong>1 V/V</strong>. Unity gain is chosen because the PGA113 has already amplified the signal to the desired level — the FDA's job is format conversion (SE→Diff), not amplification.</p>
+  <p>All four resistors are 1kΩ to maintain impedance symmetry between the two signal paths. Mismatched impedances degrade the FDA's output balance, which reduces the differential signal's CMRR benefit at the ADC. Using 0.1% tolerance resistors (or 4-resistor matched arrays) is recommended for best balance.</p>
+</div>
+
+<h4>Output Settling Network: R_OUTP, R_OUTM, C_DIFF</h4>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Why 33Ω series resistors and a differential capacitor are needed</strong>
+  <p>The ADS8881 is a SAR ADC. During the acquisition phase, an internal sampling capacitor (C<sub>SH</sub> ≈ 30 pF) connects directly to the input pins. When the sample switch closes, the capacitor demands a burst of charge from the driving amplifier. Without series resistors, this charge demand causes a current spike that rings with the parasitic inductance of the PCB traces, degrading settling accuracy.</p>
+  <p>R_OUTP and R_OUTM (33Ω each) limit the peak charging current and damp the ringing. C_DIFF (470 pF C0G, connected differentially between AINP and AINN) acts as a local charge reservoir that supplies the sampling capacitor's initial charge demand, reducing the current the FDA must supply transiently.</p>
+  <p>The RC time constant is: τ = R_OUT × (C_DIFF + C<sub>SH</sub>) = 33 × (470p + 30p) = 33 × 500p = <strong>16.5 ns</strong>. At 100 kS/s (10 µs per sample), the acquisition window is approximately 4 µs after the conversion completes. The number of time constants in the acquisition window is 4 µs / 16.5 ns = <strong>242τ</strong>. For 18-bit settling (1 part in 262,144), you need ln(262144) = 12.5τ. We have 242τ — a margin of 19×. Settling is not a concern.</p>
+</div>
+
+<h3 id="s6-3">6.3 18-Bit SAR ADC: ADS8881 (U_ADC)</h3>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Why 18-bit, why SAR</strong>
+  <p>The ADS8881 provides 18-bit resolution at up to 1 MSPS (we use 100 kSPS). At 18 bits, the least significant bit represents VREF / 2¹⁸ = 2.5V / 262,144 = <strong>9.5 µV</strong>. This means the ADC can resolve voltage changes as small as 9.5 µV — critical for detecting weak radar returns from distant targets.</p>
+  <p>SAR (Successive Approximation Register) topology is chosen over sigma-delta because SAR ADCs sample at discrete, deterministic instants. Each conversion produces a single sample at a known time. Sigma-delta ADCs inherently average over time (decimation filtering), which would smear the instantaneous beat frequency and degrade FFT performance. For FFT-based radar processing, the sample must represent the signal at a precise instant — SAR delivers this.</p>
+</div>
+
+<div class="callout callout-teal">
+  <strong><span class="tag tag-decision">DECISION</span> Reference decoupling: dual caps at REF pin</strong>
+  <p>The ADS8881's REF pin (Pin 1) connects to VREF (2.500V from REF5025) through two local decoupling caps: C_REF_BULK (10µF X5R) and C_REF_HF (100nF C0G). The 10µF provides charge reservoir for the SAR's repetitive sampling demands (each conversion draws a transient current as the internal DAC switches). The 100nF provides low impedance at high frequencies to keep the reference stable during the sub-µs switching transients. This dual-cap approach is explicitly recommended in the ADS8881 datasheet.</p>
+</div>
+
+<div class="callout callout-teal">
+  <strong><span class="tag tag-decision">DECISION</span> DOUT pull-up for busy-indicator mode</strong>
+  <p>R13 (10kΩ) pulls DOUT (Pin 7) to 3V3A. When CONVST is asserted, the ADS8881 drives DOUT low during conversion and releases it (tri-state) when conversion is complete. The pull-up returns DOUT high, creating a falling-edge → low-period → rising-edge pattern that the FPGA/MCU can use as a "conversion complete" interrupt. This eliminates the need to poll or use a fixed delay — the firmware simply waits for the rising edge on DOUT, then clocks out 18 bits.</p>
+</div>
+
+<div class="callout callout-teal">
+  <strong><span class="tag tag-decision">DECISION</span> 33Ω SCLK damping resistor (R_SCLK_DAMP1)</strong>
+  <p>The SPI clock (SPI_SCLK) is shared between the ADS8881 (Sheet D) and PGA113 (Sheet C). The trace runs from J_DFT across Sheet D to the ADC, then continues to Sheet C via a hierarchical label. This creates a long trace with potential reflections at the Sheet C endpoint. R_SCLK_DAMP1 (33Ω) is placed in series with SCLK near the ADC to damp edge ringing. The ADC is more sensitive to SCLK integrity than the PGA (the ADC clocks data on falling edges at up to 70 MHz; the PGA accepts SCLK up to 10 MHz with more relaxed timing).</p>
+</div>
+
+<h3 id="s6-4">6.4 DFT Header: J_DFT (2×10, 2.54mm)</h3>
+
+<p>J_DFT is the single external interface for the entire baseband. It provides power monitoring, analog signal observation, SPI control, and ADC readout — all through one 20-pin connector. This is the connector that the ESP32 (bringup) or FPGA (production) connects to.</p>
+
+<table>
+  <tr><th>Pin</th><th>Signal</th><th>Type</th><th>Isolation</th><th>Purpose</th></tr>
+  <tr><td>1</td><td>3V3A</td><td>Power monitor</td><td>Direct</td><td>Read analog supply voltage</td></tr>
+  <tr><td>2</td><td>GND</td><td>Ground</td><td>—</td><td>Common ground</td></tr>
+  <tr><td>3</td><td>REF_TEMP</td><td>Analog monitor</td><td>Direct</td><td>REF5025 temperature output (~557 mV @ 25°C)</td></tr>
+  <tr><td>4</td><td>GND</td><td>Ground</td><td>—</td><td>—</td></tr>
+  <tr><td>5</td><td>VREF</td><td>Reference monitor</td><td>Direct</td><td>Verify 2.500V reference</td></tr>
+  <tr><td>6</td><td>VCM</td><td>Reference monitor</td><td>Direct</td><td>Verify 1.650V common-mode</td></tr>
+  <tr><td>7</td><td>PGA_OUT</td><td>Analog monitor</td><td>10kΩ (R7)</td><td>PGA output (after gain, before filter)</td></tr>
+  <tr><td>8</td><td>LPF_OUT</td><td>Analog monitor</td><td>10kΩ (R8)</td><td>Filter output (before FDA)</td></tr>
+  <tr><td>9</td><td>SPI_SCLK</td><td>Digital output</td><td>Direct</td><td>SPI clock to PGA + ADC</td></tr>
+  <tr><td>10</td><td>SPI_SDI</td><td>Digital output</td><td>Direct</td><td>SPI data to PGA + ADC DIN</td></tr>
+  <tr><td>11</td><td>CS_PGA</td><td>Digital output</td><td>Direct</td><td>PGA113 chip select</td></tr>
+  <tr><td>12</td><td>SDO_ADC</td><td>Digital input</td><td>Direct</td><td>18-bit ADC data output</td></tr>
+  <tr><td>13</td><td>CONVST</td><td>Digital output</td><td>Direct</td><td>ADC conversion trigger</td></tr>
+  <tr><td>14</td><td>GND</td><td>Ground</td><td>—</td><td>—</td></tr>
+  <tr><td>15</td><td>AINP</td><td>Analog monitor</td><td>10kΩ (R9)</td><td>ADC positive input (after RC settle)</td></tr>
+  <tr><td>16</td><td>AINN</td><td>Analog monitor</td><td>10kΩ (R10)</td><td>ADC negative input</td></tr>
+  <tr><td>17</td><td>FDA_OUTP</td><td>Analog monitor</td><td>10kΩ (R11)</td><td>FDA positive output (before 33Ω)</td></tr>
+  <tr><td>18</td><td>FDA_OUTN</td><td>Analog monitor</td><td>10kΩ (R12)</td><td>FDA negative output</td></tr>
+  <tr><td>19</td><td>3V3D</td><td>Power monitor</td><td>Direct</td><td>Digital supply (post-ferrite)</td></tr>
+  <tr><td>20</td><td>GND</td><td>Ground</td><td>—</td><td>—</td></tr>
+</table>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Why 10kΩ isolation resistors on analog monitor pins</strong>
+  <p>The six analog monitor pins (PGA_OUT, LPF_OUT, AINP, AINN, FDA_OUTP, FDA_OUTN) pass through 10kΩ series resistors (R7–R12) before reaching J_DFT. This protects the signal chain from probe loading: a 15 pF oscilloscope probe tip at J_DFT forms a low-pass filter with the 10kΩ isolation resistor at f = 1/(2π × 10k × 15p) = 1.06 MHz — well above the 15 kHz signal band. Without isolation, the 15 pF probe would load the FDA output directly, potentially causing instability.</p>
+  <p>The resistors are always populated — they protect the signal chain even when J_DFT is unconnected (the header pins act as antennas that could couple noise into the signal chain without series impedance).</p>
+</div>
+
+<h3 id="s6-5">6.5 Inter-Sheet Connections</h3>
+
+<table>
+  <tr><th>Signal</th><th>Direction</th><th>From</th><th>To</th><th>Purpose</th></tr>
+  <tr><td style="color:var(--blue); font-weight:600;">LPF_OUT</td><td>Input</td><td>Sheet C (filter output)</td><td>R_G → FDA VIN+</td><td>Filtered signal from anti-alias filter</td></tr>
+  <tr><td style="color:var(--green); font-weight:600;">VCM</td><td>Input</td><td>Sheet A</td><td>FDA VOCM (Pin 2)</td><td>Output common-mode reference</td></tr>
+  <tr><td style="color:var(--green); font-weight:600;">VREF</td><td>Input</td><td>Sheet A (REF5025)</td><td>ADC REF (Pin 1)</td><td>2.500V ADC reference</td></tr>
+  <tr><td style="color:var(--orange); font-weight:600;">3V3A</td><td>Input (×2 passive)</td><td>Sheet A</td><td>FDA VS+, ADC AVDD/DVDD</td><td>Analog supply</td></tr>
+  <tr><td style="color:var(--orange); font-weight:600;">3V3D</td><td>Input</td><td>Sheet A (post-ferrite)</td><td>J_DFT VCC (Pin 19)</td><td>Digital supply for external controller</td></tr>
+  <tr><td style="color:var(--green); font-weight:600;">REF_TEMP</td><td>Input</td><td>Sheet A (REF5025 TEMP pin)</td><td>J_DFT Pin 3</td><td>Temperature monitoring</td></tr>
+  <tr><td style="color:var(--blue); font-weight:600;">PGA_OUT</td><td>Input</td><td>Sheet C (PGA113 VOUT)</td><td>J_DFT Pin 7 (via 10kΩ)</td><td>DFT monitoring</td></tr>
+  <tr><td style="color:var(--purple); font-weight:600;">SPI_SCLK</td><td>Output</td><td>J_DFT Pin 9</td><td>Sheet C (PGA113)</td><td>Shared SPI clock</td></tr>
+  <tr><td style="color:var(--purple); font-weight:600;">SPI_SDI</td><td>Output</td><td>J_DFT Pin 10</td><td>Sheet C (PGA113)</td><td>Shared SPI data</td></tr>
+  <tr><td style="color:var(--purple); font-weight:600;">CS_PGA</td><td>Output</td><td>J_DFT Pin 11</td><td>Sheet C (PGA113 ~CS)</td><td>PGA chip select</td></tr>
+</table>
+
+<h3 id="s6-6">6.6 Component Summary — Sheet D</h3>
+
+<table>
+  <tr><th>Ref Des</th><th>Part Number</th><th>Value / Type</th><th>First-Principles Role</th></tr>
+  <tr><td><code>U_FDA</code></td><td>THS4531AIDGKR</td><td>FDA, VSSOP-8</td><td>SE→Diff conversion. Sets output CM at VCM. G=1 V/V.</td></tr>
+  <tr><td><code>U_ADC</code></td><td>ADS8881IDGSR</td><td>18-bit SAR, VSSOP-10</td><td>Digitization at 100 kSPS. 9.5 µV/LSB resolution.</td></tr>
+  <tr><td><code>R_G</code></td><td>—</td><td>1kΩ 0402</td><td>FDA gain resistor (non-inverting input).</td></tr>
+  <tr><td><code>R_GND</code></td><td>—</td><td>1kΩ 0402</td><td>FDA balance resistor (inverting input to GND).</td></tr>
+  <tr><td><code>R_F1, R_F2</code></td><td>—</td><td>1kΩ 0402 (×2)</td><td>FDA feedback resistors. Cross-coupled: VOUT+ → VIN−, VOUT− → VIN+.</td></tr>
+  <tr><td><code>R_OUTP, R_OUTM</code></td><td>—</td><td>33Ω 0402 (×2)</td><td>Output isolation for ADC charge kickback damping.</td></tr>
+  <tr><td><code>C_DIFF</code></td><td>—</td><td>470pF C0G</td><td>Differential charge reservoir. τ = 16.5 ns with 33Ω.</td></tr>
+  <tr><td><code>C_FDA</code></td><td>—</td><td>100nF 0402</td><td>FDA VS+ bypass.</td></tr>
+  <tr><td><code>C_VOCM</code></td><td>—</td><td>100nF C0G</td><td>VOCM pin bypass. C0G for stable common-mode.</td></tr>
+  <tr><td><code>C_AVDD</code></td><td>—</td><td>1µF 0402</td><td>ADC AVDD bypass (per datasheet).</td></tr>
+  <tr><td><code>C_DVDD</code></td><td>—</td><td>1µF 0402</td><td>ADC DVDD bypass.</td></tr>
+  <tr><td><code>C_REF_BULK</code></td><td>—</td><td>10µF X5R</td><td>ADC REF charge reservoir (per datasheet).</td></tr>
+  <tr><td><code>C_REF_HF</code></td><td>—</td><td>100nF C0G</td><td>ADC REF HF bypass.</td></tr>
+  <tr><td><code>R_SCLK_DAMP</code></td><td>—</td><td>33Ω 0402</td><td>SCLK edge damping for shared SPI bus.</td></tr>
+  <tr><td><code>R13</code></td><td>—</td><td>10kΩ 0402</td><td>DOUT pull-up for busy-indicator mode.</td></tr>
+  <tr><td><code>R7–R12</code></td><td>—</td><td>10kΩ 0402 (×6)</td><td>J_DFT analog isolation resistors.</td></tr>
+  <tr><td><code>J_DFT</code></td><td>—</td><td>2×10, 2.54mm</td><td>Single external interface for all test/control.</td></tr>
+  <tr><td><code>TP_AINP, TP_AINN</code></td><td>—</td><td>1.5mm pads (×2)</td><td>DFT: ADC differential inputs.</td></tr>
+  <tr><td><code>TP_FDA_OUTP, TP_FDA_OUTN</code></td><td>—</td><td>1.5mm pads (×2)</td><td>DFT: FDA differential outputs.</td></tr>
+  <tr><td><code>J_MMCX (×3)</code></td><td>—</td><td>MMCX, DNP</td><td>DFT: high-quality probe points (FDA_OUTP, FDA_OUTN, LPF). All DNP by default.</td></tr>
+</table>
+
+<div class="callout callout-green">
+  <strong>Design philosophy: the interface defines the system</strong>
+  <p>Sheet D is where the analog world meets the digital world. The FDA converts format (SE→Diff), the ADC converts domain (analog→digital), and J_DFT provides the interface to control and observe everything. Every analog signal in the chain is observable through J_DFT with 10kΩ isolation. Every digital control signal (SCLK, SDI, CS_PGA, CONVST) is accessible. The entire baseband can be characterized, debugged, and operated through a single 20-pin connector — this is what DFT-first design means in practice.</p>
+</div>
 
 <!-- ================================================================ -->
 <h2 id="sA">Appendix A: References &amp; Further Reading</h2>

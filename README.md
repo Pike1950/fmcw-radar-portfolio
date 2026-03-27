@@ -67,7 +67,7 @@ This project is one track of a broader engineering portfolio spanning processor 
 
 | Document | Description |
 |----------|-------------|
-| [Design Rationale](https://pike1950.github.io/fmcw-radar-portfolio/docs/design-rationale/RevB_Design_Rationale.html) | First-principles analysis of every design decision. Covers FMCW operating principles (§1), system overview (§2), and Sheet A power analysis (§3). Includes three-band beat frequency comparison (30/125/600 MHz), adaptive chirp modes with Chain Home historical parallel, FCC regulatory landscape across five unlicensed radar bands, and a proposed ISM band upgrade path (§15.247). |
+| [Design Rationale](https://pike1950.github.io/fmcw-radar-portfolio/docs/design-rationale/RevB_Design_Rationale.html) | First-principles analysis of every design decision across all four sheets. FMCW operating principles (§1) with three-band beat frequency comparison, adaptive chirp modes, FCC regulatory landscape, and ISM band upgrade path. System overview (§2). Sheet A power (§3): LDO, ferrite bead, voltage reference, VCM buffer. Sheet B input (§4): ESD protection, AC coupling, DC bias. Sheet C gain+filter (§5): PGA113 variable gain, 4th-order Sallen-Key Butterworth with Q derivation. Sheet D digitization (§6): FDA SE→Diff, ADS8881 18-bit SAR, J_DFT header with isolation. |
 | [Block Diagrams](https://pike1950.github.io/fmcw-radar-portfolio/docs/block-diagrams/RevB_Block_Diagrams.html) | Pin tables, signal maps, DFT reference, inter-sheet signal summary, hierarchical label directions. The "what" companion to the Design Rationale's "why." |
 | [Schematic Review](https://pike1950.github.io/fmcw-radar-portfolio/docs/analysis/SchematicReview.html) | Systematic review of all four schematic sheets. |
 | [Filter Analysis](https://pike1950.github.io/fmcw-radar-portfolio/docs/analysis/SheetC_Filter_Analysis.html) | Sheet C anti-alias filter analysis with transfer function derivation. |
@@ -123,7 +123,9 @@ The radar project connects all four tracks: it's a mixed-signal PCB (track 1) de
 
 - [x] Rev B schematic complete (90 components, 4 sheets, 0 ERC errors)
 - [x] Design rationale: FMCW principles, system overview, Sheet A (power)
-- [ ] Design rationale: Sheets B, C, D
+- [x] Design rationale: Sheet B (IF input, protection, bias)
+- [x] Design rationale: Sheet C (PGA, anti-alias filter, Sallen-Key topology)
+- [x] Design rationale: Sheet D (FDA, ADC, SPI interface, J_DFT)
 - [ ] Schematic updates (FPGA connector evaluation, ISM band provisions)
 - [ ] PCB layout
 - [ ] FPGA digital backend: SPI controller RTL and verification
