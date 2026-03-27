@@ -115,9 +115,39 @@
         <li><a href="#s3">3.6 Component Summary - Sheet A</a></li>
       </ul>
     </li>
-    <li><a href="#s4">4. Sheet B - IF Input, Protection &amp; Bias</a></li>
-    <li><a href="#s5">5. Sheet C - PGA + Anti-Alias Filter</a></li>
-    <li><a href="#s6">6. Sheet D - FDA Driver, ADC &amp; SPI Interface</a></li>
+    <li><a href="#s4">4. Sheet B - IF Input, Protection &amp; Bias</a>
+      <ul>
+        <li><a href="#s4-1">4.1 Signal Flow</a></li>
+        <li><a href="#s4-2">4.2 Input Connector: J_IF (SMA 132289)</a></li>
+        <li><a href="#s4-3">4.3 Current Limiting: R_IN (200Ω)</a></li>
+        <li><a href="#s4-4">4.4 ESD Protection: D_ESD (TPD1E10B06)</a></li>
+        <li><a href="#s4-5">4.5 AC Coupling: C_AC (100nF, C0G)</a></li>
+        <li><a href="#s4-6">4.6 DC Bias: R_BIAS (47kΩ to VCM)</a></li>
+        <li><a href="#s4-7">4.7 Inter-Sheet Connections</a></li>
+        <li><a href="#s4-8">4.8 Component Summary</a></li>
+      </ul>
+    </li>
+    <li><a href="#s5">5. Sheet C - PGA + Anti-Alias Filter</a>
+      <ul>
+        <li><a href="#s5-1">5.1 Signal Flow</a></li>
+        <li><a href="#s5-2">5.2 Programmable Gain Amplifier: PGA113</a></li>
+        <li><a href="#s5-3">5.3 Isolation Resistor: R_FILT_ISO</a></li>
+        <li><a href="#s5-4">5.4 Anti-Alias Filter: 4th-Order Sallen-Key Butterworth</a></li>
+        <li><a href="#s5-5">5.5 Unused Op-Amp Sections</a></li>
+        <li><a href="#s5-6">5.6 Inter-Sheet Connections</a></li>
+        <li><a href="#s5-7">5.7 Component Summary</a></li>
+      </ul>
+    </li>
+    <li><a href="#s6">6. Sheet D - FDA Driver, ADC &amp; SPI Interface</a>
+      <ul>
+        <li><a href="#s6-1">6.1 Signal Flow</a></li>
+        <li><a href="#s6-2">6.2 Fully Differential Amplifier: THS4531A</a></li>
+        <li><a href="#s6-3">6.3 18-Bit SAR ADC: ADS8881</a></li>
+        <li><a href="#s6-4">6.4 DFT Header: J_DFT (2x10)</a></li>
+        <li><a href="#s6-5">6.5 Inter-Sheet Connections</a></li>
+        <li><a href="#s6-6">6.6 Component Summary</a></li>
+      </ul>
+    </li>
     <li><a href="#s7">7. Layout Design Rationale</a> <em>(forthcoming)</em></li>
     <li><a href="#sA">Appendix A: References &amp; Further Reading</a></li>
   </ul>
@@ -1688,6 +1718,12 @@
   <strong>Design philosophy: the interface defines the system</strong>
   <p>Sheet D is where the analog world meets the digital world. The FDA converts format (SE→Diff), the ADC converts domain (analog→digital), and J_DFT provides the interface to control and observe everything. Every analog signal in the chain is observable through J_DFT with 10kΩ isolation. Every digital control signal (SCLK, SDI, CS_PGA, CONVST) is accessible. The entire baseband can be characterized, debugged, and operated through a single 20-pin connector - this is what DFT-first design means in practice.</p>
 </div>
+
+<!-- ================================================================ -->
+<h2 id="s7">7. Layout Design Rationale</h2>
+<!-- ================================================================ -->
+
+<p><em>This section is forthcoming. It will cover the 4-layer stackup (signal/ground/power/signal), component placement strategy, ground plane partitioning (single plane, partitioned routing), critical trace routing (analog signal path, SPI bus, power distribution), and the DFT connector placement rationale.</em></p>
 
 <!-- ================================================================ -->
 <h2 id="sA">Appendix A: References &amp; Further Reading</h2>
