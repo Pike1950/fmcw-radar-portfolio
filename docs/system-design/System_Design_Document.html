@@ -954,6 +954,121 @@
   <p>This is the "capacitor nets paired together" concept that Shield AI's feedback specifically called out. The answer from first principles is: a single cap has a U-shaped impedance curve with a minimum at its SRF. Two caps with different SRFs create overlapping low-impedance regions that cover a broader frequency range.</p>
 </div>
 
+<h4>3.1.3 Why Placement Distance Matters: Trace Inductance as the Hidden Bottleneck</h4>
+
+<p>A common interview question in hardware design is: "Why does the small-value cap need to be within 2mm of the power pin, but the bulk cap can be further away?" The answer is not "because the datasheet says so." It is a direct consequence of PCB trace inductance and the frequency band each capacitor serves.</p>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> The PCB trace between cap and pin is a series inductor</strong>
+  <p>A PCB trace has approximately <strong>1 nH per mm</strong> of length (rule of thumb for microstrip over a ground plane). This inductance is in series with the decoupling capacitor, forming an RLC circuit between the power pin and ground:</p>
+  <span class="eq">Pin ←-[L<sub>trace</sub>]-[ESL]-[C]-[ESR]-→ GND</span>
+  <p>The total impedance seen at the power pin is not just 1/(2πfC). It includes the trace inductance: Z<sub>total</sub> = |jω(L<sub>trace</sub> + ESL) + 1/(jωC) + ESR|. At low frequencies, the capacitor's reactance dominates and provides low impedance. But as frequency increases, the trace inductance term (ωL<sub>trace</sub>) grows and eventually dominates, causing the impedance at the pin to <em>increase</em> despite the capacitor's own impedance being low.</p>
+</div>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Worked example: 100nF bypass cap at different trace lengths</strong>
+  <p>Consider the 100nF C0G bypass cap (C11 or C12) serving the PGA113 on Sheet C. Its job is to supply transient current during SPI transactions and internal gain-switching events, which have spectral content in the 10-50 MHz range.</p>
+  <p>The cap itself has ESL = 0.8 nH (0805 package) and ESR = 0.1Ω. Near its SRF (17.8 MHz), its impedance drops to just 0.1Ω. Excellent. But what does the power pin actually see?</p>
+  <table>
+    <tr><th>Trace Length</th><th>L<sub>trace</sub></th><th>L<sub>total</sub> (ESL + trace)</th><th>Z at 10 MHz</th><th>Z at 50 MHz</th><th>Effective SRF</th></tr>
+    <tr style="background:rgba(63,185,80,0.08);"><td>1 mm</td><td>1.0 nH</td><td>1.8 nH</td><td>0.15Ω</td><td>0.47Ω</td><td>11.9 MHz</td></tr>
+    <tr style="background:rgba(88,166,255,0.08);"><td><strong>2 mm</strong></td><td>2.0 nH</td><td>2.8 nH</td><td>0.19Ω</td><td>0.78Ω</td><td>9.5 MHz</td></tr>
+    <tr style="background:rgba(210,153,34,0.08);"><td>5 mm</td><td>5.0 nH</td><td>5.8 nH</td><td>0.33Ω</td><td>1.7Ω</td><td>6.6 MHz</td></tr>
+    <tr style="background:rgba(248,81,73,0.08);"><td>10 mm</td><td>10.0 nH</td><td>10.8 nH</td><td>0.58Ω</td><td><strong>3.3Ω</strong></td><td>4.8 MHz</td></tr>
+  </table>
+  <p>At 50 MHz with a 10mm trace, the impedance at the power pin is 3.3Ω. The capacitor's own impedance at 50 MHz is only 0.03Ω (near its SRF), but the trace inductance contributes 3.3Ω in series, making the cap <strong>100x less effective</strong> than its intrinsic impedance would suggest. The trace is the bottleneck, not the cap.</p>
+  <p>At 2mm, the trace contributes 0.78Ω at 50 MHz. Still not ideal, but the cap is at least partially effective. This is why the schematic notes specify "≤2mm from pin" for bypass caps.</p>
+</div>
+
+<div class="svg-wrap">
+<svg viewBox="0 0 860 380" width="860" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,sans-serif">
+  <rect x="0" y="0" width="860" height="380" fill="none"/>
+  <text x="365" y="18" text-anchor="middle" fill="#e6edf3" font-size="12" font-weight="600">100nF C0G Bypass Cap: Impedance vs Trace Length to Power Pin</text>
+  <text x="365" y="32" text-anchor="middle" fill="#8b949e" font-size="9">PCB trace adds ~1 nH/mm of series inductance, raising impedance at high frequencies</text>
+  <rect x="70" y="40" width="590" height="290" fill="none" stroke="#30363d" stroke-width="1"/>
+  <line x1="70.0" y1="40" x2="70.0" y2="330" stroke="#30363d" stroke-width="0.5"/>
+  <text x="70.0" y="345" text-anchor="middle" fill="#8b949e" font-size="8">100kHz</text>
+  <line x1="217.5" y1="40" x2="217.5" y2="330" stroke="#30363d" stroke-width="0.5"/>
+  <text x="217.5" y="345" text-anchor="middle" fill="#8b949e" font-size="8">1MHz</text>
+  <line x1="365.0" y1="40" x2="365.0" y2="330" stroke="#30363d" stroke-width="0.5"/>
+  <text x="365.0" y="345" text-anchor="middle" fill="#8b949e" font-size="8">10MHz</text>
+  <line x1="512.5" y1="40" x2="512.5" y2="330" stroke="#30363d" stroke-width="0.5"/>
+  <text x="512.5" y="345" text-anchor="middle" fill="#8b949e" font-size="8">100MHz</text>
+  <line x1="660.0" y1="40" x2="660.0" y2="330" stroke="#30363d" stroke-width="0.5"/>
+  <text x="660.0" y="345" text-anchor="middle" fill="#8b949e" font-size="8">1GHz</text>
+  <line x1="70" y1="330.0" x2="660" y2="330.0" stroke="#30363d" stroke-width="0.5"/>
+  <text x="65" y="330.0" text-anchor="end" fill="#8b949e" font-size="7.5" dominant-baseline="middle">10mΩ</text>
+  <line x1="70" y1="257.5" x2="660" y2="257.5" stroke="#30363d" stroke-width="0.5"/>
+  <text x="65" y="257.5" text-anchor="end" fill="#8b949e" font-size="7.5" dominant-baseline="middle">0.1Ω</text>
+  <line x1="70" y1="185.0" x2="660" y2="185.0" stroke="#30363d" stroke-width="0.5"/>
+  <text x="65" y="185.0" text-anchor="end" fill="#8b949e" font-size="7.5" dominant-baseline="middle">1Ω</text>
+  <line x1="70" y1="112.5" x2="660" y2="112.5" stroke="#30363d" stroke-width="0.5"/>
+  <text x="65" y="112.5" text-anchor="end" fill="#8b949e" font-size="7.5" dominant-baseline="middle">10Ω</text>
+  <line x1="70" y1="40.0" x2="660" y2="40.0" stroke="#30363d" stroke-width="0.5"/>
+  <text x="65" y="40.0" text-anchor="end" fill="#8b949e" font-size="7.5" dominant-baseline="middle">100Ω</text>
+  <text x="365" y="375" text-anchor="middle" fill="#8b949e" font-size="9">Frequency</text>
+  <text x="12" y="185" text-anchor="middle" fill="#8b949e" font-size="9" transform="rotate(-90,12,185)">Impedance |Z| at power pin</text>
+  <rect x="391.2" y="40" width="121.2" height="290" fill="rgba(248,81,73,0.06)"/>
+  <text x="451.9" y="52" text-anchor="middle" fill="#f85149" font-size="7" font-style="italic">SPI / digital switching band</text>
+  <line x1="70" y1="185.0" x2="660" y2="185.0" stroke="#8b949e" stroke-width="0.5" stroke-dasharray="6,4"/>
+  <text x="663" y="185.0" fill="#8b949e" font-size="7" dominant-baseline="middle">1Ω target</text>
+  <!-- 1mm trace (green) -->
+  <polyline points="70.0,131.2 73.0,131.2 75.9,131.5 78.9,132.0 81.9,132.6 84.8,133.3 87.8,134.1 90.8,134.9 93.7,135.8 96.7,136.8 99.6,137.9 102.6,139.1 105.6,140.3 108.5,141.6 111.5,143.0 114.5,144.5 117.4,146.0 120.4,147.7 123.4,149.4 126.3,151.2 129.3,153.1 132.3,155.1 135.2,157.1 138.2,159.3 141.2,161.5 144.1,163.9 147.1,166.3 150.1,168.8 153.0,171.4 156.0,174.1 158.9,176.9 161.9,179.7 164.9,182.6 167.8,185.6 170.8,188.6 173.8,191.7 176.7,194.8 179.7,197.9 182.7,201.0 185.6,204.1 188.6,207.1 191.6,210.0 194.5,212.9 197.5,215.6 200.5,218.2 203.4,220.5 206.4,222.7 209.3,224.6 212.3,226.3 215.3,227.8 218.2,229.0 221.2,230.0 224.2,230.8 227.1,231.3 230.1,231.7 233.1,231.9 236.0,231.9 239.0,231.9 242.0,231.7 244.9,231.4 247.9,231.0 250.9,230.6 253.8,230.1 256.8,229.5 259.7,228.8 262.7,228.1 265.7,227.4 268.6,226.6 271.6,225.8 274.6,225.0 277.5,224.1 280.5,223.2 283.5,222.3 286.4,221.4 289.4,220.5 292.4,219.6 295.3,218.7 298.3,217.7 301.3,216.8 304.2,215.8 307.2,214.9 310.2,213.9 313.1,213.0 316.1,212.0 319.0,211.1 322.0,210.1 325.0,209.2 327.9,208.2 330.9,207.3 333.9,206.3 336.8,205.4 339.8,204.5 342.8,203.5 345.7,202.6 348.7,201.6 351.7,200.7 354.6,199.8 357.6,198.8 360.6,197.9 363.5,197.0 366.5,196.0 369.4,195.1 372.4,194.1 375.4,193.2 378.3,192.3 381.3,191.3 384.3,190.4 387.2,189.5 390.2,188.5 393.2,187.6 396.1,186.7 399.1,185.7 402.1,184.8 405.0,183.9 408.0,183.0 411.0,182.0 413.9,181.1 416.9,180.2 419.8,179.2 422.8,178.3 425.8,177.4 428.7,176.5 431.7,175.5 434.7,174.6 437.6,173.7 440.6,172.7 443.6,171.8 446.5,170.9 449.5,170.0 452.5,169.0 455.4,168.1 458.4,167.2 461.4,166.3 464.3,165.3 467.3,164.4 470.3,163.5 473.2,162.6 476.2,161.6 479.1,160.7 482.1,159.8 485.1,158.9 488.0,157.9 491.0,157.0 494.0,156.1 496.9,155.2 499.9,154.2 502.9,153.3 505.8,152.4 508.8,151.5 511.8,150.5 514.7,149.6 517.7,148.7 520.7,147.8 523.6,146.9 526.6,145.9 529.5,145.0 532.5,144.1 535.5,143.2 538.4,142.2 541.4,141.3 544.4,140.4 547.3,139.5 550.3,138.5 553.3,137.6 556.2,136.7 559.2,135.8 562.2,134.9 565.1,133.9 568.1,133.0 571.1,132.1 574.0,131.2 577.0,130.3 579.9,129.3 582.9,128.4 585.9,127.5 588.8,126.6 591.8,125.6 594.8,124.7 597.7,123.8 600.7,122.9 603.7,122.0 606.6,121.0 609.6,120.1 612.6,119.2 615.5,118.3 618.5,117.3 621.5,116.4 624.4,115.5 627.4,114.6 630.4,113.7 633.3,112.7 636.3,111.8 639.2,110.9 642.2,110.0 645.2,109.0 648.1,108.1 651.1,107.2 654.1,106.3 657.0,105.4 660.0,104.4" fill="none" stroke="#3fb950" stroke-width="2" stroke-opacity="0.9"/>
+  <circle cx="229.7" cy="231.9" r="3" fill="#3fb950"/>
+  <!-- 2mm trace (blue) -->
+  <polyline points="70.0,120.9 73.0,121.0 75.9,121.3 78.9,121.9 81.9,122.6 84.8,123.4 87.8,124.3 90.8,125.3 93.7,126.4 96.7,127.6 99.6,128.9 102.6,130.2 105.6,131.7 108.5,133.2 111.5,134.9 114.5,136.6 117.4,138.4 120.4,140.3 123.4,142.3 126.3,144.4 129.3,146.6 132.3,148.9 135.2,151.2 138.2,153.7 141.2,156.2 144.1,158.8 147.1,161.5 150.1,164.3 153.0,167.1 156.0,170.0 158.9,173.0 161.9,175.9 164.9,178.9 167.8,181.9 170.8,184.9 173.8,187.9 176.7,190.9 179.7,193.8 182.7,196.6 185.6,199.3 188.6,201.8 191.6,204.2 194.5,206.4 197.5,208.4 200.5,210.2 203.4,211.8 206.4,213.2 209.3,214.4 212.3,215.4 215.3,216.2 218.2,216.9 221.2,217.4 224.2,217.8 227.1,218.0 230.1,218.2 233.1,218.3 236.0,218.2 239.0,218.1 242.0,217.9 244.9,217.6 247.9,217.3 250.9,216.9 253.8,216.4 256.8,215.9 259.7,215.3 262.7,214.7 265.7,214.1 268.6,213.4 271.6,212.7 274.6,212.0 277.5,211.2 280.5,210.5 283.5,209.7 286.4,208.9 289.4,208.1 292.4,207.3 295.3,206.5 298.3,205.7 301.3,204.9 304.2,204.1 307.2,203.3 310.2,202.5 313.1,201.7 316.1,200.9 319.0,200.1 322.0,199.3 325.0,198.5 327.9,197.7 330.9,196.9 333.9,196.1 336.8,195.3 339.8,194.5 342.8,193.7 345.7,192.9 348.7,192.1 351.7,191.4 354.6,190.6 357.6,189.8 360.6,189.0 363.5,188.2 366.5,187.4 369.4,186.6 372.4,185.8 375.4,185.1 378.3,184.3 381.3,183.5 384.3,182.7 387.2,181.9 390.2,181.1 393.2,180.4 396.1,179.6 399.1,178.8 402.1,178.0 405.0,177.2 408.0,176.5 411.0,175.7 413.9,174.9 416.9,174.1 419.8,173.4 422.8,172.6 425.8,171.8 428.7,171.0 431.7,170.3 434.7,169.5 437.6,168.7 440.6,167.9 443.6,167.2 446.5,166.4 449.5,165.6 452.5,164.9 455.4,164.1 458.4,163.3 461.4,162.5 464.3,161.8 467.3,161.0 470.3,160.2 473.2,159.5 476.2,158.7 479.1,157.9 482.1,157.2 485.1,156.4 488.0,155.6 491.0,154.9 494.0,154.1 496.9,153.3 499.9,152.6 502.9,151.8 505.8,151.0 508.8,150.3 511.8,149.5 514.7,148.8 517.7,148.0 520.7,147.2 523.6,146.5 526.6,145.7 529.5,144.9 532.5,144.2 535.5,143.4 538.4,142.7 541.4,141.9 544.4,141.1 547.3,140.4 550.3,139.6 553.3,138.9 556.2,138.1 559.2,137.3 562.2,136.6 565.1,135.8 568.1,135.1 571.1,134.3 574.0,133.5 577.0,132.8 579.9,132.0 582.9,131.3 585.9,130.5 588.8,129.8 591.8,129.0 594.8,128.2 597.7,127.5 600.7,126.7 603.7,126.0 606.6,125.2 609.6,124.4 612.6,123.7 615.5,122.9 618.5,122.2 621.5,121.4 624.4,120.7 627.4,119.9 630.4,119.1 633.3,118.4 636.3,117.6 639.2,116.9 642.2,116.1 645.2,115.4 648.1,114.6 651.1,113.8 654.1,113.1 657.0,112.3 660.0,111.6" fill="none" stroke="#58a6ff" stroke-width="2" stroke-opacity="0.9"/>
+  <circle cx="218.1" cy="218.3" r="3" fill="#58a6ff"/>
+  <!-- 5mm trace (amber) -->
+  <polyline points="70.0,110.3 73.0,110.4 75.9,110.9 78.9,111.6 81.9,112.5 84.8,113.5 87.8,114.7 90.8,116.0 93.7,117.4 96.7,118.9 99.6,120.5 102.6,122.3 105.6,124.1 108.5,126.1 111.5,128.1 114.5,130.3 117.4,132.5 120.4,134.9 123.4,137.3 126.3,139.8 129.3,142.4 132.3,145.0 135.2,147.7 138.2,150.5 141.2,153.3 144.1,156.1 147.1,158.9 150.1,161.7 153.0,164.5 156.0,167.2 158.9,169.9 161.9,172.5 164.9,175.0 167.8,177.3 170.8,179.5 173.8,181.5 176.7,183.3 179.7,185.0 182.7,186.4 185.6,187.6 188.6,188.7 191.6,189.5 194.5,190.2 197.5,190.8 200.5,191.2 203.4,191.4 206.4,191.6 209.3,191.7 212.3,191.7 215.3,191.6 218.2,191.5 221.2,191.3 224.2,191.0 227.1,190.7 230.1,190.4 233.1,190.0 236.0,189.6 239.0,189.1 242.0,188.7 244.9,188.2 247.9,187.6 250.9,187.1 253.8,186.5 256.8,186.0 259.7,185.4 262.7,184.8 265.7,184.2 268.6,183.6 271.6,183.0 274.6,182.3 277.5,181.7 280.5,181.1 283.5,180.5 286.4,179.8 289.4,179.2 292.4,178.5 295.3,177.9 298.3,177.3 301.3,176.6 304.2,176.0 307.2,175.3 310.2,174.7 313.1,174.0 316.1,173.4 319.0,172.7 322.0,172.1 325.0,171.5 327.9,170.8 330.9,170.2 333.9,169.5 336.8,168.9 339.8,168.2 342.8,167.6 345.7,167.0 348.7,166.3 351.7,165.7 354.6,165.0 357.6,164.4 360.6,163.8 363.5,163.1 366.5,162.5 369.4,161.8 372.4,161.2 375.4,160.5 378.3,159.9 381.3,159.3 384.3,158.6 387.2,158.0 390.2,157.4 393.2,156.7 396.1,156.1 399.1,155.4 402.1,154.8 405.0,154.2 408.0,153.5 411.0,152.9 413.9,152.2 416.9,151.6 419.8,151.0 422.8,150.3 425.8,149.7 428.7,149.1 431.7,148.4 434.7,147.8 437.6,147.1 440.6,146.5 443.6,145.9 446.5,145.2 449.5,144.6 452.5,144.0 455.4,143.3 458.4,142.7 461.4,142.0 464.3,141.4 467.3,140.8 470.3,140.1 473.2,139.5 476.2,138.9 479.1,138.2 482.1,137.6 485.1,137.0 488.0,136.3 491.0,135.7 494.0,135.1 496.9,134.4 499.9,133.8 502.9,133.1 505.8,132.5 508.8,131.9 511.8,131.2 514.7,130.6 517.7,130.0 520.7,129.3 523.6,128.7 526.6,128.1 529.5,127.4 532.5,126.8 535.5,126.2 538.4,125.5 541.4,124.9 544.4,124.3 547.3,123.6 550.3,123.0 553.3,122.3 556.2,121.7 559.2,121.1 562.2,120.4 565.1,119.8 568.1,119.2 571.1,118.5 574.0,117.9 577.0,117.3 579.9,116.6 582.9,116.0 585.9,115.3 588.8,114.7 591.8,114.1 594.8,113.4 597.7,112.8 600.7,112.2 603.7,111.5 606.6,110.9 609.6,110.3 612.6,109.6 615.5,109.0 618.5,108.3 621.5,107.7 624.4,107.1 627.4,106.4 630.4,105.8 633.3,105.2 636.3,104.5 639.2,103.9 642.2,103.3 645.2,102.6 648.1,102.0 651.1,101.3 654.1,100.7 657.0,100.1 660.0,99.4" fill="none" stroke="#d29922" stroke-width="2" stroke-opacity="0.9"/>
+  <circle cx="205.2" cy="191.7" r="3" fill="#d29922"/>
+  <!-- 10mm trace (red) -->
+  <polyline points="70.0,101.7 73.0,101.9 75.9,102.5 78.9,103.3 81.9,104.3 84.8,105.5 87.8,106.8 90.8,108.3 93.7,109.9 96.7,111.6 99.6,113.5 102.6,115.4 105.6,117.5 108.5,119.6 111.5,121.9 114.5,124.2 117.4,126.6 120.4,129.1 123.4,131.6 126.3,134.1 129.3,136.7 132.3,139.2 135.2,141.7 138.2,144.1 141.2,146.4 144.1,148.6 147.1,150.7 150.1,152.6 153.0,154.3 156.0,155.8 158.9,157.1 161.9,158.2 164.9,159.1 167.8,159.8 170.8,160.4 173.8,160.8 176.7,161.1 179.7,161.2 182.7,161.3 185.6,161.3 188.6,161.2 191.6,161.0 194.5,160.8 197.5,160.5 200.5,160.2 203.4,159.9 206.4,159.5 209.3,159.1 212.3,158.7 215.3,158.2 218.2,157.7 221.2,157.3 224.2,156.8 227.1,156.3 230.1,155.7 233.1,155.2 236.0,154.7 239.0,154.1 242.0,153.6 244.9,153.0 247.9,152.5 250.9,151.9 253.8,151.4 256.8,150.8 259.7,150.3 262.7,149.7 265.7,149.2 268.6,148.6 271.6,148.1 274.6,147.5 277.5,147.0 280.5,146.4 283.5,145.9 286.4,145.3 289.4,144.8 292.4,144.2 295.3,143.7 298.3,143.1 301.3,142.6 304.2,142.0 307.2,141.5 310.2,140.9 313.1,140.4 316.1,139.8 319.0,139.3 322.0,138.7 325.0,138.2 327.9,137.6 330.9,137.1 333.9,136.5 336.8,136.0 339.8,135.4 342.8,134.9 345.7,134.4 348.7,133.8 351.7,133.3 354.6,132.7 357.6,132.2 360.6,131.6 363.5,131.1 366.5,130.5 369.4,130.0 372.4,129.4 375.4,128.9 378.3,128.3 381.3,127.8 384.3,127.3 387.2,126.7 390.2,126.2 393.2,125.6 396.1,125.1 399.1,124.5 402.1,124.0 405.0,123.4 408.0,122.9 411.0,122.4 413.9,121.8 416.9,121.3 419.8,120.7 422.8,120.2 425.8,119.6 428.7,119.1 431.7,118.5 434.7,118.0 437.6,117.5 440.6,116.9 443.6,116.4 446.5,115.8 449.5,115.3 452.5,114.7 455.4,114.2 458.4,113.6 461.4,113.1 464.3,112.6 467.3,112.0 470.3,111.5 473.2,110.9 476.2,110.4 479.1,109.8 482.1,109.3 485.1,108.8 488.0,108.2 491.0,107.7 494.0,107.1 496.9,106.6 499.9,106.0 502.9,105.5 505.8,104.9 508.8,104.4 511.8,103.9 514.7,103.3 517.7,102.8 520.7,102.2 523.6,101.7 526.6,101.1 529.5,100.6 532.5,100.1 535.5,99.5 538.4,99.0 541.4,98.4 544.4,97.9 547.3,97.3 550.3,96.8 553.3,96.3 556.2,95.7 559.2,95.2 562.2,94.6 565.1,94.1 568.1,93.5 571.1,93.0 574.0,92.5 577.0,91.9 579.9,91.4 582.9,90.8 585.9,90.3 588.8,89.7 591.8,89.2 594.8,88.7 597.7,88.1 600.7,87.6 603.7,87.0 606.6,86.5 609.6,85.9 612.6,85.4 615.5,84.9 618.5,84.3 621.5,83.8 624.4,83.2 627.4,82.7 630.4,82.2 633.3,81.6 636.3,81.1 639.2,80.5 642.2,80.0 645.2,79.4 648.1,78.9 651.1,78.4 654.1,77.8 657.0,77.3 660.0,76.7" fill="none" stroke="#f85149" stroke-width="2" stroke-opacity="0.9"/>
+  <circle cx="181.5" cy="161.3" r="3" fill="#f85149"/>
+  <!-- Legend -->
+  <rect x="675" y="50" width="180" height="200" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <line x1="685" y1="68" x2="705" y2="68" stroke="#3fb950" stroke-width="2"/>
+  <circle cx="695" cy="68" r="2.5" fill="#3fb950"/>
+  <text x="711" y="69" fill="#3fb950" font-size="8.5" font-weight="600">100nF + 1mm trace</text>
+  <text x="711" y="81" fill="#8b949e" font-size="7">L_total: 1.8nH (ESL + 1nH trace)</text>
+  <text x="711" y="92" fill="#8b949e" font-size="7">SRF: 11.9 MHz</text>
+  <line x1="685" y1="104" x2="705" y2="104" stroke="#58a6ff" stroke-width="2"/>
+  <circle cx="695" cy="104" r="2.5" fill="#58a6ff"/>
+  <text x="711" y="105" fill="#58a6ff" font-size="8.5" font-weight="600">100nF + 2mm trace</text>
+  <text x="711" y="117" fill="#8b949e" font-size="7">L_total: 2.8nH (ESL + 2nH trace)</text>
+  <text x="711" y="128" fill="#8b949e" font-size="7">SRF: 9.5 MHz</text>
+  <line x1="685" y1="140" x2="705" y2="140" stroke="#d29922" stroke-width="2"/>
+  <circle cx="695" cy="140" r="2.5" fill="#d29922"/>
+  <text x="711" y="141" fill="#d29922" font-size="8.5" font-weight="600">100nF + 5mm trace</text>
+  <text x="711" y="153" fill="#8b949e" font-size="7">L_total: 5.8nH (ESL + 5nH trace)</text>
+  <text x="711" y="164" fill="#8b949e" font-size="7">SRF: 6.6 MHz</text>
+  <line x1="685" y1="176" x2="705" y2="176" stroke="#f85149" stroke-width="2"/>
+  <circle cx="695" cy="176" r="2.5" fill="#f85149"/>
+  <text x="711" y="177" fill="#f85149" font-size="8.5" font-weight="600">100nF + 10mm trace</text>
+  <text x="711" y="189" fill="#8b949e" font-size="7">L_total: 10.8nH (ESL + 10nH trace)</text>
+  <text x="711" y="200" fill="#8b949e" font-size="7">SRF: 4.8 MHz</text>
+  <text x="685" y="222" fill="#e6edf3" font-size="8" font-weight="600">Key insight:</text>
+  <text x="685" y="235" fill="#8b949e" font-size="7.5">At 50 MHz, 10mm trace adds</text>
+  <text x="685" y="247" fill="#f85149" font-size="7.5" font-weight="600">3.3Ω vs cap's 0.03Ω = 100x worse</text>
+</svg>
+</div>
+
+<div class="callout callout-teal">
+  <strong><span class="tag tag-decision">DECISION</span> Placement rules derived from impedance budget</strong>
+  <p>The placement distance for each capacitor follows directly from its operating frequency band and the acceptable trace impedance budget:</p>
+  <table>
+    <tr><th>Cap</th><th>Frequency Band</th><th>Cap Z at Band Edge</th><th>Max Acceptable Trace Z</th><th>Max Trace Length</th><th>Our Spec</th></tr>
+    <tr><td>100nF bypass (C11, C12, etc.)</td><td>2-50 MHz</td><td>0.03-0.16Ω</td><td>~0.5Ω (3x cap Z)</td><td>~1.6mm at 50 MHz</td><td><strong>≤2mm</strong></td></tr>
+    <tr><td>1µF output (C3)</td><td>0.5-5 MHz</td><td>0.03-0.3Ω</td><td>~1Ω</td><td>~5mm at 5 MHz</td><td><strong>≤5mm</strong></td></tr>
+    <tr><td>10µF bulk (C1, C5)</td><td>DC-2 MHz</td><td>0.08-1Ω</td><td>~3Ω</td><td>~15mm at 2 MHz</td><td><strong>≤10mm</strong></td></tr>
+  </table>
+  <p>The rule is: the higher the frequency the cap must serve, the shorter the trace must be. This is not a qualitative guideline - it is a quantitative result of the trace inductance (1 nH/mm) versus the capacitor's impedance at the frequencies of interest. The "≤2mm" callout on every bypass cap in this design is derived from this analysis, not copied from a reference design.</p>
+</div>
+
+<div class="callout callout-green">
+  <strong>Interview-ready summary</strong>
+  <p>"The placement distance is determined by the trace inductance budget relative to the capacitor's impedance at its operating frequency. A PCB trace has approximately 1 nH/mm of inductance. For a 100nF bypass cap serving the 10-50 MHz band, the cap's impedance near its SRF is around 0.1Ω, so the trace inductance must be kept below a comparable value. At 50 MHz, 2 nH of trace inductance contributes 0.6Ω. This means the trace length must be under about 2mm to avoid the trace becoming the dominant impedance element. The 10µF bulk cap serves frequencies below 2 MHz where the same trace inductance contributes only 0.13Ω at 10mm, so it can be placed further away without significantly degrading effectiveness."</p>
+</div>
+
 <h3>3.2 The LDO: TPS7A2033 (U_LDO)</h3>
 
 <div class="callout">
