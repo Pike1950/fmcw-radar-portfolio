@@ -202,11 +202,16 @@
       <li><span class="fig-type">Fig.</span> <a href="#fig-1-6">§1.6 Complete FMCW radar signal path</a></li>
       <li><span class="fig-type">Fig.</span> <a href="#fig-1-7">§1.7 Adaptive chirp sweep bandwidth modes</a></li>
       <li><span class="fig-type">Fig.</span> <a href="#fig-2-2a">§2.2a Baseband signal flow</a></li>
+      <li><span class="fig-type">Fig.</span> <a href="#fig-2-2b">§2.2b Top-level 4-sheet hierarchy</a></li>
       <li><span class="fig-type">Fig.</span> <a href="#fig-3-1a">§3.1 Sheet A power architecture</a></li>
+      <li><span class="fig-type">Fig.</span> <a href="#fig-3-1b">§3.1b Sheet A detailed block diagram</a></li>
       <li><span class="fig-type">Fig.</span> <a href="#fig-3-1">§3.1.3 Trace impedance vs placement distance</a></li>
       <li><span class="fig-type">Fig.</span> <a href="#fig-4-1">§4.1 Sheet B signal flow</a></li>
+      <li><span class="fig-type">Fig.</span> <a href="#fig-4-1b">§4.1b Sheet B detailed block diagram</a></li>
       <li><span class="fig-type">Fig.</span> <a href="#fig-5-1">§5.1 Sheet C signal flow</a></li>
+      <li><span class="fig-type">Fig.</span> <a href="#fig-5-1b">§5.1b Sheet C block diagram</a></li>
       <li><span class="fig-type">Fig.</span> <a href="#fig-6-1">§6.1 Sheet D signal flow</a></li>
+      <li><span class="fig-type">Fig.</span> <a href="#fig-6-1b">§6.1b Sheet D detailed block diagram</a></li>
 
       <li style="margin-top:0.8rem; color:var(--teal); font-weight:600; font-size:0.85rem;">Tables — §1 FMCW Principles</li>
       <li><span class="fig-type">Table</span> <a href="#tbl-1-2">§1.2 System parameters</a></li>
@@ -241,7 +246,9 @@
 
       <li style="margin-top:0.8rem; color:var(--teal); font-weight:600; font-size:0.85rem;">Tables — §5 Sheet C</li>
       <li><span class="fig-type">Table</span> <a href="#s5-2">§5.2 PGA113 gain settings</a></li>
+      <li><span class="fig-type">Table</span> <a href="#tbl-5-2p">§5.2b PGA113 pin connections</a></li>
       <li><span class="fig-type">Table</span> <a href="#s5-4">§5.4 Sallen-Key stage parameters</a></li>
+      <li><span class="fig-type">Table</span> <a href="#tbl-5-4p">§5.4b LTC6242 pin connections</a></li>
       <li><span class="fig-type">Table</span> <a href="#s5-5">§5.5 Unused op-amp configuration</a></li>
       <li><span class="fig-type">Table</span> <a href="#s5-6">§5.6 Inter-sheet connections - Sheet C</a></li>
       <li><span class="fig-type">Table</span> <a href="#s5-7">§5.7 Component summary - Sheet C</a></li>
@@ -782,6 +789,65 @@
 </div>
 <p class="fig-caption" id="fig-2-2a">Figure 2.2a: Baseband signal flow - RF mixer input through SPI digital output</p>
 
+<div class="svg-wrap">
+<svg viewBox="0 0 1000 420" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="h-ab" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#58a6ff"/></marker>
+    <marker id="h-ao" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#d29922"/></marker>
+    <marker id="h-ag" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#3fb950"/></marker>
+    <marker id="h-ap" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#bc8cff"/></marker>
+  </defs>
+  <rect x="30" y="80" width="180" height="200" rx="6" fill="#1c2129" stroke="#d29922" stroke-width="2"/>
+  <text x="120" y="102" text-anchor="middle" fill="#d29922" font-weight="700" font-size="13">Sheet A (Page 2)</text>
+  <text x="120" y="118" text-anchor="middle" fill="#8b949e" font-size="10">Power + References</text>
+  <text x="45" y="142" fill="#e6edf3" font-size="9.5">TPS7A2033 (LDO)</text>
+  <text x="45" y="158" fill="#e6edf3" font-size="9.5">BLM18PG (Ferrite)</text>
+  <text x="45" y="178" fill="#e6edf3" font-size="9.5">REF5025 (2.5V Ref)</text>
+  <text x="45" y="198" fill="#e6edf3" font-size="9.5">OPA320 (VCM Buf)</text>
+  <text x="45" y="218" fill="#e6edf3" font-size="9.5">R1/R2 (VCM Divider)</text>
+  <rect x="290" y="120" width="160" height="160" rx="6" fill="#1c2129" stroke="#58a6ff" stroke-width="2"/>
+  <text x="370" y="142" text-anchor="middle" fill="#58a6ff" font-weight="700" font-size="13">Sheet B (Page 3)</text>
+  <text x="370" y="158" text-anchor="middle" fill="#8b949e" font-size="10">IF Input + Bias</text>
+  <text x="305" y="182" fill="#e6edf3" font-size="9.5">J_IF (SMA 132289)</text>
+  <text x="305" y="198" fill="#e6edf3" font-size="9.5">R_IN→D_ESD→C_AC</text>
+  <text x="305" y="214" fill="#e6edf3" font-size="9.5">R_BIAS (47kΩ→VCM)</text>
+  <rect x="530" y="80" width="190" height="220" rx="6" fill="#1c2129" stroke="#58a6ff" stroke-width="2"/>
+  <text x="625" y="102" text-anchor="middle" fill="#58a6ff" font-weight="700" font-size="13">Sheet C (Page 4)</text>
+  <text x="625" y="118" text-anchor="middle" fill="#8b949e" font-size="10">PGA + Anti-Alias Filter</text>
+  <text x="545" y="142" fill="#e6edf3" font-size="9.5">PGA113 (1-200x)</text>
+  <text x="545" y="162" fill="#e6edf3" font-size="9.5">LTC6242 (Quad Op-Amp)</text>
+  <text x="545" y="178" fill="#e6edf3" font-size="9.5">  Stage 1: SK Q=1.306</text>
+  <text x="545" y="194" fill="#e6edf3" font-size="9.5">  Stage 2: SK Q=0.541</text>
+  <text x="545" y="214" fill="#e6edf3" font-size="9.5">R3-R6, C13-C16 (Filter)</text>
+  <rect x="800" y="80" width="180" height="220" rx="6" fill="#1c2129" stroke="#bc8cff" stroke-width="2"/>
+  <text x="890" y="102" text-anchor="middle" fill="#bc8cff" font-weight="700" font-size="13">Sheet D (Page 5)</text>
+  <text x="890" y="118" text-anchor="middle" fill="#8b949e" font-size="10">FDA + ADC + SPI</text>
+  <text x="815" y="142" fill="#e6edf3" font-size="9.5">THS4531A (FDA, SE→Diff)</text>
+  <text x="815" y="162" fill="#e6edf3" font-size="9.5">ADS8881 (18-bit SAR)</text>
+  <text x="815" y="182" fill="#e6edf3" font-size="9.5">R_G, Rf1/Rf2 (1kΩ each)</text>
+  <text x="815" y="202" fill="#e6edf3" font-size="9.5">R_OUTP/M (33Ω) + C_DIFF</text>
+  <text x="815" y="222" fill="#e6edf3" font-size="9.5">J_DFT (2x10 header)</text>
+  <line x1="210" y1="210" x2="288" y2="210" stroke="#3fb950" stroke-width="1.5" marker-end="url(#h-ag)"/>
+  <text x="248" y="204" text-anchor="middle" fill="#3fb950" font-size="8" font-weight="600">VCM</text>
+  <line x1="450" y1="190" x2="528" y2="190" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#h-ab)"/>
+  <text x="489" y="184" text-anchor="middle" fill="#58a6ff" font-size="8" font-weight="600">IF_BIASED</text>
+  <line x1="720" y1="190" x2="798" y2="190" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#h-ab)"/>
+  <text x="759" y="184" text-anchor="middle" fill="#58a6ff" font-size="8" font-weight="600">LPF_OUT</text>
+  <path d="M210,140 L260,140 L260,55 L890,55" stroke="#d29922" stroke-width="1.2" stroke-dasharray="5,3" fill="none"/>
+  <line x1="370" y1="55" x2="370" y2="118" stroke="#d29922" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="625" y1="55" x2="625" y2="78" stroke="#d29922" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="890" y1="55" x2="890" y2="78" stroke="#d29922" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="620" y="45" text-anchor="middle" fill="#d29922" font-size="8">3V3A to all sheets</text>
+  <path d="M210,170 L260,170 L260,350 L890,350 L890,302" stroke="#3fb950" stroke-width="1.2" stroke-dasharray="5,3" fill="none"/>
+  <text x="575" y="342" text-anchor="middle" fill="#3fb950" font-size="8">VREF (2.5V to ADC)</text>
+  <path d="M210,225 L250,225 L250,380 L890,380 L890,302" stroke="#3fb950" stroke-width="1.2" stroke-dasharray="3,3" fill="none"/>
+  <text x="575" y="393" text-anchor="middle" fill="#3fb950" font-size="8">VCM (1.65V to FDA VOCM)</text>
+  <path d="M800,260 L770,260 L770,330 L625,330 L625,302" stroke="#bc8cff" stroke-width="1.2" stroke-dasharray="4,3" fill="none" marker-end="url(#h-ap)"/>
+  <text x="697" y="323" text-anchor="middle" fill="#bc8cff" font-size="8">SPI: CS_PGA, SCLK, SDI</text>
+</svg>
+</div>
+<p class="fig-caption" id="fig-2-2b">Figure 2.2b: Top-level 4-sheet hierarchy with inter-sheet signal routing (3V3A power bus, VCM/VREF references, SPI control)</p>
+
 <table>
   <tr>
     <th>Stage</th><th>Sheet</th><th>Key Components</th><th>Function</th><th>Signal Level</th>
@@ -1085,6 +1151,63 @@
 </div>
 <p class="fig-caption" id="fig-3-1a">Figure 3.1: Sheet A power architecture - 5V input through analog/digital rail splitting</p>
 
+<div class="svg-wrap">
+<svg viewBox="0 0 950 340" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a-ao" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#d29922"/></marker>
+    <marker id="a-ag" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#3fb950"/></marker>
+  </defs>
+  <rect x="20" y="30" width="120" height="55" rx="5" fill="#2d1f0e" stroke="#d29922" stroke-width="1.5"/>
+  <text x="80" y="50" text-anchor="middle" fill="#d29922" font-weight="600" font-size="10">5V Input</text>
+  <text x="80" y="64" text-anchor="middle" fill="#8b949e" font-size="8">ST1→F1→D1</text>
+  <text x="80" y="76" text-anchor="middle" fill="#8b949e" font-size="7">C1(10u) + C2(1u)</text>
+  <line x1="140" y1="57" x2="175" y2="57" stroke="#d29922" stroke-width="1.5" marker-end="url(#a-ao)"/>
+  <rect x="178" y="30" width="150" height="55" rx="5" fill="#2d1f0e" stroke="#d29922" stroke-width="1.5"/>
+  <text x="253" y="50" text-anchor="middle" fill="#d29922" font-weight="600" font-size="10">TPS7A2033 (U_LDO)</text>
+  <text x="253" y="64" text-anchor="middle" fill="#e6edf3" font-size="8">3.3V out, 4.4uVrms noise</text>
+  <text x="253" y="76" text-anchor="middle" fill="#8b949e" font-size="7">C3(1u) at Vout pin</text>
+  <line x1="328" y1="57" x2="368" y2="57" stroke="#d29922" stroke-width="1.5" marker-end="url(#a-ao)"/>
+  <circle cx="390" cy="57" r="18" fill="#2d1f0e" stroke="#d29922" stroke-width="2"/>
+  <text x="390" y="61" text-anchor="middle" fill="#d29922" font-weight="700" font-size="9">3V3A</text>
+  <text x="390" y="90" text-anchor="middle" fill="#8b949e" font-size="7">R_SHUNT (0Ω DFT)</text>
+  <line x1="408" y1="57" x2="460" y2="57" stroke="#d29922" stroke-width="1.2"/>
+  <rect x="462" y="38" width="120" height="38" rx="4" fill="#1c2129" stroke="#d29922" stroke-width="1"/>
+  <text x="522" y="55" text-anchor="middle" fill="#d29922" font-size="8.5" font-weight="500">FB1 (220Ω@100M)</text>
+  <text x="522" y="68" text-anchor="middle" fill="#8b949e" font-size="7">BLM18PG221SN1D</text>
+  <line x1="582" y1="57" x2="628" y2="57" stroke="#d29922" stroke-width="1.2" marker-end="url(#a-ao)"/>
+  <circle cx="650" cy="57" r="18" fill="#1c2129" stroke="#d29922" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="650" y="61" text-anchor="middle" fill="#d29922" font-size="8" font-weight="600">3V3D</text>
+  <text x="650" y="90" text-anchor="middle" fill="#8b949e" font-size="7">C4(100n) + C5(10u)</text>
+  <text x="650" y="102" text-anchor="middle" fill="#8b949e" font-size="7">GNDD for C4/C5 only</text>
+  <line x1="668" y1="57" x2="710" y2="57" stroke="#d29922" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="720" y="52" fill="#8b949e" font-size="7.5" font-style="italic">→ J_DFT VCC, pull-ups,</text>
+  <text x="720" y="64" fill="#8b949e" font-size="7.5" font-style="italic">   debug LEDs only</text>
+  <line x1="390" y1="75" x2="390" y2="140" stroke="#3fb950" stroke-width="1" stroke-dasharray="3,2"/>
+  <path d="M390,140 L170,140 L170,160" stroke="#3fb950" stroke-width="1" stroke-dasharray="3,2" fill="none"/>
+  <rect x="60" y="160" width="220" height="80" rx="5" fill="#0d2818" stroke="#3fb950" stroke-width="1.5"/>
+  <text x="170" y="182" text-anchor="middle" fill="#3fb950" font-weight="600" font-size="10">VCM Generator</text>
+  <text x="170" y="198" text-anchor="middle" fill="#e6edf3" font-size="8.5">R1/R2 (10k/10k 0.1%) → 1.650V</text>
+  <text x="170" y="214" text-anchor="middle" fill="#e6edf3" font-size="8.5">OPA320 (U_VCM) unity buffer</text>
+  <text x="170" y="230" text-anchor="middle" fill="#8b949e" font-size="7">C9(100n) supply, C10(100n) output</text>
+  <path d="M280,195 L340,195 L340,290 L560,290" stroke="#3fb950" stroke-width="1.5" marker-end="url(#a-ag)" fill="none"/>
+  <text x="580" y="286" fill="#3fb950" font-weight="600" font-size="9">VCM</text>
+  <text x="580" y="300" fill="#8b949e" font-size="7.5">1.650V → Sheets B, C, D</text>
+  <path d="M390,140 L520,140 L520,160" stroke="#3fb950" stroke-width="1" stroke-dasharray="3,2" fill="none"/>
+  <rect x="400" y="160" width="240" height="80" rx="5" fill="#0d2818" stroke="#3fb950" stroke-width="1.5"/>
+  <text x="520" y="182" text-anchor="middle" fill="#3fb950" font-weight="600" font-size="10">REF5025 (U_REF)</text>
+  <text x="520" y="198" text-anchor="middle" fill="#e6edf3" font-size="8.5">SOIC-8 variant (AIDGKR)</text>
+  <text x="520" y="214" text-anchor="middle" fill="#8b949e" font-size="7.5">VIN(2)=3V3A | VOUT(6)=2.500V | DNC: pins 1,7</text>
+  <text x="520" y="230" text-anchor="middle" fill="#8b949e" font-size="7">C6(1u) in, C7(10u)+C8(100n) out</text>
+  <line x1="640" y1="195" x2="718" y2="195" stroke="#3fb950" stroke-width="1.5" marker-end="url(#a-ag)"/>
+  <text x="740" y="191" fill="#3fb950" font-weight="600" font-size="9">VREF</text>
+  <text x="740" y="205" fill="#8b949e" font-size="7.5">2.500V → Sheet D (ADC)</text>
+  <rect x="60" y="290" width="460" height="38" rx="4" fill="rgba(139,148,158,0.06)" stroke="#30363d" stroke-width="1"/>
+  <text x="290" y="306" text-anchor="middle" fill="#8b949e" font-size="8.5">Ground Assignment: GND (analog) for all components. GNDD only for C4 + C5 (3V3D side of ferrite).</text>
+  <text x="290" y="320" text-anchor="middle" fill="#8b949e" font-size="8">4 hierarchical labels out: 3V3A, 3V3D, VREF, VCM</text>
+</svg>
+</div>
+<p class="fig-caption" id="fig-3-1b">Figure 3.1b: Sheet A detailed block diagram - LDO, ferrite bead rail split, VCM generator, and REF5025 with decoupling</p>
+
 <h4>3.1.1 Input Protection: F1 + D1</h4>
 
 <div class="callout callout-blue">
@@ -1383,6 +1506,44 @@
 </div>
 <p class="fig-caption" id="fig-4-1">Figure 4.1: Sheet B signal flow - SMA input through ESD protection, AC coupling, and DC bias</p>
 
+<div class="svg-wrap">
+<svg viewBox="0 0 900 160" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="b-ab" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#58a6ff"/></marker>
+  </defs>
+  <rect x="20" y="40" width="90" height="50" rx="5" fill="#0d2238" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="65" y="60" text-anchor="middle" fill="#58a6ff" font-weight="600" font-size="10">J_IF</text>
+  <text x="65" y="75" text-anchor="middle" fill="#8b949e" font-size="7.5">SMA 132289</text>
+  <line x1="110" y1="65" x2="145" y2="65" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#b-ab)"/>
+  <rect x="148" y="48" width="80" height="34" rx="4" fill="#0d2238" stroke="#58a6ff" stroke-width="1"/>
+  <text x="188" y="64" text-anchor="middle" fill="#e6edf3" font-size="9">R_IN 200Ω</text>
+  <text x="188" y="76" text-anchor="middle" fill="#8b949e" font-size="7">Current limit</text>
+  <line x1="228" y1="65" x2="260" y2="65" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#b-ab)"/>
+  <rect x="263" y="48" width="90" height="34" rx="4" fill="#0d2238" stroke="#58a6ff" stroke-width="1"/>
+  <text x="308" y="64" text-anchor="middle" fill="#e6edf3" font-size="9">D_ESD</text>
+  <text x="308" y="76" text-anchor="middle" fill="#8b949e" font-size="7">TPD1E10B06</text>
+  <line x1="308" y1="82" x2="308" y2="110" stroke="#8b949e" stroke-width="1"/>
+  <text x="308" y="122" text-anchor="middle" fill="#8b949e" font-size="7">GND (shunt)</text>
+  <line x1="353" y1="65" x2="388" y2="65" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#b-ab)"/>
+  <rect x="390" y="48" width="100" height="34" rx="4" fill="#0d2238" stroke="#58a6ff" stroke-width="1"/>
+  <text x="440" y="64" text-anchor="middle" fill="#e6edf3" font-size="9">C_AC 100nF C0G</text>
+  <text x="440" y="76" text-anchor="middle" fill="#8b949e" font-size="7">AC coupling, 50V</text>
+  <line x1="490" y1="65" x2="530" y2="65" stroke="#58a6ff" stroke-width="1.5"/>
+  <circle cx="530" cy="65" r="3" fill="#58a6ff"/>
+  <line x1="530" y1="68" x2="530" y2="110" stroke="#3fb950" stroke-width="1"/>
+  <rect x="500" y="110" width="60" height="26" rx="3" fill="#0d2818" stroke="#3fb950" stroke-width="1"/>
+  <text x="530" y="126" text-anchor="middle" fill="#3fb950" font-size="8">R_BIAS 47k</text>
+  <line x1="530" y1="136" x2="530" y2="150" stroke="#3fb950" stroke-width="1"/>
+  <text x="530" y="155" text-anchor="middle" fill="#3fb950" font-size="7.5" font-weight="600">VCM (1.65V)</text>
+  <line x1="533" y1="65" x2="620" y2="65" stroke="#58a6ff" stroke-width="2" marker-end="url(#b-ab)"/>
+  <rect x="623" y="48" width="110" height="34" rx="5" fill="#0d2238" stroke="#58a6ff" stroke-width="2"/>
+  <text x="678" y="64" text-anchor="middle" fill="#58a6ff" font-weight="700" font-size="10">IF_BIASED</text>
+  <text x="678" y="76" text-anchor="middle" fill="#8b949e" font-size="7">→ Sheet C (PGA CH0)</text>
+  <text x="440" y="100" text-anchor="middle" fill="#8b949e" font-size="7" font-style="italic">f_HP = 1/(2π·47k·100n) = 33.9 Hz</text>
+</svg>
+</div>
+<p class="fig-caption" id="fig-4-1b">Figure 4.1b: Sheet B block diagram - component-level signal path with ESD shunt, AC coupling, and VCM bias network</p>
+
 <p>Two test points provide visibility: <strong>TP_IF_RAW</strong> (after R_IN, before ESD) monitors the raw input signal, and <strong>TP_PGA_IN</strong> (at the IF_BIASED output) confirms the DC bias is correct before the signal enters the PGA.</p>
 
 <h3 id="s4-2">4.2 Input Connector: J_IF (SMA 132289)</h3>
@@ -1532,6 +1693,71 @@
 </div>
 <p class="fig-caption" id="fig-5-1">Figure 5.1: Sheet C signal flow - PGA variable gain through 4th-order Sallen-Key filter</p>
 
+<div class="svg-wrap">
+<svg viewBox="0 0 900 330" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs><marker id="arr-sc" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#58a6ff"/></marker></defs>
+  <!-- PGA113 -->
+  <rect x="20" y="30" width="180" height="150" rx="6" fill="#1c2129" stroke="#58a6ff" stroke-width="2"/>
+  <text x="110" y="52" text-anchor="middle" fill="#58a6ff" font-weight="700" font-size="11">PGA113 (U_PGA)</text>
+  <text x="110" y="67" text-anchor="middle" fill="#8b949e" font-size="8">MSOP-10, G: 1-200x</text>
+  <text x="35" y="90" fill="#d29922" font-size="8">Pin 1 AVDD → 3V3A + C11</text>
+  <text x="35" y="105" fill="#f85149" font-size="8" font-weight="600">Pin 10 DVDD → 3V3A + C12 ⚠</text>
+  <text x="35" y="122" fill="#58a6ff" font-size="8">Pin 3 CH0 ← IF_BIASED</text>
+  <text x="35" y="137" fill="#3fb950" font-size="8">Pin 4 VREF ← VCM (1.65V)</text>
+  <text x="35" y="152" fill="#58a6ff" font-size="8">Pin 5 VOUT → R3</text>
+  <text x="35" y="167" fill="#bc8cff" font-size="8">Pins 7,8,9 ← SPI bus</text>
+  <!-- PGA output -->
+  <line x1="200" y1="150" x2="248" y2="150" stroke="#58a6ff" stroke-width="2" marker-end="url(#arr-sc)"/>
+  <text x="225" y="143" text-anchor="middle" fill="#58a6ff" font-size="7.5">PGA_OUT</text>
+  <!-- R_FILT_ISO -->
+  <rect x="252" y="140" width="50" height="20" rx="3" fill="#1c2129" stroke="#8b949e" stroke-width="1"/>
+  <text x="277" y="153" text-anchor="middle" fill="#8b949e" font-size="7">0Ω ISO</text>
+  <line x1="302" y1="150" x2="330" y2="150" stroke="#58a6ff" stroke-width="1.5"/>
+
+  <!-- Filter Stage 1 -->
+  <rect x="332" y="70" width="200" height="110" rx="6" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="432" y="92" text-anchor="middle" fill="#58a6ff" font-weight="600" font-size="10">LTC6242 Section A</text>
+  <text x="432" y="107" text-anchor="middle" fill="#8b949e" font-size="8">Filter Stage 1 - Sallen-Key</text>
+  <text x="347" y="125" fill="#e6edf3" font-size="8">R3=1.62kΩ  R4=5.76kΩ</text>
+  <text x="347" y="140" fill="#e6edf3" font-size="8">C13=11nF   C14=1.1nF (C0G)</text>
+  <text x="347" y="155" fill="#d29922" font-size="8">Q = 1.306  (high-Q stage)</text>
+  <text x="347" y="170" fill="#8b949e" font-size="7.5">+IN_A(3), -IN_A(2), OUT_A(1)</text>
+  <!-- Stage 1 output -->
+  <line x1="532" y1="130" x2="560" y2="130" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#arr-sc)"/>
+  <text x="547" y="123" text-anchor="middle" fill="#8b949e" font-size="7">S1_OUT</text>
+
+  <!-- Filter Stage 2 -->
+  <rect x="564" y="70" width="200" height="110" rx="6" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="664" y="92" text-anchor="middle" fill="#58a6ff" font-weight="600" font-size="10">LTC6242 Section B</text>
+  <text x="664" y="107" text-anchor="middle" fill="#8b949e" font-size="8">Filter Stage 2 - Sallen-Key</text>
+  <text x="579" y="125" fill="#e6edf3" font-size="8">R5=17.4kΩ  R6=536Ω</text>
+  <text x="579" y="140" fill="#e6edf3" font-size="8">C15=11nF   C16=1.1nF (C0G)</text>
+  <text x="579" y="155" fill="#d29922" font-size="8">Q = 0.541  (low-Q stage)</text>
+  <text x="579" y="170" fill="#8b949e" font-size="7.5">+IN_B(5), -IN_B(6), OUT_B(7)</text>
+  <!-- LPF output -->
+  <line x1="764" y1="130" x2="828" y2="130" stroke="#58a6ff" stroke-width="2" marker-end="url(#arr-sc)"/>
+  <rect x="832" y="115" width="55" height="30" rx="4" fill="#0d2238" stroke="#58a6ff" stroke-width="2"/>
+  <text x="860" y="134" text-anchor="middle" fill="#58a6ff" font-weight="700" font-size="9">LPF_OUT</text>
+  <text x="860" y="155" text-anchor="middle" fill="#8b949e" font-size="7">→ Sheet D</text>
+
+  <!-- Unused sections -->
+  <rect x="332" y="210" width="200" height="60" rx="5" fill="#1c2129" stroke="#f85149" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="432" y="232" text-anchor="middle" fill="#f85149" font-size="9" font-weight="500">LTC6242 Sections C &amp; D - Unused</text>
+  <text x="432" y="247" text-anchor="middle" fill="#8b949e" font-size="7.5">OUT→-IN tied (unity follower), +IN to GND</text>
+  <text x="432" y="260" text-anchor="middle" fill="#8b949e" font-size="7">Pins 10↔11, 15↔16 tied. Pins 12, 14 → GND</text>
+
+  <!-- Power supply -->
+  <rect x="564" y="210" width="200" height="50" rx="5" fill="#2d1f0e" stroke="#d29922" stroke-width="1"/>
+  <text x="664" y="232" text-anchor="middle" fill="#d29922" font-weight="500" font-size="9">Power: V+(4)=3V3A, V-(13)=GND</text>
+  <text x="664" y="248" text-anchor="middle" fill="#8b949e" font-size="7.5">C17(100nF) at V+, C18(100nF) at V-</text>
+
+  <!-- Filter annotation -->
+  <text x="432" y="300" text-anchor="middle" fill="#39d2c0" font-size="9" font-weight="500">4th-order Butterworth, fc = 15 kHz → -41.8 dB at 50 kHz (Nyquist @ 100 kS/s)</text>
+</svg>
+</div>
+<p class="fig-caption" id="fig-5-1b">Figure 5.1b: Sheet C block diagram - PGA113, LTC6242 two-stage filter, unused sections, and power connections</p>
+<p style="font-size:0.82rem; color:var(--dim); text-align:center;">Source: <a href="../block-diagrams/RevB_Block_Diagrams.html#sheet-c" style="color:var(--blue);">Block Diagrams §5</a> (standalone reference with full pin tables)</p>
+
 <h3 id="s5-2">5.2 Programmable Gain Amplifier: PGA113 (U_PGA)</h3>
 
 <div class="callout callout-blue">
@@ -1571,6 +1797,23 @@
   <p>The PGA113 uses a simple 16-bit SPI protocol: 8-bit register address + 8-bit gain/channel code. A gain change command is 0x2A followed by the gain code (bits 7:4) and channel select (bits 3:0). The SPI clock maximum is 10 MHz. With only 16 bits per command, a gain change takes 1.6 µs at full speed - fast enough to change gain between chirp ramps (~5 ms apart) with negligible dead time.</p>
   <p>The SPI bus is shared with the ADS8881 ADC (on Sheet D). The PGA113 is selected by CS_PGA (active low), while the ADC uses a separate ~CS line. The 33Ω SCLK damping resistor (R_SCLK_DAMP1 on Sheet D) is placed near the ADC, not the PGA, because the ADC is more sensitive to clock edge ringing.</p>
 </div>
+
+<h4>PGA113 Pin Connections</h4>
+
+<table>
+  <tr><th style="width:40px;">Pin</th><th>Name</th><th>Net</th><th>Connection</th><th>Rationale</th></tr>
+  <tr><td>1</td><td>AVDD</td><td style="color:var(--amber);">3V3A</td><td>C11(100nF 0402) to GND, ≤2mm</td><td>Analog supply for PGA core</td></tr>
+  <tr><td>2</td><td>CH1</td><td style="color:var(--dim);">GND</td><td>Tie to GND</td><td>Unused channel - prevents floating noise</td></tr>
+  <tr><td>3</td><td>VCAL/CH0</td><td style="color:var(--blue);">IF_BIASED</td><td>From Sheet B hier label</td><td>Primary input, DC-biased at VCM (1.65V)</td></tr>
+  <tr><td>4</td><td>VREF</td><td style="color:var(--green);">VCM</td><td>From Sheet A VCM (1.65V)</td><td>VOUT=G×(VIN-VREF)+VREF. Centers output at VCM across all gains</td></tr>
+  <tr><td>5</td><td>VOUT</td><td style="color:var(--blue);">PGA_OUT</td><td>To R3 (filter input) + TP_PGA_OUT</td><td>~1.0 Vpp at G=200× with 5 mVpp input</td></tr>
+  <tr><td>6</td><td>GND</td><td style="color:var(--dim);">GND</td><td>Analog ground, short via to L2</td><td>Must be GND (analog), not GNDD</td></tr>
+  <tr><td>7</td><td>SCLK</td><td style="color:var(--teal);">SPI_SCLK</td><td>From Sheet D (shared SPI bus)</td><td>Max 10 MHz. 33Ω damping R is near ADC, not PGA.</td></tr>
+  <tr><td>8</td><td>DIO</td><td style="color:var(--teal);">SPI_SDI</td><td>From Sheet D (MCU MOSI)</td><td>Data input only; 2-byte command: 0x2A+(gain&lt;&lt;4|ch)</td></tr>
+  <tr><td>9</td><td>~CS</td><td style="color:var(--teal);">CS_PGA</td><td>From Sheet D (MCU GPIO via J_DFT)</td><td>Active-low chip select</td></tr>
+  <tr style="background:rgba(248,81,73,0.08);"><td>10</td><td>DVDD</td><td style="color:var(--red);">3V3A ⚠</td><td>C12(100nF 0402) to GND, ≤2mm</td><td><strong>NOT 3V3D!</strong> Powers analog output stage + SPI logic.</td></tr>
+</table>
+<p class="tbl-caption" id="tbl-5-2p">Table 5.2b: PGA113 pin connections (10-pin MSOP)</p>
 
 <h3 id="s5-3">5.3 Isolation Resistor: R_FILT_ISO (0Ω)</h3>
 
@@ -1633,6 +1876,30 @@
   <strong><span class="tag tag-risk">RISK</span> C_feedback must NOT go to GND - the Rev A wiring error</strong>
   <p>In the initial Rev B schematic wiring, C14 Pin 2 was accidentally connected to GND instead of OUT_A. This converts the Sallen-Key into a passive 3-pole RC filter with no Q control - the Butterworth response shape is lost, and attenuation at 50 kHz drops from −41.8 dB to approximately −20 dB. This error was caught during the schematic review (see <a href="https://pike1950.github.io/fmcw-radar-portfolio/docs/analysis/SheetC_Filter_Analysis.html">Filter Analysis</a>) and corrected. The corrected wiring routes C14.Pin2 to OUT_A and C16.Pin2 to OUT_B.</p>
 </div>
+
+<h4>LTC6242 Pin Connections</h4>
+<p style="font-size:0.85rem; color:var(--dim);">HV variant (LTC6242HVCGN#PBF) placed - 12V max, identical at 3.3V. SSOP-16 package.</p>
+
+<table>
+  <tr><th style="width:40px;">Pin</th><th>Name</th><th>Net</th><th>Connection</th><th>Rationale</th></tr>
+  <tr><td>1</td><td>OUT_A</td><td style="color:var(--blue);">Stage1_OUT</td><td>To C14 (feedback) and R5 (Stage 2)</td><td>Stage 1 output, Q=1.306</td></tr>
+  <tr><td>2</td><td>-IN_A</td><td>—</td><td>Tied to OUT_A (Pin 1)</td><td>Unity gain: -IN = OUT</td></tr>
+  <tr><td>3</td><td>+IN_A</td><td>—</td><td>From R4/C13 junction (Node B)</td><td>Signal input from PGA through R3→R4</td></tr>
+  <tr><td>4</td><td>V+</td><td style="color:var(--amber);">3V3A</td><td>C17(100nF) to GND, ≤3mm</td><td>Supply for all 4 sections</td></tr>
+  <tr><td>5</td><td>+IN_B</td><td>—</td><td>From R6/C15 junction</td><td>Stage 2 input from Stage1_OUT through R5→R6</td></tr>
+  <tr><td>6</td><td>-IN_B</td><td>—</td><td>Tied to OUT_B (Pin 7)</td><td>Unity gain: -IN = OUT</td></tr>
+  <tr><td>7</td><td>OUT_B</td><td style="color:var(--blue);">LPF_OUT</td><td>→ hier label to Sheet D</td><td>Final filtered output. -41.8 dB at 50 kHz</td></tr>
+  <tr><td>8</td><td>NC_1</td><td>—</td><td>Float</td><td>Per datasheet</td></tr>
+  <tr><td>9</td><td>NC_2</td><td>—</td><td>Float</td><td>Per datasheet</td></tr>
+  <tr style="background:rgba(248,81,73,0.06);"><td>10</td><td>OUT_C</td><td>—</td><td>Wire to -IN_C (Pin 11)</td><td>Unused: unity follower prevents oscillation</td></tr>
+  <tr style="background:rgba(248,81,73,0.06);"><td>11</td><td>-IN_C</td><td>—</td><td>Wire to OUT_C (Pin 10)</td><td>Unity gain feedback</td></tr>
+  <tr><td>12</td><td>+IN_C</td><td style="color:var(--dim);">GND</td><td>Tie to GND</td><td>Stable bias for unused follower</td></tr>
+  <tr><td>13</td><td>V-</td><td style="color:var(--dim);">GND</td><td>Analog ground plane</td><td>Single-supply: V- = GND</td></tr>
+  <tr><td>14</td><td>+IN_D</td><td style="color:var(--dim);">GND</td><td>Tie to GND</td><td>Same treatment as Section C</td></tr>
+  <tr style="background:rgba(248,81,73,0.06);"><td>15</td><td>-IN_D</td><td>—</td><td>Wire to OUT_D (Pin 16)</td><td>Unity gain feedback</td></tr>
+  <tr style="background:rgba(248,81,73,0.06);"><td>16</td><td>OUT_D</td><td>—</td><td>Wire to -IN_D (Pin 15)</td><td>Prevents oscillation</td></tr>
+</table>
+<p class="tbl-caption" id="tbl-5-4p">Table 5.4b: LTC6242 pin connections (16-pin SSOP). Highlighted rows are unused sections configured as unity followers.</p>
 
 <h4>Component Value Selection</h4>
 
@@ -1721,6 +1988,57 @@
   <div class="block">SPI → J_DFT<br><small>→ FPGA/MCU</small></div>
 </div>
 <p class="fig-caption" id="fig-6-1">Figure 6.1: Sheet D signal flow - FDA differential conversion, ADC digitization, SPI interface</p>
+
+<div class="svg-wrap">
+<svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="d-ab" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#58a6ff"/></marker>
+    <marker id="d-ap" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#bc8cff"/></marker>
+  </defs>
+  <rect x="20" y="30" width="200" height="150" rx="6" fill="#1c2129" stroke="#58a6ff" stroke-width="2"/>
+  <text x="120" y="52" text-anchor="middle" fill="#58a6ff" font-weight="700" font-size="11">THS4531A (U_FDA)</text>
+  <text x="120" y="67" text-anchor="middle" fill="#8b949e" font-size="8">VSSOP-8, SE→Diff, G=1 V/V</text>
+  <text x="35" y="88" fill="#58a6ff" font-size="8">VIN+(8) ← R_G(1kΩ) ← LPF_OUT</text>
+  <text x="35" y="103" fill="#8b949e" font-size="8">VIN-(1) ← R_GND(1kΩ) ← GND</text>
+  <text x="35" y="120" fill="#3fb950" font-size="8">VOCM(2) ← VCM (1.65V) + C_VOCM</text>
+  <text x="35" y="137" fill="#58a6ff" font-size="8">VOUT+(4) → R_OUTP(33Ω) → AINP</text>
+  <text x="35" y="152" fill="#58a6ff" font-size="8">VOUT-(5) → R_OUTM(33Ω) → AINM</text>
+  <text x="35" y="167" fill="#d29922" font-size="8">VS+(3)=3V3A, VS-(6)=GND, PD(7)=3V3A</text>
+  <text x="120" y="200" text-anchor="middle" fill="#8b949e" font-size="7.5" font-style="italic">Rf1(VOUT+→VIN-)=Rf2(VOUT-→VIN+)=R_G=R_GND=1kΩ → G=1 V/V</text>
+  <line x1="220" y1="100" x2="278" y2="100" stroke="#58a6ff" stroke-width="1.5"/>
+  <rect x="280" y="60" width="100" height="80" rx="5" fill="#0d2238" stroke="#58a6ff" stroke-width="1"/>
+  <text x="330" y="80" text-anchor="middle" fill="#58a6ff" font-weight="500" font-size="9">RC Settle</text>
+  <text x="330" y="95" text-anchor="middle" fill="#e6edf3" font-size="7.5">R_OUTP/M = 33Ω</text>
+  <text x="330" y="108" text-anchor="middle" fill="#e6edf3" font-size="7.5">C_DIFF = 470pF C0G</text>
+  <text x="330" y="121" text-anchor="middle" fill="#8b949e" font-size="7">τ=16.5ns, 242τ in 4µs</text>
+  <text x="330" y="133" text-anchor="middle" fill="#3fb950" font-size="7">18-bit settling ✓</text>
+  <line x1="380" y1="100" x2="418" y2="100" stroke="#58a6ff" stroke-width="2" marker-end="url(#d-ab)"/>
+  <rect x="422" y="30" width="200" height="180" rx="6" fill="#1c2129" stroke="#bc8cff" stroke-width="2"/>
+  <text x="522" y="52" text-anchor="middle" fill="#bc8cff" font-weight="700" font-size="11">ADS8881 (U_ADC)</text>
+  <text x="522" y="67" text-anchor="middle" fill="#8b949e" font-size="8">VSSOP-10, 18-bit SAR, 1 MS/s</text>
+  <text x="437" y="88" fill="#3fb950" font-size="8">REF(1) ← 2.500V + 10uF+100nF</text>
+  <text x="437" y="103" fill="#d29922" font-size="8">AVDD(2)=3V3A, 1uF</text>
+  <text x="437" y="118" fill="#58a6ff" font-size="8">AINP(3) ← R_OUTP junction</text>
+  <text x="437" y="133" fill="#58a6ff" font-size="8">AINN(4) ← R_OUTM junction</text>
+  <text x="437" y="148" fill="#8b949e" font-size="8">GND(5) - common return</text>
+  <text x="437" y="163" fill="#bc8cff" font-size="8">CONVST(6)←MCU, DOUT(7)→10kΩ PU</text>
+  <text x="437" y="178" fill="#bc8cff" font-size="8">SCLK(8)←33Ω, DIN(9), DVDD(10)=3V3A</text>
+  <rect x="680" y="30" width="190" height="150" rx="6" fill="#1c2129" stroke="#bc8cff" stroke-width="2"/>
+  <text x="775" y="52" text-anchor="middle" fill="#bc8cff" font-weight="700" font-size="11">J_DFT (2x10 Header)</text>
+  <text x="775" y="67" text-anchor="middle" fill="#8b949e" font-size="8">2.54mm pitch</text>
+  <text x="695" y="88" fill="#bc8cff" font-size="8">Pins 1-8: 3V3A, GND, TEMP, GND,</text>
+  <text x="695" y="103" fill="#bc8cff" font-size="8">  VREF, VCM, PGA_OUT, LPF_OUT</text>
+  <text x="695" y="118" fill="#bc8cff" font-size="8">Pins 9-14: SCLK, SDI, CS_PGA,</text>
+  <text x="695" y="133" fill="#bc8cff" font-size="8">  SDO, CONVST, GND</text>
+  <text x="695" y="148" fill="#8b949e" font-size="8">Pins 15-20: analog monitors + GND</text>
+  <text x="775" y="170" text-anchor="middle" fill="#8b949e" font-size="7.5">R13: 10kΩ pull-up on SDO → 3V3A</text>
+  <line x1="622" y1="80" x2="676" y2="80" stroke="#bc8cff" stroke-width="1.5" marker-end="url(#d-ap)"/>
+  <text x="650" y="75" text-anchor="middle" fill="#bc8cff" font-size="7">SPI bus</text>
+  <path d="M680,165 L660,165 L660,245 L330,245 L330,255" stroke="#bc8cff" stroke-width="1.2" stroke-dasharray="4,3" fill="none" marker-end="url(#d-ap)"/>
+  <text x="500" y="240" text-anchor="middle" fill="#bc8cff" font-size="7.5">CS_PGA + SCLK + SDI → Sheet C (PGA113)</text>
+</svg>
+</div>
+<p class="fig-caption" id="fig-6-1b">Figure 6.1b: Sheet D block diagram - FDA with feedback network, RC settling, ADC with reference/power, J_DFT header, and SPI routing to Sheet C</p>
 
 <h3 id="s6-2">6.2 Fully Differential Amplifier: THS4531A (U_FDA)</h3>
 
