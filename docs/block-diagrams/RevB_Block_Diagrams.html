@@ -75,6 +75,11 @@
   table.dft-table th { background: #0d3b66; color: #fff; padding: 6px 8px; text-align: left; font-size: 0.78rem; }
   table.dft-table td { padding: 5px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
 
+  /* Generic table fallback (for §11 and other unclassed tables) */
+  table:not(.pin-table):not(.conn-table):not(.dft-table) { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin: 0.8rem 0; }
+  table:not(.pin-table):not(.conn-table):not(.dft-table) th { background: #1f3864; color: #fff; padding: 6px 8px; text-align: left; font-weight: 600; font-size: 0.8rem; }
+  table:not(.pin-table):not(.conn-table):not(.dft-table) td { padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+
   @media print { body { background: #fff; color: #000; } .sheet-section { border-color: #ccc; background: #f8f8f8; } }
 </style>
 </head>
@@ -95,77 +100,89 @@
 </div>
 
 <div class="svg-container">
-<svg viewBox="0 0 960 340" width="960" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+<svg viewBox="0 0 1000 420" width="1000" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
   <defs>
     <marker id="arr-b" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#58a6ff" stroke="none"/></marker>
     <marker id="arr-o" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#d29922" stroke="none"/></marker>
     <marker id="arr-g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#3fb950" stroke="none"/></marker>
     <marker id="arr-p" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#bc8cff" stroke="none"/></marker>
   </defs>
+
   <!-- Sheet A -->
-  <rect x="30" y="40" width="170" height="190" rx="6" fill="#1c2129" stroke="#d29922" stroke-width="2"/>
-  <text x="115" y="62" text-anchor="middle" fill="#d29922" font-weight="700" font-size="13">Sheet A (Page 2)</text>
-  <text x="115" y="78" text-anchor="middle" fill="#8b949e" font-size="10">Power + References</text>
-  <text x="45" y="102" fill="#e6edf3" font-size="9.5" font-weight="500">TPS7A2033 (LDO)</text>
-  <text x="45" y="118" fill="#e6edf3" font-size="9.5" font-weight="500">BLM18PG (Ferrite)</text>
-  <text x="45" y="138" fill="#e6edf3" font-size="9.5" font-weight="500">REF5025 (2.5V Ref)</text>
-  <text x="45" y="158" fill="#e6edf3" font-size="9.5" font-weight="500">OPA320 (VCM Buf)</text>
-  <text x="45" y="178" fill="#e6edf3" font-size="9.5" font-weight="500">R1/R2 (VCM Divider)</text>
-  <text x="188" y="102" text-anchor="end" fill="#d29922" font-size="9" font-weight="600">3V3A →</text>
-  <text x="188" y="122" text-anchor="end" fill="#d29922" font-size="9" font-weight="600">3V3D →</text>
-  <text x="188" y="148" text-anchor="end" fill="#3fb950" font-size="9" font-weight="600">VREF →</text>
-  <text x="188" y="168" text-anchor="end" fill="#3fb950" font-size="9" font-weight="600">VCM →</text>
-  <text x="115" y="216" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="700">✓ COMPLETE</text>
+  <rect x="30" y="80" width="180" height="200" rx="6" fill="#1c2129" stroke="#d29922" stroke-width="2"/>
+  <text x="120" y="102" text-anchor="middle" fill="#d29922" font-weight="700" font-size="13">Sheet A (Page 2)</text>
+  <text x="120" y="118" text-anchor="middle" fill="#8b949e" font-size="10">Power + References</text>
+  <text x="45" y="142" fill="#e6edf3" font-size="9.5">TPS7A2033 (LDO)</text>
+  <text x="45" y="158" fill="#e6edf3" font-size="9.5">BLM18PG (Ferrite)</text>
+  <text x="45" y="178" fill="#e6edf3" font-size="9.5">REF5025 (2.5V Ref)</text>
+  <text x="45" y="198" fill="#e6edf3" font-size="9.5">OPA320 (VCM Buf)</text>
+  <text x="45" y="218" fill="#e6edf3" font-size="9.5">R1/R2 (VCM Divider)</text>
+  <text x="120" y="264" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="700">✓ COMPLETE</text>
+
   <!-- Sheet B -->
-  <rect x="250" y="80" width="170" height="150" rx="6" fill="#1c2129" stroke="#58a6ff" stroke-width="2"/>
-  <text x="335" y="102" text-anchor="middle" fill="#58a6ff" font-weight="700" font-size="13">Sheet B (Page 3)</text>
-  <text x="335" y="118" text-anchor="middle" fill="#8b949e" font-size="10">IF Input + Bias</text>
-  <text x="265" y="142" fill="#e6edf3" font-size="9.5" font-weight="500">J_IF (SMA 132289)</text>
-  <text x="265" y="158" fill="#e6edf3" font-size="9.5" font-weight="500">R_IN→D_ESD→C_AC</text>
-  <text x="265" y="174" fill="#e6edf3" font-size="9.5" font-weight="500">R_BIAS (47kΩ→VCM)</text>
-  <text x="335" y="222" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="700">✓ COMPLETE</text>
-  <!-- VCM arrow A→B -->
-  <path d="M200,165 L248,165" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arr-g)" fill="none"/>
-  <text x="224" y="160" text-anchor="middle" fill="#3fb950" font-size="8">VCM</text>
-  <!-- IF_BIASED arrow B→C -->
-  <path d="M420,155 L468,155" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#arr-b)" fill="none"/>
-  <text x="444" y="150" text-anchor="middle" fill="#58a6ff" font-size="8">IF_BIASED</text>
+  <rect x="290" y="120" width="160" height="160" rx="6" fill="#1c2129" stroke="#58a6ff" stroke-width="2"/>
+  <text x="370" y="142" text-anchor="middle" fill="#58a6ff" font-weight="700" font-size="13">Sheet B (Page 3)</text>
+  <text x="370" y="158" text-anchor="middle" fill="#8b949e" font-size="10">IF Input + Bias</text>
+  <text x="305" y="182" fill="#e6edf3" font-size="9.5">J_IF (SMA 132289)</text>
+  <text x="305" y="198" fill="#e6edf3" font-size="9.5">R_IN→D_ESD→C_AC</text>
+  <text x="305" y="214" fill="#e6edf3" font-size="9.5">R_BIAS (47kΩ→VCM)</text>
+  <text x="370" y="264" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="700">✓ COMPLETE</text>
+
   <!-- Sheet C -->
-  <rect x="470" y="50" width="200" height="210" rx="6" fill="#1c2129" stroke="#58a6ff" stroke-width="2"/>
-  <text x="570" y="72" text-anchor="middle" fill="#58a6ff" font-weight="700" font-size="13">Sheet C (Page 4)</text>
-  <text x="570" y="88" text-anchor="middle" fill="#8b949e" font-size="10">PGA + Anti-Alias Filter</text>
-  <text x="485" y="112" fill="#e6edf3" font-size="9.5" font-weight="500">PGA113 (1–200×)</text>
-  <text x="485" y="132" fill="#e6edf3" font-size="9.5" font-weight="500">LTC6242 (Quad Op-Amp)</text>
-  <text x="485" y="148" fill="#e6edf3" font-size="9.5" font-weight="500">  Stage 1: SK Q=1.306</text>
-  <text x="485" y="164" fill="#e6edf3" font-size="9.5" font-weight="500">  Stage 2: SK Q=0.541</text>
-  <text x="485" y="184" fill="#e6edf3" font-size="9.5" font-weight="500">R3–R6, C13–C16 (Filter)</text>
-  <text x="570" y="246" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="700">✓ COMPLETE</text>
-  <!-- LPF_OUT arrow C→D -->
-  <path d="M670,155 L718,155" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#arr-b)" fill="none"/>
-  <text x="694" y="150" text-anchor="middle" fill="#58a6ff" font-size="8">LPF_OUT</text>
+  <rect x="530" y="80" width="190" height="220" rx="6" fill="#1c2129" stroke="#58a6ff" stroke-width="2"/>
+  <text x="625" y="102" text-anchor="middle" fill="#58a6ff" font-weight="700" font-size="13">Sheet C (Page 4)</text>
+  <text x="625" y="118" text-anchor="middle" fill="#8b949e" font-size="10">PGA + Anti-Alias Filter</text>
+  <text x="545" y="142" fill="#e6edf3" font-size="9.5">PGA113 (1–200×)</text>
+  <text x="545" y="162" fill="#e6edf3" font-size="9.5">LTC6242 (Quad Op-Amp)</text>
+  <text x="545" y="178" fill="#e6edf3" font-size="9.5">  Stage 1: SK Q=1.306</text>
+  <text x="545" y="194" fill="#e6edf3" font-size="9.5">  Stage 2: SK Q=0.541</text>
+  <text x="545" y="214" fill="#e6edf3" font-size="9.5">R3–R6, C13–C16 (Filter)</text>
+  <text x="625" y="284" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="700">✓ COMPLETE</text>
+
   <!-- Sheet D -->
-  <rect x="720" y="50" width="200" height="210" rx="6" fill="#1c2129" stroke="#bc8cff" stroke-width="2"/>
-  <text x="820" y="72" text-anchor="middle" fill="#bc8cff" font-weight="700" font-size="13">Sheet D (Page 5)</text>
-  <text x="820" y="88" text-anchor="middle" fill="#8b949e" font-size="10">FDA + ADC + SPI</text>
-  <text x="735" y="112" fill="#e6edf3" font-size="9.5" font-weight="500">THS4531A (FDA, SE→Diff)</text>
-  <text x="735" y="132" fill="#e6edf3" font-size="9.5" font-weight="500">ADS8881 (18-bit SAR)</text>
-  <text x="735" y="152" fill="#e6edf3" font-size="9.5" font-weight="500">R_G, Rf1/Rf2 (1kΩ each)</text>
-  <text x="735" y="172" fill="#e6edf3" font-size="9.5" font-weight="500">R_OUTP/M (33Ω) + C_DIFF</text>
-  <text x="735" y="192" fill="#e6edf3" font-size="9.5" font-weight="500">J_DFT (2×10 header)</text>
-  <text x="820" y="246" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="700">✓ COMPLETE</text>
-  <!-- Power distribution -->
-  <path d="M200,100 C230,100 230,68 335,68 C440,68 440,43 570,43" stroke="#d29922" stroke-width="1.2" stroke-dasharray="4,3" fill="none"/>
-  <path d="M570,43 L820,43" stroke="#d29922" stroke-width="1.2" stroke-dasharray="4,3" fill="none"/>
-  <text x="450" y="38" text-anchor="middle" fill="#d29922" font-size="8">3V3A to all sheets</text>
-  <!-- VREF A→D -->
-  <path d="M200,146 C220,146 230,290 470,290 C710,290 720,230 820,230" stroke="#3fb950" stroke-width="1.2" stroke-dasharray="4,3" fill="none"/>
-  <text x="600" y="300" text-anchor="middle" fill="#3fb950" font-size="8">VREF (2.5V to ADC)</text>
-  <!-- VCM A→D -->
-  <path d="M200,165 C220,175 230,310 470,310 C710,310 720,240 820,240" stroke="#3fb950" stroke-width="1.2" stroke-dasharray="3,4" fill="none"/>
-  <text x="600" y="322" text-anchor="middle" fill="#3fb950" font-size="8">VCM (1.65V to FDA VOCM)</text>
-  <!-- SPI D→C -->
-  <path d="M735,220 C710,220 700,235 570,235 C500,235 490,225 490,215" stroke="#bc8cff" stroke-width="1.2" stroke-dasharray="4,3" fill="none"/>
-  <text x="640" y="248" text-anchor="middle" fill="#bc8cff" font-size="8">SPI: CS_PGA, SCLK, SDI</text>
+  <rect x="800" y="80" width="180" height="220" rx="6" fill="#1c2129" stroke="#bc8cff" stroke-width="2"/>
+  <text x="890" y="102" text-anchor="middle" fill="#bc8cff" font-weight="700" font-size="13">Sheet D (Page 5)</text>
+  <text x="890" y="118" text-anchor="middle" fill="#8b949e" font-size="10">FDA + ADC + SPI</text>
+  <text x="815" y="142" fill="#e6edf3" font-size="9.5">THS4531A (FDA, SE→Diff)</text>
+  <text x="815" y="162" fill="#e6edf3" font-size="9.5">ADS8881 (18-bit SAR)</text>
+  <text x="815" y="182" fill="#e6edf3" font-size="9.5">R_G, Rf1/Rf2 (1kΩ each)</text>
+  <text x="815" y="202" fill="#e6edf3" font-size="9.5">R_OUTP/M (33Ω) + C_DIFF</text>
+  <text x="815" y="222" fill="#e6edf3" font-size="9.5">J_DFT (2×10 header)</text>
+  <text x="890" y="284" text-anchor="middle" fill="#3fb950" font-size="10" font-weight="700">✓ COMPLETE</text>
+
+  <!-- === SIGNAL ROUTING (all orthogonal) === -->
+
+  <!-- VCM: A → B (green, straight horizontal) -->
+  <path d="M210,210 L288,210" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arr-g)" fill="none"/>
+  <text x="248" y="204" text-anchor="middle" fill="#3fb950" font-size="8" font-weight="600">VCM</text>
+
+  <!-- IF_BIASED: B → C (blue, straight horizontal) -->
+  <path d="M450,190 L528,190" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#arr-b)" fill="none"/>
+  <text x="489" y="184" text-anchor="middle" fill="#58a6ff" font-size="8" font-weight="600">IF_BIASED</text>
+
+  <!-- LPF_OUT: C → D (blue, straight horizontal) -->
+  <path d="M720,190 L798,190" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#arr-b)" fill="none"/>
+  <text x="759" y="184" text-anchor="middle" fill="#58a6ff" font-size="8" font-weight="600">LPF_OUT</text>
+
+  <!-- 3V3A power bus: horizontal line across top -->
+  <path d="M210,140 L260,140 L260,55 L890,55" stroke="#d29922" stroke-width="1.2" stroke-dasharray="5,3" fill="none"/>
+  <!-- Taps down to each sheet -->
+  <path d="M370,55 L370,118" stroke="#d29922" stroke-width="1" stroke-dasharray="3,2" fill="none"/>
+  <path d="M625,55 L625,78" stroke="#d29922" stroke-width="1" stroke-dasharray="3,2" fill="none"/>
+  <path d="M890,55 L890,78" stroke="#d29922" stroke-width="1" stroke-dasharray="3,2" fill="none"/>
+  <text x="620" y="45" text-anchor="middle" fill="#d29922" font-size="8">3V3A to all sheets</text>
+
+  <!-- VREF: A → D (green, orthogonal: down, right, down) -->
+  <path d="M210,170 L260,170 L260,350 L890,350 L890,302" stroke="#3fb950" stroke-width="1.2" stroke-dasharray="5,3" fill="none"/>
+  <text x="575" y="342" text-anchor="middle" fill="#3fb950" font-size="8">VREF (2.5V to ADC)</text>
+
+  <!-- VCM to D: A → D (green, orthogonal: below VREF line) -->
+  <path d="M210,225 L250,225 L250,380 L890,380 L890,302" stroke="#3fb950" stroke-width="1.2" stroke-dasharray="3,3" fill="none"/>
+  <text x="575" y="393" text-anchor="middle" fill="#3fb950" font-size="8">VCM (1.65V to FDA VOCM)</text>
+
+  <!-- SPI: D → C (purple, orthogonal: left along bottom of sheets) -->
+  <path d="M800,260 L770,260 L770,330 L625,330 L625,302" stroke="#bc8cff" stroke-width="1.2" stroke-dasharray="4,3" fill="none"/>
+  <text x="697" y="323" text-anchor="middle" fill="#bc8cff" font-size="8">SPI: CS_PGA, SCLK, SDI</text>
 </svg>
 </div>
 
@@ -202,68 +219,89 @@
 <div class="sheet-section">
 
 <div class="svg-container">
-<svg viewBox="0 0 900 290" width="900" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
-  <!-- 5V input cluster -->
-  <rect x="20" y="20" width="120" height="60" rx="5" fill="#2d1f0e" stroke="#d29922" stroke-width="1.5"/>
-  <text x="80" y="42" text-anchor="middle" fill="#d29922" font-weight="600" font-size="10">5V Input</text>
-  <text x="80" y="57" text-anchor="middle" fill="#8b949e" font-size="8">ST1→F1→D1</text>
-  <text x="80" y="70" text-anchor="middle" fill="#8b949e" font-size="7">C1(10µ) + C2(1µ)</text>
-  <!-- Arrow to LDO -->
-  <path d="M140,50 L175,50" stroke="#d29922" stroke-width="1.5" marker-end="url(#arr-o)" fill="none"/>
+<svg viewBox="0 0 950 340" width="950" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <!-- === TOP ROW: Power path (5V → LDO → 3V3A → Ferrite → 3V3D) === -->
+
+  <!-- 5V input -->
+  <rect x="20" y="30" width="120" height="55" rx="5" fill="#2d1f0e" stroke="#d29922" stroke-width="1.5"/>
+  <text x="80" y="50" text-anchor="middle" fill="#d29922" font-weight="600" font-size="10">5V Input</text>
+  <text x="80" y="64" text-anchor="middle" fill="#8b949e" font-size="8">ST1→F1→D1</text>
+  <text x="80" y="76" text-anchor="middle" fill="#8b949e" font-size="7">C1(10µ) + C2(1µ)</text>
+  <!-- Arrow -->
+  <path d="M140,57 L175,57" stroke="#d29922" stroke-width="1.5" marker-end="url(#arr-o)" fill="none"/>
+
   <!-- LDO -->
-  <rect x="178" y="20" width="130" height="60" rx="5" fill="#2d1f0e" stroke="#d29922" stroke-width="1.5"/>
-  <text x="243" y="42" text-anchor="middle" fill="#d29922" font-weight="600" font-size="10">TPS7A2033 (U_LDO)</text>
-  <text x="243" y="57" text-anchor="middle" fill="#e6edf3" font-size="8">3.3V out, 4.4µVrms noise</text>
-  <text x="243" y="70" text-anchor="middle" fill="#8b949e" font-size="7">C3(1µ) at Vout pin</text>
-  <!-- Arrow to 3V3A node -->
-  <path d="M308,50 L345,50" stroke="#d29922" stroke-width="1.5" marker-end="url(#arr-o)" fill="none"/>
+  <rect x="178" y="30" width="150" height="55" rx="5" fill="#2d1f0e" stroke="#d29922" stroke-width="1.5"/>
+  <text x="253" y="50" text-anchor="middle" fill="#d29922" font-weight="600" font-size="10">TPS7A2033 (U_LDO)</text>
+  <text x="253" y="64" text-anchor="middle" fill="#e6edf3" font-size="8">3.3V out, 4.4µVrms noise</text>
+  <text x="253" y="76" text-anchor="middle" fill="#8b949e" font-size="7">C3(1µ) at Vout pin</text>
+  <!-- Arrow -->
+  <path d="M328,57 L368,57" stroke="#d29922" stroke-width="1.5" marker-end="url(#arr-o)" fill="none"/>
+
   <!-- 3V3A node -->
-  <circle cx="365" cy="50" r="15" fill="#2d1f0e" stroke="#d29922" stroke-width="2"/>
-  <text x="365" y="54" text-anchor="middle" fill="#d29922" font-weight="700" font-size="9">3V3A</text>
-  <!-- R_SHUNT -->
-  <text x="365" y="78" text-anchor="middle" fill="#8b949e" font-size="7">R_SHUNT (0Ω DFT)</text>
-  <!-- Ferrite bead path to 3V3D -->
-  <path d="M380,50 L430,50" stroke="#d29922" stroke-width="1.2" fill="none"/>
-  <rect x="430" y="35" width="100" height="30" rx="4" fill="#1c2129" stroke="#d29922" stroke-width="1"/>
-  <text x="480" y="52" text-anchor="middle" fill="#d29922" font-size="8" font-weight="500">FB1 (220Ω@100M)</text>
-  <text x="480" y="62" text-anchor="middle" fill="#8b949e" font-size="7">BLM18PG221SN1D</text>
-  <path d="M530,50 L565,50" stroke="#d29922" stroke-width="1.2" marker-end="url(#arr-o)" fill="none"/>
-  <circle cx="585" cy="50" r="15" fill="#1c2129" stroke="#d29922" stroke-width="1.5" stroke-dasharray="3,2"/>
-  <text x="585" y="54" text-anchor="middle" fill="#d29922" font-size="8" font-weight="600">3V3D</text>
-  <text x="585" y="78" text-anchor="middle" fill="#8b949e" font-size="7">C4(100n) + C5(10µ)</text>
-  <text x="585" y="88" text-anchor="middle" fill="#8b949e" font-size="7">GNDD for C4/C5 only</text>
-  <!-- 3V3D purpose -->
-  <text x="660" y="48" fill="#8b949e" font-size="7.5" font-style="italic">→ J_DFT VCC, pull-ups,</text>
-  <text x="660" y="58" fill="#8b949e" font-size="7.5" font-style="italic">   debug LEDs only</text>
+  <circle cx="390" cy="57" r="18" fill="#2d1f0e" stroke="#d29922" stroke-width="2"/>
+  <text x="390" y="61" text-anchor="middle" fill="#d29922" font-weight="700" font-size="9">3V3A</text>
+  <text x="390" y="90" text-anchor="middle" fill="#8b949e" font-size="7">R_SHUNT (0Ω DFT)</text>
 
-  <!-- REF5025 -->
-  <path d="M365,65 L365,120" stroke="#3fb950" stroke-width="1.2" fill="none"/>
-  <rect x="280" y="120" width="170" height="65" rx="5" fill="#0d2818" stroke="#3fb950" stroke-width="1.5"/>
-  <text x="365" y="140" text-anchor="middle" fill="#3fb950" font-weight="600" font-size="10">REF5025 (U_REF)</text>
-  <text x="365" y="155" text-anchor="middle" fill="#e6edf3" font-size="8">SOIC-8 variant (AIDGKR)</text>
-  <text x="365" y="168" text-anchor="middle" fill="#8b949e" font-size="7.5">VIN(2)=3V3A | VOUT(6)=2.500V | DNC: pins 1,7</text>
-  <text x="365" y="178" text-anchor="middle" fill="#8b949e" font-size="7">C6(1µ) in, C7(10µ)+C8(100n) out</text>
-  <!-- VREF output -->
-  <path d="M450,152 L520,152" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arr-g)" fill="none"/>
-  <text x="540" y="148" fill="#3fb950" font-weight="600" font-size="9">VREF</text>
-  <text x="540" y="160" fill="#8b949e" font-size="7.5">2.500V → Sheet D (ADC)</text>
+  <!-- Arrow to ferrite -->
+  <path d="M408,57 L460,57" stroke="#d29922" stroke-width="1.2" fill="none"/>
 
-  <!-- VCM generator -->
-  <path d="M365,65 L365,100 L170,100 L170,130" stroke="#3fb950" stroke-width="1" stroke-dasharray="3,2" fill="none"/>
-  <rect x="80" y="130" width="180" height="75" rx="5" fill="#0d2818" stroke="#3fb950" stroke-width="1.5"/>
-  <text x="170" y="150" text-anchor="middle" fill="#3fb950" font-weight="600" font-size="10">VCM Generator</text>
-  <text x="170" y="165" text-anchor="middle" fill="#e6edf3" font-size="8">R1/R2 (10k/10k 0.1%) → 1.650V</text>
-  <text x="170" y="178" text-anchor="middle" fill="#e6edf3" font-size="8">OPA320 (U_VCM) unity buffer</text>
-  <text x="170" y="192" text-anchor="middle" fill="#8b949e" font-size="7">C9(100n) supply, C10(100n) output</text>
-  <!-- VCM output -->
-  <path d="M260,167 L330,167 L330,210 L520,210" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arr-g)" fill="none"/>
-  <text x="540" y="206" fill="#3fb950" font-weight="600" font-size="9">VCM</text>
-  <text x="540" y="218" fill="#8b949e" font-size="7.5">1.650V → Sheets B, C, D</text>
+  <!-- Ferrite bead -->
+  <rect x="462" y="38" width="120" height="38" rx="4" fill="#1c2129" stroke="#d29922" stroke-width="1"/>
+  <text x="522" y="55" text-anchor="middle" fill="#d29922" font-size="8.5" font-weight="500">FB1 (220Ω@100M)</text>
+  <text x="522" y="68" text-anchor="middle" fill="#8b949e" font-size="7">BLM18PG221SN1D</text>
 
-  <!-- Ground note -->
-  <rect x="80" y="230" width="400" height="40" rx="4" fill="rgba(139,148,158,0.08)" stroke="var(--border)" stroke-width="1"/>
-  <text x="280" y="248" text-anchor="middle" fill="#8b949e" font-size="8.5" font-weight="500">Ground Assignment: GND (analog) for all components. GNDD only for C4 + C5 (3V3D side of ferrite).</text>
-  <text x="280" y="260" text-anchor="middle" fill="#8b949e" font-size="8">4 hierarchical labels out: 3V3A, 3V3D, VREF, VCM</text>
+  <!-- Arrow to 3V3D -->
+  <path d="M582,57 L628,57" stroke="#d29922" stroke-width="1.2" marker-end="url(#arr-o)" fill="none"/>
+
+  <!-- 3V3D node -->
+  <circle cx="650" cy="57" r="18" fill="#1c2129" stroke="#d29922" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="650" y="61" text-anchor="middle" fill="#d29922" font-size="8" font-weight="600">3V3D</text>
+  <text x="650" y="90" text-anchor="middle" fill="#8b949e" font-size="7">C4(100n) + C5(10µ)</text>
+  <text x="650" y="102" text-anchor="middle" fill="#8b949e" font-size="7">GNDD for C4/C5 only</text>
+
+  <!-- 3V3D purpose label -->
+  <path d="M668,57 L710,57" stroke="#d29922" stroke-width="1" stroke-dasharray="3,2" fill="none"/>
+  <text x="720" y="52" fill="#8b949e" font-size="7.5" font-style="italic">→ J_DFT VCC, pull-ups,</text>
+  <text x="720" y="64" fill="#8b949e" font-size="7.5" font-style="italic">   debug LEDs only</text>
+
+  <!-- === BOTTOM LEFT: VCM Generator === -->
+
+  <!-- Tap from 3V3A down to VCM -->
+  <path d="M390,75 L390,140" stroke="#3fb950" stroke-width="1" stroke-dasharray="3,2" fill="none"/>
+  <path d="M390,140 L170,140 L170,160" stroke="#3fb950" stroke-width="1" stroke-dasharray="3,2" fill="none"/>
+
+  <rect x="60" y="160" width="220" height="80" rx="5" fill="#0d2818" stroke="#3fb950" stroke-width="1.5"/>
+  <text x="170" y="182" text-anchor="middle" fill="#3fb950" font-weight="600" font-size="10">VCM Generator</text>
+  <text x="170" y="198" text-anchor="middle" fill="#e6edf3" font-size="8.5">R1/R2 (10k/10k 0.1%) → 1.650V</text>
+  <text x="170" y="214" text-anchor="middle" fill="#e6edf3" font-size="8.5">OPA320 (U_VCM) unity buffer</text>
+  <text x="170" y="230" text-anchor="middle" fill="#8b949e" font-size="7">C9(100n) supply, C10(100n) output</text>
+
+  <!-- VCM output arrow (orthogonal right) -->
+  <path d="M280,195 L340,195 L340,290 L560,290" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arr-g)" fill="none"/>
+  <text x="580" y="286" fill="#3fb950" font-weight="600" font-size="9">VCM</text>
+  <text x="580" y="300" fill="#8b949e" font-size="7.5">1.650V → Sheets B, C, D</text>
+
+  <!-- === BOTTOM RIGHT: REF5025 === -->
+
+  <!-- Tap from 3V3A down to REF -->
+  <path d="M390,75 L390,140 L520,140 L520,160" stroke="#3fb950" stroke-width="1" stroke-dasharray="3,2" fill="none"/>
+
+  <rect x="400" y="160" width="240" height="80" rx="5" fill="#0d2818" stroke="#3fb950" stroke-width="1.5"/>
+  <text x="520" y="182" text-anchor="middle" fill="#3fb950" font-weight="600" font-size="10">REF5025 (U_REF)</text>
+  <text x="520" y="198" text-anchor="middle" fill="#e6edf3" font-size="8.5">SOIC-8 variant (AIDGKR)</text>
+  <text x="520" y="214" text-anchor="middle" fill="#8b949e" font-size="7.5">VIN(2)=3V3A | VOUT(6)=2.500V | DNC: pins 1,7</text>
+  <text x="520" y="230" text-anchor="middle" fill="#8b949e" font-size="7">C6(1µ) in, C7(10µ)+C8(100n) out</text>
+
+  <!-- VREF output arrow -->
+  <path d="M640,195 L720,195" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arr-g)" fill="none"/>
+  <text x="740" y="191" fill="#3fb950" font-weight="600" font-size="9">VREF</text>
+  <text x="740" y="205" fill="#8b949e" font-size="7.5">2.500V → Sheet D (ADC)</text>
+
+  <!-- === Ground note === -->
+  <rect x="60" y="290" width="460" height="38" rx="4" fill="rgba(139,148,158,0.06)" stroke="#30363d" stroke-width="1"/>
+  <text x="290" y="306" text-anchor="middle" fill="#8b949e" font-size="8.5">Ground Assignment: GND (analog) for all components. GNDD only for C4 + C5 (3V3D side of ferrite).</text>
+  <text x="290" y="320" text-anchor="middle" fill="#8b949e" font-size="8">4 hierarchical labels out: 3V3A, 3V3D, VREF, VCM</text>
 </svg>
 </div>
 
