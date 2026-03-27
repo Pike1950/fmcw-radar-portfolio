@@ -86,7 +86,7 @@ This project is one track of a broader engineering portfolio spanning processor 
 - **Adaptive chirp modes** — Multi-scale radar operation via time-division sweep bandwidth switching (narrow/medium/wide), analogous to the British Chain Home / Chain Home Low / Chain Home Extra Low layered defense concept from WWII. Includes multi-channel staggered filter bandwidth analysis (academic concept for 3-RX architecture).
 
 ### Digital Design (In Progress)
-- **FPGA digital backend** (planned) — SystemVerilog modules for the radar's digital subsystem, targeting Gowin GW1NR-9 (Tang Nano 9K, ~$20, 8,640 LUTs) for the radar backend:
+- **FPGA digital backend** (planned) — SystemVerilog modules for the radar's digital subsystem, targeting Gowin GW5A (Tang Primer 25K, ~$35, in hand, 23K LUT4, 1008Kb BSRAM):
   - SPI master controllers for ADS8881 (ADC readout) and PGA113 (gain control)
   - DDS chirp waveform generator for VCO sweep control
   - Configurable FIR digital filter (supplements the analog anti-alias filter)
@@ -100,9 +100,8 @@ This project is one track of a broader engineering portfolio spanning processor 
 - **Simulation:** LTspice (analog), Verilator (digital), GTKWave (waveforms)
 - **HDL:** SystemVerilog (digital backend, verification)
 - **FPGA Targets:**
-  - *Radar digital backend:* Gowin GW1NR-9 (Tang Nano 9K, ~$20) — SPI controller, DDS, FIR filter
-  - *RISC processor synthesis:* Gowin GW5A (Tang Primer 25K, ~$35, in hand) — 23K LUT4, 1008Kb BSRAM, 3 PMOD ports
-  - *Phase 2 (high-speed interfaces):* Alinx AX7325B (Kintex-7, ~$350-450, Vivado, PCIe Gen2 x8, 4× SFP+) or Tang Mega 138K Pro (~$200, PCIe 3.0 x4, dual SFP+)
+  - *Phase 1:* Gowin GW5A (Sipeed Tang Primer 25K, ~$35, in hand) — 23K LUT4, 1008Kb BSRAM, 3 PMOD ports. Radar digital backend, RISC processor synthesis, SCPI diagnostic modules. Gowin EDA + open-source Yosys/Apicula.
+  - *Phase 2:* Gowin GW5AST-138 (Sipeed Tang Mega 138K Pro, ~$200) — 138K LUT4, PCIe 3.0 x4, dual SFP+, SerDes transceivers. High-speed interface validation and multi-gigabit protocol work.
 - **Documentation:** HTML with first-principles analysis, SVG block diagrams
 - **Test Automation:** PyVISA (planned integration with SCPI instrument platform)
 

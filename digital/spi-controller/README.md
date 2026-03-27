@@ -55,8 +55,8 @@ A SystemVerilog SPI master controller designed to interface with the FMCW radar 
 
 ## FPGA Targets
 
-- **Gowin GW1NR-9** (Tang Nano 9K, ~$20) — 8,640 LUT4, sufficient for SPI + DDS + FIR filter. Gowin EDA with SystemVerilog support. Primary target for the radar digital backend.
-- **Gowin GW5A** (Tang Primer 25K, ~$35, in hand) — 23,040 LUT4, 1008Kb BSRAM, 3 PMOD ports. Shared with RISC processor project. Gowin EDA + open-source Yosys/Apicula toolchain.
+- **Gowin GW5A** (Sipeed Tang Primer 25K, ~$35, in hand) — 23,040 LUT4, 1008Kb BSRAM, 3 PMOD ports. Primary target for the radar digital backend. Gowin EDA + open-source Yosys/Apicula toolchain.
+- **Gowin GW5AST-138** (Sipeed Tang Mega 138K Pro, ~$200) — 138K LUT4, PCIe 3.0 x4, dual SFP+. Phase 2 target for expanded digital backend and high-speed interface work.
 
 ## Toolchain
 
