@@ -13,449 +13,370 @@
   h2 { font-size:1.3rem; color:var(--t); margin:2rem 0 0.8rem; padding-bottom:0.4rem; border-bottom:1px solid var(--bd); }
   h3 { font-size:1.05rem; color:var(--cyan); margin:1.5rem 0 0.5rem; }
   p { font-size:0.9rem; margin-bottom:0.7rem; }
-  .card { background:var(--s); border:1px solid var(--bd); border-radius:10px; padding:1.5rem; margin:1rem 0; }
-  .svg-wrap { width:100%; overflow-x:auto; margin:0.8rem 0; background:var(--s2); border-radius:8px; border:1px solid var(--bd); padding:0.5rem; }
+  .svg-wrap { width:100%; overflow-x:auto; margin:0.8rem 0; background:var(--s2); border-radius:8px; border:1px solid var(--bd); padding:1rem; }
   .svg-wrap svg { display:block; margin:0 auto; }
   .ok { background:rgba(63,185,80,0.1); border-left:4px solid var(--green); padding:0.8rem 1rem; border-radius:0 6px 6px 0; margin:0.8rem 0; font-size:0.88rem; }
   .err { background:rgba(248,81,73,0.1); border-left:4px solid var(--red); padding:0.8rem 1rem; border-radius:0 6px 6px 0; margin:0.8rem 0; font-size:0.88rem; }
   .warn { background:rgba(210,153,34,0.1); border-left:4px solid var(--orange); padding:0.8rem 1rem; border-radius:0 6px 6px 0; margin:0.8rem 0; font-size:0.88rem; }
   .err strong, .ok strong, .warn strong { display:block; margin-bottom:0.2rem; }
   table { width:100%; border-collapse:collapse; font-size:0.82rem; margin:0.8rem 0; }
-  th { background:#1f3864; color:#fff; padding:5px 8px; text-align:left; }
-  td { padding:5px 8px; border-bottom:1px solid var(--bd); vertical-align:top; }
+  th { background:#1f3864; color:#fff; padding:6px 8px; text-align:left; }
+  td { padding:6px 8px; border-bottom:1px solid var(--bd); vertical-align:top; }
   .yes { color:var(--green); font-weight:700; }
   .no { color:var(--red); font-weight:700; }
   .fix { color:var(--orange); font-weight:600; }
-  code { font-family:'JetBrains Mono',monospace; font-size:0.85em; background:rgba(88,166,255,0.08); padding:1px 4px; border-radius:3px; }
 </style>
 </head>
 <body>
 
 <h1>Sheet C — 4th-Order Filter Wiring Analysis</h1>
-<p class="sub">Extracted from your KiCad schematic &nbsp;|&nbsp; 9 nets traced, 29 wires, 13 components</p>
+<p class="sub">Extracted from KiCad schematic &nbsp;|&nbsp; 9 nets traced, 29 wires, 13 components</p>
 
-<!-- ═══════════════════════════════════════════════════════════ -->
 <h2>1. What a Sallen-Key Stage Looks Like (Reference)</h2>
 <p>Each stage of the 4th-order Butterworth uses a unity-gain Sallen-Key low-pass topology. The key is that <strong>C_feedback connects from the op-amp output back to the R-R junction node</strong>, not to ground.</p>
 
 <div class="svg-wrap">
-<svg viewBox="0 0 700 200" width="700" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,sans-serif">
-  <defs>
-    <marker id="a1" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#58a6ff"/></marker>
-    <marker id="a2" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#3fb950"/></marker>
-  </defs>
+<svg viewBox="0 0 800 230" width="800" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,sans-serif">
+  <defs><marker id="a1" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#58a6ff"/></marker></defs>
   <text x="20" y="18" fill="#39d2c0" font-size="11" font-weight="600">Correct Sallen-Key Low-Pass (Single Stage)</text>
 
-  <!-- Input -->
-  <text x="20" y="82" fill="#58a6ff" font-size="10" font-weight="600">IN</text>
-  <path d="M38,78 L60,78" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#a1)"/>
+  <!-- Signal path: IN → R1 → [Node A] → R2 → [Node B] → Op-Amp → OUT -->
+  <text x="20" y="92" fill="#58a6ff" font-size="10" font-weight="600">IN</text>
+  <line x1="38" y1="88" x2="68" y2="88" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#a1)"/>
+  <rect x="70" y="78" width="80" height="20" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="110" y="92" text-anchor="middle" fill="#e6edf3" font-size="9">R_series1</text>
+  <line x1="150" y1="88" x2="185" y2="88" stroke="#58a6ff" stroke-width="1.5"/>
+  <circle cx="185" cy="88" r="4" fill="#58a6ff"/>
+  <text x="185" y="72" text-anchor="middle" fill="#d29922" font-size="8" font-weight="600">Node A</text>
+  <line x1="189" y1="88" x2="228" y2="88" stroke="#58a6ff" stroke-width="1.5"/>
+  <rect x="228" y="78" width="80" height="20" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="268" y="92" text-anchor="middle" fill="#e6edf3" font-size="9">R_series2</text>
+  <line x1="308" y1="88" x2="343" y2="88" stroke="#58a6ff" stroke-width="1.5"/>
+  <circle cx="343" cy="88" r="4" fill="#58a6ff"/>
+  <text x="343" y="72" text-anchor="middle" fill="#d29922" font-size="8" font-weight="600">Node B</text>
+  <line x1="347" y1="88" x2="385" y2="88" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#a1)"/>
 
-  <!-- R_series1 -->
-  <rect x="62" y="68" width="65" height="20" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
-  <text x="95" y="82" text-anchor="middle" fill="#e6edf3" font-size="9">R_series1</text>
-
-  <!-- Node A -->
-  <path d="M127,78 L155,78" stroke="#58a6ff" stroke-width="1.5"/>
-  <circle cx="155" cy="78" r="4" fill="#58a6ff"/>
-  <text x="155" y="68" text-anchor="middle" fill="#d29922" font-size="8" font-weight="600">Node A</text>
-
-  <!-- C_shunt down to GND -->
-  <path d="M155,82 L155,130" stroke="#3fb950" stroke-width="1.5"/>
-  <rect x="140" y="130" width="30" height="18" rx="3" fill="#0d2818" stroke="#3fb950" stroke-width="1.5"/>
-  <text x="155" y="143" text-anchor="middle" fill="#3fb950" font-size="8">C_shunt</text>
-  <path d="M155,148 L155,165" stroke="#8b949e" stroke-width="1"/>
-  <line x1="145" y1="165" x2="165" y2="165" stroke="#8b949e" stroke-width="2"/>
-  <line x1="148" y1="169" x2="162" y2="169" stroke="#8b949e" stroke-width="1.5"/>
-  <line x1="151" y1="173" x2="159" y2="173" stroke="#8b949e" stroke-width="1"/>
-  <text x="175" y="168" fill="#8b949e" font-size="8">GND</text>
-
-  <!-- R_series2 -->
-  <path d="M159,78 L195,78" stroke="#58a6ff" stroke-width="1.5"/>
-  <rect x="195" y="68" width="65" height="20" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
-  <text x="228" y="82" text-anchor="middle" fill="#e6edf3" font-size="9">R_series2</text>
-
-  <!-- Node B -->
-  <path d="M260,78 L290,78" stroke="#58a6ff" stroke-width="1.5"/>
-  <circle cx="290" cy="78" r="4" fill="#58a6ff"/>
-  <text x="290" y="68" text-anchor="middle" fill="#d29922" font-size="8" font-weight="600">Node B</text>
-
-  <!-- Wire to +IN -->
-  <path d="M294,78 L340,78" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#a1)"/>
-
-  <!-- Op-amp triangle -->
-  <polygon points="342,58 342,98 392,78" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
-  <text x="360" y="82" fill="#e6edf3" font-size="8" font-weight="600">+IN</text>
-  <text x="360" y="72" fill="#8b949e" font-size="7">−IN tied</text>
-  <text x="360" y="92" fill="#8b949e" font-size="7">to OUT</text>
+  <!-- Op-amp as labeled rect -->
+  <rect x="388" y="72" width="70" height="32" rx="4" fill="#1c2129" stroke="#58a6ff" stroke-width="2"/>
+  <text x="423" y="86" text-anchor="middle" fill="#58a6ff" font-size="9" font-weight="600">Op-Amp</text>
+  <text x="423" y="98" text-anchor="middle" fill="#8b949e" font-size="7">−IN=OUT</text>
 
   <!-- OUT -->
-  <path d="M392,78 L445,78" stroke="#58a6ff" stroke-width="2"/>
-  <circle cx="445" cy="78" r="4" fill="#58a6ff"/>
-  <text x="455" y="82" fill="#58a6ff" font-size="10" font-weight="600">OUT</text>
+  <line x1="458" y1="88" x2="498" y2="88" stroke="#58a6ff" stroke-width="2"/>
+  <circle cx="498" cy="88" r="4" fill="#58a6ff"/>
+  <text x="510" y="92" fill="#58a6ff" font-size="10" font-weight="600">OUT</text>
 
-  <!-- Unity gain feedback (−IN to OUT) -->
-  <path d="M445,78 L445,50 L342,50 L342,70" stroke="#8b949e" stroke-width="1" stroke-dasharray="3,2"/>
-  <text x="393" y="46" text-anchor="middle" fill="#8b949e" font-size="7">−IN = OUT (unity gain)</text>
+  <!-- C_shunt: Node A → GND (green, goes down) -->
+  <line x1="185" y1="92" x2="185" y2="140" stroke="#3fb950" stroke-width="1.5"/>
+  <rect x="167" y="140" width="36" height="18" rx="3" fill="#1c2129" stroke="#3fb950" stroke-width="1.5"/>
+  <text x="185" y="153" text-anchor="middle" fill="#3fb950" font-size="8">C_shunt</text>
+  <line x1="185" y1="158" x2="185" y2="175" stroke="#8b949e" stroke-width="1"/>
+  <line x1="175" y1="175" x2="195" y2="175" stroke="#8b949e" stroke-width="2"/>
+  <line x1="178" y1="179" x2="192" y2="179" stroke="#8b949e" stroke-width="1.5"/>
+  <text x="200" y="178" fill="#8b949e" font-size="7">GND</text>
 
-  <!-- C_feedback from Node B back to OUT — THIS IS THE KEY -->
-  <path d="M290,82 L290,140 L445,140 L445,82" stroke="#f85149" stroke-width="2"/>
-  <rect x="340" y="130" width="55" height="20" rx="3" fill="#2d0e0e" stroke="#f85149" stroke-width="2"/>
-  <text x="367" y="144" text-anchor="middle" fill="#f85149" font-size="8" font-weight="700">C_feedback</text>
-  <text x="367" y="165" text-anchor="middle" fill="#f85149" font-size="9" font-weight="700">← NOT to GND!</text>
-  <text x="367" y="178" text-anchor="middle" fill="#f85149" font-size="8">Connects Node B → OUT</text>
+  <!-- C_feedback: Node B → OUT (red, goes down then right then up) -->
+  <line x1="343" y1="92" x2="343" y2="160" stroke="#f85149" stroke-width="2"/>
+  <line x1="343" y1="160" x2="498" y2="160" stroke="#f85149" stroke-width="2"/>
+  <line x1="498" y1="160" x2="498" y2="92" stroke="#f85149" stroke-width="2"/>
+  <rect x="385" y="150" width="60" height="18" rx="3" fill="#1c2129" stroke="#f85149" stroke-width="1.5"/>
+  <text x="415" y="163" text-anchor="middle" fill="#f85149" font-size="8" font-weight="600">C_feedback</text>
+  <text x="415" y="185" text-anchor="middle" fill="#f85149" font-size="8" font-weight="700">← NOT to GND!</text>
+  <text x="415" y="199" text-anchor="middle" fill="#f85149" font-size="7.5">Connects Node B → OUT</text>
 
-  <!-- Annotation -->
-  <rect x="490" y="30" width="195" height="90" rx="6" fill="rgba(248,81,73,0.08)" stroke="#f85149" stroke-width="1"/>
-  <text x="500" y="48" fill="#f85149" font-size="9" font-weight="700">KEY DIFFERENCE:</text>
-  <text x="500" y="63" fill="#e6edf3" font-size="8.5">C_shunt: Node A → GND</text>
-  <text x="500" y="78" fill="#e6edf3" font-size="8.5">C_feedback: Node B → OUT</text>
-  <text x="500" y="98" fill="#d29922" font-size="8.5">C_feedback creates the</text>
-  <text x="500" y="111" fill="#d29922" font-size="8.5">positive feedback that</text>
-  <text x="500" y="124" fill="#d29922" font-size="8.5">controls Q (peaking).</text>
+  <!-- Annotation box -->
+  <rect x="560" y="50" width="220" height="110" rx="6" fill="rgba(248,81,73,0.06)" stroke="#f85149" stroke-width="1"/>
+  <text x="575" y="70" fill="#f85149" font-size="9" font-weight="700">KEY DIFFERENCE:</text>
+  <text x="575" y="88" fill="#e6edf3" font-size="8.5">C_shunt: Node A → GND</text>
+  <text x="575" y="104" fill="#e6edf3" font-size="8.5">C_feedback: Node B → OUT</text>
+  <text x="575" y="126" fill="#d29922" font-size="8.5">C_feedback creates the</text>
+  <text x="575" y="142" fill="#d29922" font-size="8.5">positive feedback that</text>
+  <text x="575" y="158" fill="#d29922" font-size="8.5">controls Q (peaking).</text>
 </svg>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════ -->
 <h2>2. Your Current Wiring (Extracted from KiCad)</h2>
 <p>Here's exactly what I found by tracing every wire and pin-to-pin connection in your schematic:</p>
 
 <h3>Stage 1 — R3 / R4 / C13 / C14 → LTC6242 Section A</h3>
 <div class="svg-wrap">
-<svg viewBox="0 0 800 250" width="800" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,sans-serif">
-  <text x="20" y="18" fill="#39d2c0" font-size="11" font-weight="600">Stage 1 — What You Have Now</text>
+<svg viewBox="0 0 860 280" width="860" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,sans-serif">
+  <text x="20" y="22" fill="#39d2c0" font-size="11" font-weight="600">Stage 1 — What You Have Now</text>
 
-  <!-- R_FILT_ISO -->
-  <rect x="20" y="60" width="55" height="22" rx="3" fill="#1c2129" stroke="#3fb950" stroke-width="1.5"/>
-  <text x="48" y="75" text-anchor="middle" fill="#3fb950" font-size="8">0Ω ISO</text>
-  <path d="M75,71 L100,71" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#a1)"/>
-  <text x="48" y="55" text-anchor="middle" fill="#8b949e" font-size="7">R_FILT_ISO</text>
+  <!-- R_FILT_ISO → R3 → R4 chain -->
+  <rect x="20" y="80" width="60" height="22" rx="3" fill="#1c2129" stroke="#3fb950" stroke-width="1.5"/>
+  <text x="50" y="95" text-anchor="middle" fill="#3fb950" font-size="8">0Ω ISO</text>
+  <text x="50" y="72" text-anchor="middle" fill="#8b949e" font-size="7">R_FILT_ISO</text>
+  <line x1="80" y1="91" x2="113" y2="91" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#a1)"/>
 
-  <!-- R3 -->
-  <rect x="102" y="60" width="80" height="22" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
-  <text x="142" y="75" text-anchor="middle" fill="#e6edf3" font-size="9">R3 = 1.62kΩ</text>
-  <text x="105" y="57" fill="#8b949e" font-size="7">Pin1</text>
-  <text x="170" y="57" fill="#8b949e" font-size="7" text-anchor="end">Pin2</text>
+  <rect x="115" y="80" width="90" height="22" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="160" y="95" text-anchor="middle" fill="#e6edf3" font-size="9">R3 = 1.62kΩ</text>
+  <text x="120" y="74" fill="#8b949e" font-size="7">Pin1 ✓</text>
 
-  <!-- Junction (Node A) -->
-  <path d="M182,71 L210,71" stroke="#58a6ff" stroke-width="1.5"/>
-  <circle cx="210" cy="71" r="5" fill="#58a6ff"/>
-  <text x="210" y="55" text-anchor="middle" fill="#d29922" font-size="9" font-weight="700">Node A</text>
+  <line x1="205" y1="91" x2="238" y2="91" stroke="#58a6ff" stroke-width="1.5"/>
+  <circle cx="238" cy="91" r="5" fill="#58a6ff"/>
+  <text x="238" y="72" text-anchor="middle" fill="#d29922" font-size="9" font-weight="700">Node A</text>
+  <line x1="243" y1="91" x2="282" y2="91" stroke="#58a6ff" stroke-width="1.5"/>
 
-  <!-- C13 going up from junction -->
-  <path d="M210,66 L210,35" stroke="#3fb950" stroke-width="1.5"/>
-  <rect x="192" y="15" width="55" height="20" rx="3" fill="#0d2818" stroke="#3fb950" stroke-width="1.5"/>
-  <text x="220" y="29" text-anchor="middle" fill="#3fb950" font-size="8">C13 = 11nF</text>
-  <text x="195" y="12" fill="#8b949e" font-size="7">Pin1 ✓</text>
-  <!-- C13 Pin 2 DANGLING -->
-  <path d="M247,25 L275,25" stroke="#f85149" stroke-width="1.5" stroke-dasharray="4,3"/>
-  <text x="280" y="22" fill="#f85149" font-size="8" font-weight="700">Pin2 — FLOATING!</text>
-  <text x="280" y="33" fill="#f85149" font-size="7">Needs → GND</text>
+  <rect x="282" y="80" width="90" height="22" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="327" y="95" text-anchor="middle" fill="#e6edf3" font-size="9">R4 = 5.76kΩ</text>
 
-  <!-- R4 -->
-  <path d="M215,71 L245,71" stroke="#58a6ff" stroke-width="1.5"/>
-  <rect x="245" y="60" width="80" height="22" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
-  <text x="285" y="75" text-anchor="middle" fill="#e6edf3" font-size="9">R4 = 5.76kΩ</text>
+  <line x1="372" y1="91" x2="408" y2="91" stroke="#58a6ff" stroke-width="1.5"/>
+  <circle cx="408" cy="91" r="5" fill="#58a6ff"/>
+  <text x="408" y="72" text-anchor="middle" fill="#d29922" font-size="9" font-weight="700">Node B</text>
 
-  <!-- Node B -->
-  <path d="M325,71 L360,71" stroke="#58a6ff" stroke-width="1.5"/>
-  <circle cx="360" cy="71" r="5" fill="#58a6ff"/>
-  <text x="360" y="55" text-anchor="middle" fill="#d29922" font-size="9" font-weight="700">Node B</text>
+  <!-- C13: Node A → floating -->
+  <line x1="238" y1="96" x2="238" y2="132" stroke="#3fb950" stroke-width="1.5"/>
+  <rect x="213" y="132" width="55" height="20" rx="3" fill="#1c2129" stroke="#3fb950" stroke-width="1.5"/>
+  <text x="241" y="146" text-anchor="middle" fill="#3fb950" font-size="8">C13 = 11nF</text>
+  <line x1="238" y1="152" x2="238" y2="172" stroke="#f85149" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="238" y="186" text-anchor="middle" fill="#f85149" font-size="8" font-weight="700">Pin2 FLOATING!</text>
+  <text x="238" y="199" text-anchor="middle" fill="#f85149" font-size="7">Needs → GND</text>
 
-  <!-- C14 going down from Node B -->
-  <path d="M360,76 L360,110" stroke="#f85149" stroke-width="2"/>
-  <rect x="332" y="110" width="56" height="20" rx="3" fill="#2d0e0e" stroke="#f85149" stroke-width="2"/>
-  <text x="360" y="124" text-anchor="middle" fill="#f85149" font-size="8" font-weight="600">C14 = 1.1nF</text>
+  <!-- C14: Node B → GND (WRONG) -->
+  <line x1="408" y1="96" x2="408" y2="132" stroke="#f85149" stroke-width="2"/>
+  <rect x="380" y="132" width="60" height="20" rx="3" fill="#1c2129" stroke="#f85149" stroke-width="2"/>
+  <text x="410" y="146" text-anchor="middle" fill="#f85149" font-size="8" font-weight="600">C14 = 1.1nF</text>
+  <line x1="408" y1="152" x2="408" y2="175" stroke="#f85149" stroke-width="2"/>
+  <line x1="398" y1="175" x2="418" y2="175" stroke="#f85149" stroke-width="2.5"/>
+  <line x1="401" y1="179" x2="415" y2="179" stroke="#f85149" stroke-width="2"/>
+  <text x="428" y="178" fill="#f85149" font-size="8" font-weight="700">GND ← WRONG!</text>
 
-  <!-- C14 Pin 2 goes to GND (WRONG!) -->
-  <path d="M360,130 L360,155" stroke="#f85149" stroke-width="2"/>
-  <line x1="350" y1="155" x2="370" y2="155" stroke="#f85149" stroke-width="2.5"/>
-  <line x1="353" y1="159" x2="367" y2="159" stroke="#f85149" stroke-width="2"/>
-  <line x1="356" y1="163" x2="364" y2="163" stroke="#f85149" stroke-width="1.5"/>
-  <text x="375" y="160" fill="#f85149" font-size="8" font-weight="700">GND ← WRONG!</text>
+  <!-- No wire to op-amp -->
+  <line x1="413" y1="91" x2="475" y2="91" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="485" y="95" fill="#8b949e" font-size="7" font-style="italic">No wire to +IN_A yet</text>
 
   <!-- Error callout -->
-  <rect x="420" y="95" width="350" height="75" rx="6" fill="rgba(248,81,73,0.1)" stroke="#f85149" stroke-width="1.5"/>
-  <text x="435" y="115" fill="#f85149" font-size="10" font-weight="700">⚠ C14 IS GROUNDED — This breaks Sallen-Key!</text>
-  <text x="435" y="132" fill="#e6edf3" font-size="8.5">You have C14 Pin2 → GND at (125.73, 88.90).</text>
-  <text x="435" y="147" fill="#e6edf3" font-size="8.5">C14 is the feedback cap — it must go to OUT_A (Pin 1),</text>
-  <text x="435" y="162" fill="#e6edf3" font-size="8.5">not GND. With C14 grounded, this is just a passive RC.</text>
-
-  <!-- What should happen (dashed) -->
-  <path d="M360,71 L360,71" stroke="none"/>
-
-  <!-- Node B to +IN_A (not connected) -->
-  <path d="M365,71 L440,71" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="440" y="68" fill="#8b949e" font-size="7" font-style="italic">No wire to +IN_A yet</text>
+  <rect x="510" y="110" width="320" height="65" rx="6" fill="rgba(248,81,73,0.1)" stroke="#f85149" stroke-width="1.5"/>
+  <text x="525" y="130" fill="#f85149" font-size="10" font-weight="700">⚠ C14 IS GROUNDED — Breaks Sallen-Key!</text>
+  <text x="525" y="148" fill="#e6edf3" font-size="8.5">C14 is the feedback cap — it must go to OUT_A,</text>
+  <text x="525" y="163" fill="#e6edf3" font-size="8.5">not GND. With C14 grounded, this is just a passive RC.</text>
 
   <!-- Status bar -->
-  <rect x="20" y="190" width="750" height="50" rx="6" fill="#1c2129" stroke="var(--bd)" stroke-width="1"/>
-  <text x="35" y="210" fill="#3fb950" font-size="9">✓ R_FILT_ISO → R3 → R4 series chain</text>
-  <text x="35" y="225" fill="#3fb950" font-size="9">✓ C13 tees off R3-R4 junction (Node A)</text>
-  <text x="350" y="210" fill="#f85149" font-size="9">✗ C13 Pin2 floating (needs GND)</text>
-  <text x="350" y="225" fill="#f85149" font-size="9">✗ C14 Pin2 → GND (should be → OUT_A)</text>
-  <text x="600" y="210" fill="#f85149" font-size="9">✗ Node B → +IN_A missing</text>
-  <text x="600" y="225" fill="#f85149" font-size="9">✗ −IN_A → OUT_A missing</text>
+  <rect x="20" y="220" width="810" height="48" rx="6" fill="#1c2129" stroke="#30363d" stroke-width="1"/>
+  <text x="35" y="240" fill="#3fb950" font-size="8.5">✓ R_FILT_ISO → R3 → R4 series chain</text>
+  <text x="35" y="255" fill="#3fb950" font-size="8.5">✓ C13 tees off R3-R4 junction (Node A)</text>
+  <text x="330" y="240" fill="#f85149" font-size="8.5">✗ C13 Pin2 floating (needs GND)</text>
+  <text x="330" y="255" fill="#f85149" font-size="8.5">✗ C14 Pin2 → GND (should be → OUT_A)</text>
+  <text x="620" y="240" fill="#f85149" font-size="8.5">✗ Node B → +IN_A missing</text>
+  <text x="620" y="255" fill="#f85149" font-size="8.5">✗ −IN_A → OUT_A missing</text>
 </svg>
 </div>
 
 <h3>Stage 2 — R5 / R6 / C15 / C16 → LTC6242 Section B</h3>
 <div class="svg-wrap">
-<svg viewBox="0 0 800 220" width="800" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,sans-serif">
-  <text x="20" y="18" fill="#39d2c0" font-size="11" font-weight="600">Stage 2 — What You Have Now</text>
+<svg viewBox="0 0 860 260" width="860" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,sans-serif">
+  <text x="20" y="22" fill="#39d2c0" font-size="11" font-weight="600">Stage 2 — What You Have Now</text>
 
-  <!-- Stage 1 OUT (not connected) -->
-  <text x="20" y="78" fill="#8b949e" font-size="8" font-style="italic">from OUT_A</text>
-  <path d="M75,75 L100,75" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="20" y="95" fill="#8b949e" font-size="8" font-style="italic">from OUT_A</text>
+  <line x1="80" y1="91" x2="113" y2="91" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,3"/>
 
-  <!-- R5 -->
-  <rect x="102" y="64" width="80" height="22" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
-  <text x="142" y="79" text-anchor="middle" fill="#e6edf3" font-size="9">R5 = 17.4kΩ</text>
-  <!-- R5 Pin1 dangling -->
-  <text x="98" y="61" fill="#f85149" font-size="7" font-weight="600">Pin1 floating!</text>
+  <rect x="115" y="80" width="90" height="22" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="160" y="95" text-anchor="middle" fill="#e6edf3" font-size="9">R5 = 17.4kΩ</text>
+  <text x="120" y="74" fill="#f85149" font-size="7" font-weight="600">Pin1 floating!</text>
 
-  <!-- Junction -->
-  <path d="M182,75 L210,75" stroke="#58a6ff" stroke-width="1.5"/>
-  <circle cx="210" cy="75" r="5" fill="#58a6ff"/>
-  <text x="210" y="59" text-anchor="middle" fill="#d29922" font-size="9" font-weight="700">Node A'</text>
+  <line x1="205" y1="91" x2="238" y2="91" stroke="#58a6ff" stroke-width="1.5"/>
+  <circle cx="238" cy="91" r="5" fill="#58a6ff"/>
+  <text x="238" y="72" text-anchor="middle" fill="#d29922" font-size="9" font-weight="700">Node A'</text>
 
-  <!-- C15 going up -->
-  <path d="M210,70 L210,38" stroke="#3fb950" stroke-width="1.5"/>
-  <rect x="192" y="18" width="55" height="20" rx="3" fill="#0d2818" stroke="#3fb950" stroke-width="1.5"/>
-  <text x="220" y="32" text-anchor="middle" fill="#3fb950" font-size="8">C15 = 11nF</text>
-  <text x="195" y="15" fill="#8b949e" font-size="7">Pin1 ✓</text>
-  <path d="M247,28 L275,28" stroke="#f85149" stroke-width="1.5" stroke-dasharray="4,3"/>
-  <text x="280" y="25" fill="#f85149" font-size="8" font-weight="700">Pin2 — FLOATING!</text>
-  <text x="280" y="36" fill="#f85149" font-size="7">Needs → GND</text>
+  <line x1="243" y1="91" x2="282" y2="91" stroke="#58a6ff" stroke-width="1.5"/>
+  <rect x="282" y="80" width="80" height="22" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="322" y="95" text-anchor="middle" fill="#e6edf3" font-size="9">R6 = 536Ω</text>
 
-  <!-- R6 -->
-  <path d="M215,75 L245,75" stroke="#58a6ff" stroke-width="1.5"/>
-  <rect x="245" y="64" width="75" height="22" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
-  <text x="283" y="79" text-anchor="middle" fill="#e6edf3" font-size="9">R6 = 536Ω</text>
+  <line x1="362" y1="91" x2="408" y2="91" stroke="#58a6ff" stroke-width="1.5"/>
+  <circle cx="408" cy="91" r="5" fill="#58a6ff"/>
+  <text x="408" y="72" text-anchor="middle" fill="#d29922" font-size="9" font-weight="700">Node B'</text>
 
-  <!-- Node B' -->
-  <path d="M320,75 L360,75" stroke="#58a6ff" stroke-width="1.5"/>
-  <circle cx="360" cy="75" r="5" fill="#58a6ff"/>
-  <text x="360" y="59" text-anchor="middle" fill="#d29922" font-size="9" font-weight="700">Node B'</text>
+  <!-- C15: Node A' → floating -->
+  <line x1="238" y1="96" x2="238" y2="132" stroke="#3fb950" stroke-width="1.5"/>
+  <rect x="213" y="132" width="55" height="20" rx="3" fill="#1c2129" stroke="#3fb950" stroke-width="1.5"/>
+  <text x="241" y="146" text-anchor="middle" fill="#3fb950" font-size="8">C15 = 11nF</text>
+  <line x1="238" y1="152" x2="238" y2="172" stroke="#f85149" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="238" y="186" text-anchor="middle" fill="#f85149" font-size="8" font-weight="700">Pin2 FLOATING!</text>
+  <text x="238" y="199" text-anchor="middle" fill="#f85149" font-size="7">Needs → GND</text>
 
-  <!-- C16 going up from Node B' -->
-  <path d="M360,70 L360,45" stroke="#d29922" stroke-width="1.5"/>
-  <rect x="335" y="25" width="50" height="20" rx="3" fill="#1c2129" stroke="#d29922" stroke-width="1.5"/>
-  <text x="360" y="39" text-anchor="middle" fill="#d29922" font-size="8">C16 = 1.1nF</text>
-  <path d="M360,25 L360,10" stroke="#f85149" stroke-width="1.5" stroke-dasharray="4,3"/>
-  <text x="395" y="14" fill="#f85149" font-size="8" font-weight="700">Pin2 — FLOATING!</text>
-  <text x="395" y="25" fill="#f85149" font-size="7">Needs → OUT_B (not GND)</text>
+  <!-- C16: Node B' → floating -->
+  <line x1="408" y1="96" x2="408" y2="132" stroke="#d29922" stroke-width="1.5"/>
+  <rect x="383" y="132" width="55" height="20" rx="3" fill="#1c2129" stroke="#d29922" stroke-width="1.5"/>
+  <text x="411" y="146" text-anchor="middle" fill="#d29922" font-size="8">C16 = 1.1nF</text>
+  <line x1="408" y1="152" x2="408" y2="172" stroke="#f85149" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="408" y="186" text-anchor="middle" fill="#f85149" font-size="8" font-weight="700">Pin2 FLOATING!</text>
+  <text x="408" y="199" text-anchor="middle" fill="#f85149" font-size="7">Needs → OUT_B (not GND)</text>
 
-  <!-- Node B' to +IN_B (not connected) -->
-  <path d="M365,75 L440,75" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="440" y="72" fill="#8b949e" font-size="7" font-style="italic">No wire to +IN_B yet</text>
+  <line x1="413" y1="91" x2="475" y2="91" stroke="#8b949e" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="485" y="95" fill="#8b949e" font-size="7" font-style="italic">No wire to +IN_B yet</text>
 
-  <!-- Status bar -->
-  <rect x="20" y="160" width="750" height="50" rx="6" fill="#1c2129" stroke="var(--bd)" stroke-width="1"/>
-  <text x="35" y="180" fill="#3fb950" font-size="9">✓ R5 → R6 series chain wired</text>
-  <text x="35" y="195" fill="#3fb950" font-size="9">✓ C15 tees off R5-R6 junction</text>
-  <text x="300" y="180" fill="#f85149" font-size="9">✗ R5 Pin1 floating (needs ← OUT_A)</text>
-  <text x="300" y="195" fill="#f85149" font-size="9">✗ C15 Pin2 floating (needs GND)</text>
-  <text x="570" y="180" fill="#f85149" font-size="9">✗ C16 Pin2 floating (needs → OUT_B)</text>
-  <text x="570" y="195" fill="#f85149" font-size="9">✗ Node B' → +IN_B missing</text>
+  <rect x="20" y="215" width="810" height="35" rx="6" fill="#1c2129" stroke="#30363d" stroke-width="1"/>
+  <text x="35" y="237" fill="#3fb950" font-size="8.5">✓ R5 → R6 series chain &nbsp; ✓ C15 tees off junction</text>
+  <text x="380" y="237" fill="#f85149" font-size="8.5">✗ R5.Pin1 float &nbsp; ✗ C15.Pin2 float &nbsp; ✗ C16.Pin2 float &nbsp; ✗ Node B' → +IN_B missing</text>
 </svg>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════ -->
 <h2>3. Diagnosis Summary</h2>
+<div class="ok"><strong>✓ What's Correct</strong>
+The R-R series chain topology is right for both stages. R3→R4 in series with C13 teeing off the junction, and R5→R6 in series with C15 teeing off the junction — that IS the correct Sallen-Key passive arrangement. The component values are also correct (1.62k/5.76k/11n/1.1n for Stage 1, 17.4k/536Ω/11n/1.1n for Stage 2).</div>
+<div class="err"><strong>⚠ Critical Error: C14 Pin2 is wired to GND</strong>
+C14 is the <em>feedback</em> capacitor — it connects from Node B back to OUT_A (Pin 1). <strong>Grounding the feedback cap turns this into a passive 2-pole RC filter with no Q control.</strong></div>
+<div class="err"><strong>⚠ Floating Pins: C13.Pin2, C15.Pin2, C16.Pin2</strong>
+The shunt caps (C13, C15) each have one pin at the junction but the other is floating — needs GND. C16 should connect Node B' to OUT_B.</div>
+<div class="warn"><strong>⚠ No connections to LTC6242 yet</strong>
+All 16 pins of U_FILT are unconnected. The passive networks don't reach the op-amp pins.</div>
 
-<div class="ok">
-  <strong>✓ What's Correct</strong>
-  The R-R series chain topology is right for both stages. R3→R4 in series with C13 teeing off the junction, and R5→R6 in series with C15 teeing off the junction — that IS the correct Sallen-Key passive arrangement. The component values are also correct (1.62k/5.76k/11n/1.1n for Stage 1, 17.4k/536Ω/11n/1.1n for Stage 2). PGA bypass caps (C11→AVDD, C12→DVDD, both to GND) are also correct.
-</div>
-
-<div class="err">
-  <strong>⚠ Critical Error: C14 Pin2 is wired to GND</strong>
-  C14 is at position (125.73, 76.20) with rotation 270°. Its Pin 2 lands at (125.73, 88.90) where a GND power symbol sits. In a Sallen-Key filter, C14 is the <em>feedback</em> capacitor — it connects from Node B (the R4 output / op-amp +IN junction) back to the op-amp output (OUT_A, Pin 1). <strong>Grounding the feedback cap turns this into a passive 2-pole RC filter with no Q control.</strong> The filter's frequency response will be wrong — it won't achieve the Butterworth shape (Q=1.306) and the attenuation at 50 kHz will be much less than the designed −41.8 dB.
-</div>
-
-<div class="err">
-  <strong>⚠ Floating Pins: C13.Pin2, C15.Pin2, C16.Pin2</strong>
-  The shunt caps (C13, C15) each have one pin correctly at the R-R junction, but the other pin is floating — it needs to connect to GND. The feedback cap C16 has both pins floating on the GND side (Pin2 at 119.38, 104.14 goes nowhere). C16 should connect from Node B' to OUT_B.
-</div>
-
-<div class="warn">
-  <strong>⚠ No connections to LTC6242 yet</strong>
-  All 16 pins of U_FILT are unconnected. The passive filter networks are grouped to the left of the IC but no wires reach the op-amp pins. This includes: +IN_A, −IN_A, OUT_A (Stage 1), +IN_B, −IN_B, OUT_B (Stage 2), V+, V−, and the unused section tying (Pins 10↔11, 15↔16, 12→GND, 14→GND).
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
 <h2>4. Correct Wiring — Complete Connection List</h2>
-<p>Here's every wire you need to add, organized by net. I've marked the ones that exist as ✓ and missing ones as ✗.</p>
 
 <h3>Stage 1 (Section A of LTC6242)</h3>
 <table>
 <tr><th>Net</th><th>From</th><th>To</th><th>Status</th><th>Action</th></tr>
 <tr><td>PGA_OUT chain</td><td>R_FILT_ISO.Pin2</td><td>R3.Pin1</td><td class="yes">✓ exists</td><td>—</td></tr>
 <tr><td>Node A</td><td>R3.Pin2</td><td>R4.Pin1</td><td class="yes">✓ exists</td><td>—</td></tr>
-<tr><td>Node A</td><td>C13.Pin1</td><td>R3.Pin2 / R4.Pin1 junction</td><td class="yes">✓ exists</td><td>—</td></tr>
-<tr><td>C13 GND</td><td>C13.Pin2</td><td>GND</td><td class="no">✗ floating</td><td>Add GND symbol at (123.19, 69.85)</td></tr>
+<tr><td>Node A</td><td>C13.Pin1</td><td>R3/R4 junction</td><td class="yes">✓ exists</td><td>—</td></tr>
+<tr><td>C13 GND</td><td>C13.Pin2</td><td>GND</td><td class="no">✗ floating</td><td>Add GND symbol</td></tr>
 <tr><td>Node B</td><td>R4.Pin2</td><td>C14.Pin1</td><td class="yes">✓ same pos</td><td>—</td></tr>
-<tr><td>Node B → +IN_A</td><td>R4.Pin2 / C14.Pin1</td><td>U_FILT.Pin3 (+IN_A)</td><td class="no">✗ missing</td><td>Wire from (125.73, 76.20) to U_FILT +IN_A</td></tr>
-<tr><td>C14 feedback</td><td>C14.Pin2</td><td>U_FILT.Pin1 (OUT_A)</td><td class="no fix">✗ WRONG → GND</td><td><strong>Remove GND at (125.73, 88.90). Wire C14.Pin2 to OUT_A instead.</strong></td></tr>
-<tr><td>Unity gain</td><td>U_FILT.Pin2 (−IN_A)</td><td>U_FILT.Pin1 (OUT_A)</td><td class="no">✗ missing</td><td>Wire Pin 1 → Pin 2</td></tr>
-<tr><td>Stage 1 out</td><td>U_FILT.Pin1 (OUT_A)</td><td>R5.Pin1 (Stage 2 input)</td><td class="no">✗ missing</td><td>Wire OUT_A → R5.Pin1</td></tr>
+<tr><td>Node B → +IN_A</td><td>R4.Pin2</td><td>U_FILT.Pin3</td><td class="no">✗ missing</td><td>Wire to +IN_A</td></tr>
+<tr><td>C14 feedback</td><td>C14.Pin2</td><td>U_FILT.Pin1 (OUT_A)</td><td class="no fix">✗ WRONG → GND</td><td><strong>Remove GND. Wire to OUT_A.</strong></td></tr>
+<tr><td>Unity gain</td><td>U_FILT.Pin2</td><td>U_FILT.Pin1</td><td class="no">✗ missing</td><td>Wire −IN_A → OUT_A</td></tr>
+<tr><td>Stage 1 out</td><td>U_FILT.Pin1</td><td>R5.Pin1</td><td class="no">✗ missing</td><td>Wire OUT_A → R5</td></tr>
 </table>
 
 <h3>Stage 2 (Section B of LTC6242)</h3>
 <table>
 <tr><th>Net</th><th>From</th><th>To</th><th>Status</th><th>Action</th></tr>
 <tr><td>Node A'</td><td>R5.Pin2</td><td>R6.Pin1</td><td class="yes">✓ exists</td><td>—</td></tr>
-<tr><td>Node A'</td><td>C15.Pin1</td><td>R5.Pin2 / R6.Pin1 junction</td><td class="yes">✓ exists</td><td>—</td></tr>
-<tr><td>C15 GND</td><td>C15.Pin2</td><td>GND</td><td class="no">✗ floating</td><td>Add GND symbol at (116.84, 110.49)</td></tr>
+<tr><td>Node A'</td><td>C15.Pin1</td><td>R5/R6 junction</td><td class="yes">✓ exists</td><td>—</td></tr>
+<tr><td>C15 GND</td><td>C15.Pin2</td><td>GND</td><td class="no">✗ floating</td><td>Add GND symbol</td></tr>
 <tr><td>Node B'</td><td>R6.Pin2</td><td>C16.Pin1</td><td class="yes">✓ same pos</td><td>—</td></tr>
-<tr><td>Node B' → +IN_B</td><td>R6.Pin2 / C16.Pin1</td><td>U_FILT.Pin5 (+IN_B)</td><td class="no">✗ missing</td><td>Wire from (119.38, 116.84) to U_FILT +IN_B</td></tr>
-<tr><td>C16 feedback</td><td>C16.Pin2</td><td>U_FILT.Pin7 (OUT_B)</td><td class="no">✗ floating</td><td>Wire (119.38, 104.14) → OUT_B</td></tr>
-<tr><td>Unity gain</td><td>U_FILT.Pin6 (−IN_B)</td><td>U_FILT.Pin7 (OUT_B)</td><td class="no">✗ missing</td><td>Wire Pin 7 → Pin 6</td></tr>
-<tr><td>Output</td><td>U_FILT.Pin7 (OUT_B)</td><td>LPF_OUT hier label</td><td class="no">✗ missing</td><td>Add hier label at OUT_B</td></tr>
+<tr><td>Node B' → +IN_B</td><td>R6.Pin2</td><td>U_FILT.Pin5</td><td class="no">✗ missing</td><td>Wire to +IN_B</td></tr>
+<tr><td>C16 feedback</td><td>C16.Pin2</td><td>U_FILT.Pin7</td><td class="no">✗ floating</td><td>Wire to OUT_B</td></tr>
+<tr><td>Unity gain</td><td>U_FILT.Pin6</td><td>U_FILT.Pin7</td><td class="no">✗ missing</td><td>Wire −IN_B → OUT_B</td></tr>
+<tr><td>Output</td><td>U_FILT.Pin7</td><td>LPF_OUT hier label</td><td class="no">✗ missing</td><td>Add hier label</td></tr>
 </table>
 
 <h3>Power & Unused Sections</h3>
 <table>
 <tr><th>Net</th><th>From</th><th>To</th><th>Status</th><th>Action</th></tr>
-<tr><td>V+</td><td>U_FILT.Pin4 (V+)</td><td>3V3A</td><td class="no">✗ missing</td><td>Wire to 3V3A + 100nF bypass cap</td></tr>
-<tr><td>V−</td><td>U_FILT.Pin13 (V−)</td><td>GND</td><td class="no">✗ missing</td><td>Wire to GND</td></tr>
-<tr><td>Unused C</td><td>U_FILT.Pin10 (OUT_C)</td><td>U_FILT.Pin11 (−IN_C)</td><td class="no">✗ missing</td><td>Wire Pin 10 ↔ Pin 11</td></tr>
-<tr><td>Unused C bias</td><td>U_FILT.Pin12 (+IN_C)</td><td>GND</td><td class="no">✗ missing</td><td>Wire Pin 12 → GND</td></tr>
-<tr><td>Unused D</td><td>U_FILT.Pin15 (−IN_D)</td><td>U_FILT.Pin16 (OUT_D)</td><td class="no">✗ missing</td><td>Wire Pin 15 ↔ Pin 16</td></tr>
-<tr><td>Unused D bias</td><td>U_FILT.Pin14 (+IN_D)</td><td>GND</td><td class="no">✗ missing</td><td>Wire Pin 14 → GND</td></tr>
+<tr><td>V+</td><td>U_FILT.Pin4</td><td>3V3A</td><td class="no">✗ missing</td><td>Wire + 100nF bypass</td></tr>
+<tr><td>V−</td><td>U_FILT.Pin13</td><td>GND</td><td class="no">✗ missing</td><td>Wire to GND</td></tr>
+<tr><td>Unused C</td><td>Pin10</td><td>Pin11</td><td class="no">✗ missing</td><td>Tie OUT_C ↔ −IN_C</td></tr>
+<tr><td>Unused C bias</td><td>Pin12</td><td>GND</td><td class="no">✗ missing</td><td>+IN_C → GND</td></tr>
+<tr><td>Unused D</td><td>Pin15</td><td>Pin16</td><td class="no">✗ missing</td><td>Tie −IN_D ↔ OUT_D</td></tr>
+<tr><td>Unused D bias</td><td>Pin14</td><td>GND</td><td class="no">✗ missing</td><td>+IN_D → GND</td></tr>
 </table>
 
-<!-- ═══════════════════════════════════════════════════════════ -->
 <h2>5. Correct Completed Circuit</h2>
+<p>Both stages shown with all connections made correctly. Key difference from §2: C_feedback caps connect to op-amp outputs (not GND), and all op-amp pins are wired.</p>
+
 <div class="svg-wrap">
-<svg viewBox="0 0 900 380" width="900" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,sans-serif">
-  <text x="20" y="18" fill="#39d2c0" font-size="12" font-weight="700">Complete Correct Wiring — Both Stages</text>
+<svg viewBox="0 0 920 460" width="920" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,sans-serif">
+  <text x="20" y="22" fill="#39d2c0" font-size="12" font-weight="700">Complete Correct Wiring — Both Stages</text>
 
-  <!-- ── STAGE 1 ─────────────────────────────────── -->
-  <text x="20" y="45" fill="#d29922" font-size="10" font-weight="600">STAGE 1 (Q=1.306, high-Q)</text>
+  <!-- ═══ STAGE 1 ═══ -->
+  <text x="20" y="55" fill="#d29922" font-size="10" font-weight="600">STAGE 1 (Q=1.306, high-Q)</text>
 
-  <!-- PGA_OUT input -->
-  <text x="15" y="98" fill="#58a6ff" font-size="9" font-weight="600">PGA_OUT</text>
-  <text x="15" y="108" fill="#8b949e" font-size="7">via R_FILT_ISO</text>
-  <path d="M62,95 L80,95" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#a1)"/>
+  <text x="15" y="108" fill="#58a6ff" font-size="9" font-weight="600">PGA_OUT</text>
+  <text x="15" y="120" fill="#8b949e" font-size="7">via R_FILT_ISO</text>
+  <line x1="72" y1="105" x2="98" y2="105" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#a1)"/>
 
-  <!-- R3 -->
-  <rect x="82" y="84" width="70" height="22" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
-  <text x="117" y="99" text-anchor="middle" fill="#e6edf3" font-size="9">R3 1.62kΩ</text>
+  <rect x="100" y="94" width="80" height="22" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="140" y="109" text-anchor="middle" fill="#e6edf3" font-size="9">R3 1.62kΩ</text>
+  <line x1="180" y1="105" x2="205" y2="105" stroke="#58a6ff" stroke-width="1.5"/>
+  <circle cx="205" cy="105" r="4" fill="#58a6ff"/>
 
-  <!-- Node A -->
-  <circle cx="172" cy="95" r="4" fill="#58a6ff"/>
+  <!-- C13 → GND -->
+  <line x1="205" y1="109" x2="205" y2="148" stroke="#3fb950" stroke-width="1.5"/>
+  <rect x="186" y="148" width="38" height="16" rx="3" fill="#1c2129" stroke="#3fb950" stroke-width="1"/>
+  <text x="205" y="160" text-anchor="middle" fill="#3fb950" font-size="7.5">C13 11n</text>
+  <line x1="205" y1="164" x2="205" y2="178" stroke="#8b949e" stroke-width="1"/>
+  <line x1="197" y1="178" x2="213" y2="178" stroke="#8b949e" stroke-width="1.5"/>
+  <text x="220" y="181" fill="#8b949e" font-size="7">GND</text>
 
-  <!-- C13 down to GND -->
-  <path d="M172,99 L172,135" stroke="#3fb950" stroke-width="1.5"/>
-  <rect x="155" y="135" width="34" height="16" rx="3" fill="#0d2818" stroke="#3fb950" stroke-width="1"/>
-  <text x="172" y="147" text-anchor="middle" fill="#3fb950" font-size="7.5">C13 11n</text>
-  <path d="M172,151 L172,162" stroke="#8b949e" stroke-width="1"/>
-  <line x1="164" y1="162" x2="180" y2="162" stroke="#8b949e" stroke-width="1.5"/>
-  <text x="185" y="165" fill="#8b949e" font-size="7">GND</text>
-
-  <!-- R4 -->
-  <path d="M176,95 L200,95" stroke="#58a6ff" stroke-width="1.5"/>
-  <rect x="200" y="84" width="70" height="22" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
-  <text x="235" y="99" text-anchor="middle" fill="#e6edf3" font-size="9">R4 5.76kΩ</text>
-
-  <!-- Node B -->
-  <path d="M270,95 L295,95" stroke="#58a6ff" stroke-width="1.5"/>
-  <circle cx="295" cy="95" r="4" fill="#58a6ff"/>
-
-  <!-- Wire Node B → +IN_A -->
-  <path d="M299,95 L330,95" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#a1)"/>
+  <line x1="209" y1="105" x2="240" y2="105" stroke="#58a6ff" stroke-width="1.5"/>
+  <rect x="240" y="94" width="80" height="22" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="280" y="109" text-anchor="middle" fill="#e6edf3" font-size="9">R4 5.76kΩ</text>
+  <line x1="320" y1="105" x2="348" y2="105" stroke="#58a6ff" stroke-width="1.5"/>
+  <circle cx="348" cy="105" r="4" fill="#58a6ff"/>
+  <line x1="352" y1="105" x2="390" y2="105" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#a1)"/>
 
   <!-- Op-amp A -->
-  <polygon points="332,75 332,115 382,95" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
-  <text x="345" y="92" fill="#e6edf3" font-size="7">+IN_A</text>
-  <text x="345" y="82" fill="#8b949e" font-size="7">Sec A</text>
+  <rect x="393" y="90" width="60" height="30" rx="4" fill="#1c2129" stroke="#58a6ff" stroke-width="2"/>
+  <text x="423" y="104" text-anchor="middle" fill="#58a6ff" font-size="8" font-weight="600">Sec A</text>
+  <text x="423" y="116" text-anchor="middle" fill="#8b949e" font-size="6.5">−IN=OUT</text>
 
   <!-- OUT_A -->
-  <path d="M382,95 L430,95" stroke="#58a6ff" stroke-width="2"/>
-  <circle cx="430" cy="95" r="4" fill="#58a6ff"/>
-  <text x="430" y="86" text-anchor="middle" fill="#58a6ff" font-size="8" font-weight="600">OUT_A</text>
+  <line x1="453" y1="105" x2="500" y2="105" stroke="#58a6ff" stroke-width="2"/>
+  <circle cx="500" cy="105" r="4" fill="#58a6ff"/>
+  <text x="500" y="86" text-anchor="middle" fill="#58a6ff" font-size="8" font-weight="600">OUT_A</text>
 
-  <!-- Unity gain feedback -->
-  <path d="M430,95 L430,68 L332,68 L332,83" stroke="#8b949e" stroke-width="1" stroke-dasharray="3,2"/>
-  <text x="381" y="64" text-anchor="middle" fill="#8b949e" font-size="6.5">−IN_A = OUT_A</text>
+  <!-- C14 feedback: Node B down, right, up to OUT_A — using individual lines, not path -->
+  <line x1="348" y1="109" x2="348" y2="160" stroke="#f85149" stroke-width="2"/>
+  <line x1="348" y1="160" x2="500" y2="160" stroke="#f85149" stroke-width="2"/>
+  <line x1="500" y1="160" x2="500" y2="109" stroke="#f85149" stroke-width="2"/>
+  <rect x="395" y="151" width="46" height="18" rx="3" fill="#1c2129" stroke="#f85149" stroke-width="1.5"/>
+  <text x="418" y="164" text-anchor="middle" fill="#f85149" font-size="7.5" font-weight="600">C14 1.1n</text>
+  <text x="418" y="184" text-anchor="middle" fill="#f85149" font-size="7" font-weight="600">↑ FEEDBACK to OUT_A</text>
 
-  <!-- C14 FEEDBACK: Node B → OUT_A (the critical path) -->
-  <path d="M295,99 L295,140 L430,140 L430,99" stroke="#f85149" stroke-width="2"/>
-  <rect x="340" y="131" width="38" height="18" rx="3" fill="#2d0e0e" stroke="#f85149" stroke-width="1.5"/>
-  <text x="359" y="144" text-anchor="middle" fill="#f85149" font-size="7.5" font-weight="600">C14 1.1n</text>
-  <text x="360" y="161" text-anchor="middle" fill="#f85149" font-size="8" font-weight="700">↑ FEEDBACK to OUT</text>
+  <!-- ═══ STAGE 2 ═══ -->
+  <text x="20" y="240" fill="#d29922" font-size="10" font-weight="600">STAGE 2 (Q=0.541, low-Q)</text>
 
-  <!-- ── STAGE 2 ─────────────────────────────────── -->
-  <text x="20" y="205" fill="#d29922" font-size="10" font-weight="600">STAGE 2 (Q=0.541, low-Q)</text>
+  <!-- Route from OUT_A to Stage 2 input -->
+  <line x1="500" y1="105" x2="530" y2="105" stroke="#58a6ff" stroke-width="1" stroke-dasharray="4,2"/>
+  <line x1="530" y1="105" x2="530" y2="270" stroke="#58a6ff" stroke-width="1" stroke-dasharray="4,2"/>
+  <line x1="530" y1="270" x2="98" y2="270" stroke="#58a6ff" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="545" y="190" fill="#8b949e" font-size="7">OUT_A</text>
+  <text x="545" y="200" fill="#8b949e" font-size="7">feeds</text>
+  <text x="545" y="210" fill="#8b949e" font-size="7">Stage 2</text>
 
-  <!-- OUT_A → R5 -->
-  <path d="M430,95 L430,250 L80,250" stroke="#58a6ff" stroke-width="1" stroke-dasharray="4,2"/>
-  <text x="440" y="180" fill="#8b949e" font-size="7">OUT_A feeds Stage 2</text>
-  <path d="M80,250 L80,250" stroke="#58a6ff" stroke-width="1.5"/>
+  <rect x="100" y="259" width="80" height="22" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="140" y="274" text-anchor="middle" fill="#e6edf3" font-size="9">R5 17.4kΩ</text>
+  <line x1="180" y1="270" x2="205" y2="270" stroke="#58a6ff" stroke-width="1.5"/>
+  <circle cx="205" cy="270" r="4" fill="#58a6ff"/>
 
-  <!-- R5 -->
-  <rect x="82" y="239" width="70" height="22" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
-  <text x="117" y="254" text-anchor="middle" fill="#e6edf3" font-size="9">R5 17.4kΩ</text>
+  <!-- C15 → GND -->
+  <line x1="205" y1="274" x2="205" y2="313" stroke="#3fb950" stroke-width="1.5"/>
+  <rect x="186" y="313" width="38" height="16" rx="3" fill="#1c2129" stroke="#3fb950" stroke-width="1"/>
+  <text x="205" y="325" text-anchor="middle" fill="#3fb950" font-size="7.5">C15 11n</text>
+  <line x1="205" y1="329" x2="205" y2="343" stroke="#8b949e" stroke-width="1"/>
+  <line x1="197" y1="343" x2="213" y2="343" stroke="#8b949e" stroke-width="1.5"/>
+  <text x="220" y="346" fill="#8b949e" font-size="7">GND</text>
 
-  <!-- Node A' -->
-  <circle cx="172" cy="250" r="4" fill="#58a6ff"/>
-
-  <!-- C15 down to GND -->
-  <path d="M172,254 L172,290" stroke="#3fb950" stroke-width="1.5"/>
-  <rect x="155" y="290" width="34" height="16" rx="3" fill="#0d2818" stroke="#3fb950" stroke-width="1"/>
-  <text x="172" y="302" text-anchor="middle" fill="#3fb950" font-size="7.5">C15 11n</text>
-  <path d="M172,306 L172,317" stroke="#8b949e" stroke-width="1"/>
-  <line x1="164" y1="317" x2="180" y2="317" stroke="#8b949e" stroke-width="1.5"/>
-  <text x="185" y="320" fill="#8b949e" font-size="7">GND</text>
-
-  <!-- R6 -->
-  <path d="M176,250 L200,250" stroke="#58a6ff" stroke-width="1.5"/>
-  <rect x="200" y="239" width="70" height="22" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
-  <text x="235" y="254" text-anchor="middle" fill="#e6edf3" font-size="9">R6 536Ω</text>
-
-  <!-- Node B' -->
-  <path d="M270,250 L295,250" stroke="#58a6ff" stroke-width="1.5"/>
-  <circle cx="295" cy="250" r="4" fill="#58a6ff"/>
-
-  <!-- Wire Node B' → +IN_B -->
-  <path d="M299,250 L330,250" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#a1)"/>
+  <line x1="209" y1="270" x2="240" y2="270" stroke="#58a6ff" stroke-width="1.5"/>
+  <rect x="240" y="259" width="80" height="22" rx="3" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
+  <text x="280" y="274" text-anchor="middle" fill="#e6edf3" font-size="9">R6 536Ω</text>
+  <line x1="320" y1="270" x2="348" y2="270" stroke="#58a6ff" stroke-width="1.5"/>
+  <circle cx="348" cy="270" r="4" fill="#58a6ff"/>
+  <line x1="352" y1="270" x2="390" y2="270" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#a1)"/>
 
   <!-- Op-amp B -->
-  <polygon points="332,230 332,270 382,250" fill="#1c2129" stroke="#58a6ff" stroke-width="1.5"/>
-  <text x="345" y="247" fill="#e6edf3" font-size="7">+IN_B</text>
-  <text x="345" y="237" fill="#8b949e" font-size="7">Sec B</text>
+  <rect x="393" y="255" width="60" height="30" rx="4" fill="#1c2129" stroke="#58a6ff" stroke-width="2"/>
+  <text x="423" y="269" text-anchor="middle" fill="#58a6ff" font-size="8" font-weight="600">Sec B</text>
+  <text x="423" y="281" text-anchor="middle" fill="#8b949e" font-size="6.5">−IN=OUT</text>
 
   <!-- OUT_B -->
-  <path d="M382,250 L430,250" stroke="#58a6ff" stroke-width="2"/>
-  <circle cx="430" cy="250" r="4" fill="#58a6ff"/>
-  <text x="430" y="241" text-anchor="middle" fill="#58a6ff" font-size="8" font-weight="600">OUT_B</text>
+  <line x1="453" y1="270" x2="500" y2="270" stroke="#58a6ff" stroke-width="2"/>
+  <circle cx="500" cy="270" r="4" fill="#58a6ff"/>
+  <text x="500" y="251" text-anchor="middle" fill="#58a6ff" font-size="8" font-weight="600">OUT_B</text>
 
-  <!-- Unity gain feedback -->
-  <path d="M430,250 L430,223 L332,223 L332,238" stroke="#8b949e" stroke-width="1" stroke-dasharray="3,2"/>
-  <text x="381" y="219" text-anchor="middle" fill="#8b949e" font-size="6.5">−IN_B = OUT_B</text>
-
-  <!-- C16 FEEDBACK: Node B' → OUT_B -->
-  <path d="M295,254 L295,295 L430,295 L430,254" stroke="#f85149" stroke-width="2"/>
-  <rect x="340" y="286" width="38" height="18" rx="3" fill="#2d0e0e" stroke="#f85149" stroke-width="1.5"/>
-  <text x="359" y="299" text-anchor="middle" fill="#f85149" font-size="7.5" font-weight="600">C16 1.1n</text>
+  <!-- C16 feedback: Node B' down, right, up to OUT_B — individual lines -->
+  <line x1="348" y1="274" x2="348" y2="325" stroke="#f85149" stroke-width="2"/>
+  <line x1="348" y1="325" x2="500" y2="325" stroke="#f85149" stroke-width="2"/>
+  <line x1="500" y1="325" x2="500" y2="274" stroke="#f85149" stroke-width="2"/>
+  <rect x="395" y="316" width="46" height="18" rx="3" fill="#1c2129" stroke="#f85149" stroke-width="1.5"/>
+  <text x="418" y="329" text-anchor="middle" fill="#f85149" font-size="7.5" font-weight="600">C16 1.1n</text>
 
   <!-- LPF_OUT -->
-  <path d="M434,250 L490,250" stroke="#58a6ff" stroke-width="2" marker-end="url(#a1)"/>
-  <rect x="492" y="239" width="65" height="22" rx="4" fill="#0d2238" stroke="#58a6ff" stroke-width="2"/>
-  <text x="525" y="254" text-anchor="middle" fill="#58a6ff" font-size="9" font-weight="700">LPF_OUT</text>
-  <text x="525" y="270" text-anchor="middle" fill="#8b949e" font-size="7">→ Sheet D</text>
+  <line x1="504" y1="270" x2="570" y2="270" stroke="#58a6ff" stroke-width="2" marker-end="url(#a1)"/>
+  <rect x="573" y="259" width="70" height="22" rx="4" fill="#1c2129" stroke="#58a6ff" stroke-width="2"/>
+  <text x="608" y="274" text-anchor="middle" fill="#58a6ff" font-size="9" font-weight="700">LPF_OUT</text>
+  <text x="608" y="292" text-anchor="middle" fill="#8b949e" font-size="7">→ Sheet D</text>
 
   <!-- Legend -->
-  <rect x="620" y="50" width="250" height="130" rx="6" fill="rgba(88,166,255,0.05)" stroke="var(--bd)" stroke-width="1"/>
-  <text x="635" y="70" fill="#39d2c0" font-size="9" font-weight="600">Sallen-Key Rules:</text>
-  <text x="635" y="88" fill="#3fb950" font-size="8.5">C_shunt (C13, C15):</text>
-  <text x="635" y="100" fill="#e6edf3" font-size="8">  R-R junction → GND</text>
-  <text x="635" y="118" fill="#f85149" font-size="8.5">C_feedback (C14, C16):</text>
-  <text x="635" y="130" fill="#e6edf3" font-size="8">  R-R junction → op-amp OUT</text>
-  <text x="635" y="148" fill="#8b949e" font-size="8.5">Unity gain:</text>
-  <text x="635" y="160" fill="#e6edf3" font-size="8">  −IN tied directly to OUT</text>
-  <text x="635" y="175" fill="#d29922" font-size="7.5" font-style="italic">C_feedback controls Q.</text>
+  <rect x="670" y="60" width="230" height="150" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="685" y="82" fill="#39d2c0" font-size="9.5" font-weight="600">Sallen-Key Rules:</text>
+  <text x="685" y="104" fill="#3fb950" font-size="8.5">C_shunt (C13, C15):</text>
+  <text x="685" y="118" fill="#e6edf3" font-size="8">R-R junction → GND</text>
+  <text x="685" y="142" fill="#f85149" font-size="8.5">C_feedback (C14, C16):</text>
+  <text x="685" y="156" fill="#e6edf3" font-size="8">R-R junction → op-amp OUT</text>
+  <text x="685" y="180" fill="#8b949e" font-size="8.5">Unity gain:</text>
+  <text x="685" y="194" fill="#e6edf3" font-size="8">−IN tied directly to OUT</text>
 </svg>
 </div>
 
