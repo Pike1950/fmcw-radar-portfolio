@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FMCW Radar Baseband Rev B — Design Rationale &amp; First-Principles Analysis</title>
+<title>FMCW Radar Baseband Rev B — System Design Document</title>
 <style>
   :root { --bg: #1a1a2e; --card: #16213e; --accent: #0f3460; --highlight: #e94560;
            --text: #d4d4d4; --heading: #f0f0f0; --dim: #888; --green: #4ade80;
@@ -73,18 +73,18 @@
   <span id="widthVal">2000px</span>
 </div>
 
-<h1>FMCW Radar Baseband Rev B — Design Rationale &amp; First-Principles Analysis</h1>
+<h1>FMCW Radar Baseband Rev B — System Design Document</h1>
 <p class="meta">
   Bradley Ward · v1.0 · February 2026<br>
-  Companion document to <em>RevB_Block_Diagrams.html</em> (pin tables, signal maps, DFT reference)<br>
-  This document explains <strong>why</strong> each design decision was made, traced to physics and first principles.
+  System-level design documentation covering FMCW operating principles, signal chain architecture, and component-level analysis.<br>
+  Companion references: <a href="../block-diagrams/RevB_Block_Diagrams.html" style="color:var(--blue)">Block Diagrams</a> (pin tables, signal maps) · <a href="../analysis/SheetC_Filter_Analysis.html" style="color:var(--blue)">Filter Analysis</a> (wiring verification) · <a href="../analysis/SchematicReview.html" style="color:var(--blue)">Schematic Review</a>
 </p>
 
 <nav class="toc">
   <strong>Table of Contents</strong>
   <ul>
     <li><a href="#s0">0. Document Purpose &amp; How to Read It</a></li>
-    <li><a href="#s1">1. FMCW Radar — Operating Principles</a>
+    <li><a href="#s1">1. FMCW Radar - Operating Principles</a>
       <ul>
         <li><a href="#s1-1">1.1 What is FMCW Radar?</a></li>
         <li><a href="#s1-2">1.2 The Transmitted Signal: Linear Frequency Chirp</a></li>
@@ -95,7 +95,7 @@
         <li><a href="#s1-7">1.7 System Operating Modes &amp; Adaptive Chirp</a></li>
       </ul>
     </li>
-    <li><a href="#s2">2. System Overview — The Signal Chain from First Principles</a>
+    <li><a href="#s2">2. System Overview - The Signal Chain from First Principles</a>
       <ul>
         <li><a href="#s2-1">2.1 What This System Does</a></li>
         <li><a href="#s2-2">2.2 Signal Flow &amp; Component Map</a></li>
@@ -105,19 +105,19 @@
         <li><a href="#s2-6">2.6 Rev A vs Rev B: What Changed and Why</a></li>
       </ul>
     </li>
-    <li><a href="#s3">3. Sheet A — Power + References</a>
+    <li><a href="#s3">3. Sheet A - Power + References</a>
       <ul>
         <li><a href="#s3">3.1 Power Architecture Overview</a></li>
         <li><a href="#s3">3.2 The LDO: TPS7A2033</a></li>
         <li><a href="#s3">3.3 The Ferrite Bead: BLM18PG221SN1D</a></li>
         <li><a href="#s3">3.4 The Voltage Reference: REF5025</a></li>
         <li><a href="#s3">3.5 The VCM Buffer: OPA320</a></li>
-        <li><a href="#s3">3.6 Component Summary — Sheet A</a></li>
+        <li><a href="#s3">3.6 Component Summary - Sheet A</a></li>
       </ul>
     </li>
-    <li><a href="#s4">4. Sheet B — IF Input, Protection &amp; Bias</a></li>
-    <li><a href="#s5">5. Sheet C — PGA + Anti-Alias Filter</a></li>
-    <li><a href="#s6">6. Sheet D — FDA Driver, ADC &amp; SPI Interface</a></li>
+    <li><a href="#s4">4. Sheet B - IF Input, Protection &amp; Bias</a></li>
+    <li><a href="#s5">5. Sheet C - PGA + Anti-Alias Filter</a></li>
+    <li><a href="#s6">6. Sheet D - FDA Driver, ADC &amp; SPI Interface</a></li>
     <li><a href="#s7">7. Layout Design Rationale</a> <em>(forthcoming)</em></li>
     <li><a href="#sA">Appendix A: References &amp; Further Reading</a></li>
   </ul>
@@ -127,14 +127,14 @@
 <h2 id="s0">0. Document Purpose &amp; How to Read It</h2>
 <!-- ================================================================ -->
 
-<p>This document exists to answer <strong>"why?"</strong> at every level of the design — not just "what component was chosen" but "what physical principle made that the right choice, and what would happen if we chose differently."</p>
+<p>This document exists to answer <strong>"why?"</strong> at every level of the design - not just "what component was chosen" but "what physical principle made that the right choice, and what would happen if we chose differently."</p>
 
 <p>Each section follows a consistent pattern:</p>
 <ol style="padding-left: 1.5rem; margin: 0.5rem 0;">
-  <li><strong>The requirement</strong> — what does this part of the system need to do?</li>
-  <li><strong>The physics</strong> — what fundamental principles govern the design space?</li>
-  <li><strong>The decision</strong> — what was chosen and why, with quantitative justification.</li>
-  <li><strong>The tradeoffs</strong> — what was sacrificed, and what would change under different constraints.</li>
+  <li><strong>The requirement</strong> - what does this part of the system need to do?</li>
+  <li><strong>The physics</strong> - what fundamental principles govern the design space?</li>
+  <li><strong>The decision</strong> - what was chosen and why, with quantitative justification.</li>
+  <li><strong>The tradeoffs</strong> - what was sacrificed, and what would change under different constraints.</li>
 </ol>
 
 <p>Throughout, look for these tags:</p>
@@ -149,7 +149,7 @@
 <h2 id="s1">1. FMCW Radar — Operating Principles</h2>
 <!-- ================================================================ -->
 
-<p>Before diving into the baseband circuit, we need to understand the physics of the radar system it serves. Every design decision in this document — filter cutoff frequency, ADC sampling rate, gain range, bias voltage — traces back to the fundamental operating principles of Frequency-Modulated Continuous-Wave (FMCW) radar.</p>
+<p>Before diving into the baseband circuit, we need to understand the physics of the radar system it serves. Every design decision in this document - filter cutoff frequency, ADC sampling rate, gain range, bias voltage - traces back to the fundamental operating principles of Frequency-Modulated Continuous-Wave (FMCW) radar.</p>
 
 <h3 id="s1-1">1.1 What is FMCW Radar?</h3>
 
@@ -157,8 +157,8 @@
 
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> The core principle: frequency encodes distance</strong>
-  <p>An FMCW transmitter continuously broadcasts a signal whose frequency sweeps linearly over time — a "chirp." When this chirp reflects off a target and returns to the receiver, it arrives <em>delayed</em> by the round-trip propagation time τ = 2R/c, where R is the target range and c is the speed of light.</p>
-  <p>Because the transmitter's frequency is continuously changing, the received signal's frequency is always slightly behind the currently-transmitted frequency. Mixing (multiplying) the transmitted and received signals produces an output whose frequency equals the <em>difference</em> between them. This difference — the <strong>beat frequency</strong> — is directly proportional to the target's range.</p>
+  <p>An FMCW transmitter continuously broadcasts a signal whose frequency sweeps linearly over time - a "chirp." When this chirp reflects off a target and returns to the receiver, it arrives <em>delayed</em> by the round-trip propagation time τ = 2R/c, where R is the target range and c is the speed of light.</p>
+  <p>Because the transmitter's frequency is continuously changing, the received signal's frequency is always slightly behind the currently-transmitted frequency. Mixing (multiplying) the transmitted and received signals produces an output whose frequency equals the <em>difference</em> between them. This difference - the <strong>beat frequency</strong> - is directly proportional to the target's range.</p>
   <p>This is why FMCW is powerful: it converts a time measurement (nanoseconds of propagation delay, extremely difficult to measure precisely) into a frequency measurement (Hz to kHz, easily measured with standard electronics and FFT).</p>
 </div>
 
@@ -171,14 +171,14 @@
 <p>where:</p>
 <table>
   <tr><th>Parameter</th><th>Symbol</th><th>Our System</th><th>Physical Meaning</th></tr>
-  <tr><td>Center frequency</td><td>f<sub>0</sub></td><td>5.8 GHz (C-band, ISM)</td><td>Carrier frequency — determines antenna size, propagation, and regulatory band</td></tr>
+  <tr><td>Center frequency</td><td>f<sub>0</sub></td><td>5.8 GHz (C-band, ISM)</td><td>Carrier frequency - determines antenna size, propagation, and regulatory band</td></tr>
   <tr><td>Sweep bandwidth (original)</td><td>B</td><td>30 MHz (FCC §15.245)</td><td>5.785–5.815 GHz. Minimum legal bandwidth for the original HOTRODS design.</td></tr>
   <tr style="background:#1a2a1a;"><td>Sweep bandwidth (proposed)</td><td>B</td><td><strong>125 MHz (FCC §15.247 ISM)</strong></td><td>5.725–5.850 GHz ISM band. 4× wider bandwidth, 1 W max power. Same VCO, same baseband hardware. See §1.7.7.</td></tr>
   <tr><td>Sweep period</td><td>T<sub>sweep</sub></td><td>~5 ms (half-period of ~100 Hz triangular wave)</td><td>Duration of one up-ramp or down-ramp. Must be long enough to capture sufficient ADC samples for FFT-based range extraction (see note below).</td></tr>
   <tr><td>Chirp slope (30 MHz)</td><td>S = B/T<sub>sweep</sub></td><td>6 × 10⁹ Hz/s</td><td>Rate of frequency change at 30 MHz BW</td></tr>
-  <tr style="background:#1a2a1a;"><td>Chirp slope (125 MHz)</td><td>S = B/T<sub>sweep</sub></td><td><strong>2.5 × 10¹⁰ Hz/s</strong></td><td>Rate of frequency change at 125 MHz BW — 4× steeper slope produces higher beat frequencies for the same target range</td></tr>
+  <tr style="background:#1a2a1a;"><td>Chirp slope (125 MHz)</td><td>S = B/T<sub>sweep</sub></td><td><strong>2.5 × 10¹⁰ Hz/s</strong></td><td>Rate of frequency change at 125 MHz BW - 4× steeper slope produces higher beat frequencies for the same target range</td></tr>
   <tr><td>Modulation waveform</td><td>—</td><td>Triangular (~100 Hz)</td><td>Up-ramp and down-ramp enable simultaneous range/velocity extraction (see §1.4)</td></tr>
-  <tr><td>VCO</td><td>—</td><td>HMC431LP4E, free-running</td><td>No PLL — 600 MHz tuning range covers both 30 MHz and 125 MHz sweep modes</td></tr>
+  <tr><td>VCO</td><td>—</td><td>HMC431LP4E, free-running</td><td>No PLL - 600 MHz tuning range covers both 30 MHz and 125 MHz sweep modes</td></tr>
   <tr><td>Max transmit power (§15.245)</td><td>—</td><td>75 mW (18.75 dBm)</td><td>FCC §15.245 maximum for 5.785–5.815 GHz. Current operating limit.</td></tr>
   <tr style="background:#1a2a1a;"><td>Max transmit power (§15.247)</td><td>—</td><td><strong>1 W (30 dBm)</strong></td><td>FCC §15.247 spread spectrum in ISM band. 13 dB increase → ~2× detection range.</td></tr>
 </table>
@@ -190,20 +190,20 @@
 
 <div class="callout callout-teal">
   <strong><span class="tag tag-decision">DECISION</span> VCO linearity implications at 125 MHz sweep</strong>
-  <p>At 30 MHz, the VCO exercises only 5% of its tuning range — nonlinearity is negligible. At 125 MHz (~21% of range), nonlinearity becomes measurable but still modest. The free-running VCO remains acceptable for initial implementation; however, a PLL-based VCO control loop would provide better chirp linearity and is recommended as a future RF board upgrade if the 125 MHz mode reveals range measurement degradation in testing.</p>
+  <p>At 30 MHz, the VCO exercises only 5% of its tuning range - nonlinearity is negligible. At 125 MHz (~21% of range), nonlinearity becomes measurable but still modest. The free-running VCO remains acceptable for initial implementation; however, a PLL-based VCO control loop would provide better chirp linearity and is recommended as a future RF board upgrade if the 125 MHz mode reveals range measurement degradation in testing.</p>
 </div>
 
 <div class="callout callout-red">
-  <strong><span class="tag tag-risk">RISK</span> Rev A chirp rate mismatch — corrected in Rev B</strong>
+  <strong><span class="tag tag-risk">RISK</span> Rev A chirp rate mismatch - corrected in Rev B</strong>
   <p>The original Rev A design used a 10 kHz triangular modulation waveform (T<sub>ramp</sub> = 50 µs), generated from a 96-element DAC lookup table via DMA on the STM32H743ZI. This rate was chosen for implementation convenience (timer prescaler settings) rather than being derived from signal processing requirements.</p>
-  <p>At 100 kS/s ADC sampling, a 50 µs ramp yields only <strong>5 ADC samples per ramp</strong>. A 5-point FFT has effectively no frequency resolution — all beat frequencies from 0 to 20 kHz collapse into a single bin. The system could not have extracted meaningful range information even if the analog chain had worked perfectly.</p>
-  <p>Rev B corrects this by specifying a ~100 Hz chirp rate (T<sub>ramp</sub> ≈ 5 ms), yielding <strong>500 samples per ramp</strong> — sufficient for a 512-point FFT with ~256 useful range bins. The chirp rate, ADC sample rate, and FFT length are a coupled three-parameter system; changing one requires checking the other two.</p>
+  <p>At 100 kS/s ADC sampling, a 50 µs ramp yields only <strong>5 ADC samples per ramp</strong>. A 5-point FFT has effectively no frequency resolution - all beat frequencies from 0 to 20 kHz collapse into a single bin. The system could not have extracted meaningful range information even if the analog chain had worked perfectly.</p>
+  <p>Rev B corrects this by specifying a ~100 Hz chirp rate (T<sub>ramp</sub> ≈ 5 ms), yielding <strong>500 samples per ramp</strong> - sufficient for a 512-point FFT with ~256 useful range bins. The chirp rate, ADC sample rate, and FFT length are a coupled three-parameter system; changing one requires checking the other two.</p>
 </div>
 
 <div class="callout">
   <strong><span class="tag tag-physics">PHYSICS</span> Why the chirp must be linear</strong>
-  <p>If the frequency sweep is nonlinear, the beat frequency for a single stationary target is no longer constant — it spreads across multiple FFT bins, reducing SNR and range resolution. Linearity of the chirp directly translates to the sharpness of the range measurement. In practice, VCO nonlinearity is the dominant source of range measurement error in low-cost FMCW systems.</p>
-  <p>Our system uses a free-running VCO (no PLL), which is a deliberate tradeoff: the original report notes that "a PLL would be a better choice due to higher frequency stability and better linearity across a frequency range." However, because we only use 30 MHz of the VCO's 600 MHz tuning range (5% of the full range), the nonlinearity over this small portion is negligible. The frequency drift is also common-mode — it shifts all three LO signals and the transmitted signal identically, so it cancels at the mixer output.</p>
+  <p>If the frequency sweep is nonlinear, the beat frequency for a single stationary target is no longer constant - it spreads across multiple FFT bins, reducing SNR and range resolution. Linearity of the chirp directly translates to the sharpness of the range measurement. In practice, VCO nonlinearity is the dominant source of range measurement error in low-cost FMCW systems.</p>
+  <p>Our system uses a free-running VCO (no PLL), which is a deliberate tradeoff: the original report notes that "a PLL would be a better choice due to higher frequency stability and better linearity across a frequency range." However, because we only use 30 MHz of the VCO's 600 MHz tuning range (5% of the full range), the nonlinearity over this small portion is negligible. The frequency drift is also common-mode - it shifts all three LO signals and the transmitted signal identically, so it cancels at the mixer output.</p>
 </div>
 
 <h3 id="s1-3">1.3 Range Measurement from Beat Frequency</h3>
@@ -244,11 +244,11 @@
   </table>
   <p>Key observations:</p>
   <ul style="padding-left: 1.5rem;">
-    <li><strong>30 MHz (narrow):</strong> Beat frequencies are extremely low — useful targets within the power-limited range (~200 m) fall below FFT bin resolution. Best suited for very long-range detection where targets are at km-scale distances, or as a coarse search mode.</li>
-    <li><strong>125 MHz (ISM, proposed):</strong> A target at 1,200 m reaches FFT bin 1 — the first resolvable bin. Within the practical detection range of 200–400 m (at 1 W), beat frequencies are 33–67 Hz. These fall below the bin resolution of a single 5 ms ramp, but <strong>coherent integration across multiple ramps</strong> or a longer ramp period (e.g., 10 ms → 1024 samples) can resolve them. This mode provides a good balance of legal outdoor operation, practical range, and achievable resolution (1.2 m).</li>
-    <li><strong>600 MHz (wide):</strong> Targets at 500 m produce 400 Hz — solidly in FFT bin 2. Best for sub-km precision tracking. Requires experimental license or shielded environment for full-power operation.</li>
+    <li><strong>30 MHz (narrow):</strong> Beat frequencies are extremely low - useful targets within the power-limited range (~200 m) fall below FFT bin resolution. Best suited for very long-range detection where targets are at km-scale distances, or as a coarse search mode.</li>
+    <li><strong>125 MHz (ISM, proposed):</strong> A target at 1,200 m reaches FFT bin 1 - the first resolvable bin. Within the practical detection range of 200–400 m (at 1 W), beat frequencies are 33–67 Hz. These fall below the bin resolution of a single 5 ms ramp, but <strong>coherent integration across multiple ramps</strong> or a longer ramp period (e.g., 10 ms → 1024 samples) can resolve them. This mode provides a good balance of legal outdoor operation, practical range, and achievable resolution (1.2 m).</li>
+    <li><strong>600 MHz (wide):</strong> Targets at 500 m produce 400 Hz - solidly in FFT bin 2. Best for sub-km precision tracking. Requires experimental license or shielded environment for full-power operation.</li>
   </ul>
-  <p><span class="tag tag-decision">DECISION</span> <strong>Rev B filter cutoff:</strong> The 15 kHz anti-alias filter cutoff accommodates all three modes. At the widest bandwidth (600 MHz), 15 kHz corresponds to 18.75 km range — far beyond transmit power limits. The filter cutoff is set by the ADC's Nyquist requirement (50 kHz), not by detection range. The 15 kHz cutoff provides 42 dB of anti-alias attenuation at Nyquist (see §2.3).</p>
+  <p><span class="tag tag-decision">DECISION</span> <strong>Rev B filter cutoff:</strong> The 15 kHz anti-alias filter cutoff accommodates all three modes. At the widest bandwidth (600 MHz), 15 kHz corresponds to 18.75 km range - far beyond transmit power limits. The filter cutoff is set by the ADC's Nyquist requirement (50 kHz), not by detection range. The 15 kHz cutoff provides 42 dB of anti-alias attenuation at Nyquist (see §2.3).</p>
 </div>
 
 <h4>Range Resolution</h4>
@@ -257,7 +257,7 @@
 
 <span class="eq">ΔR = c / (2B)</span>
 
-<p>For B = 30 MHz: ΔR = 3×10⁸ / (2 × 30×10⁶) = <strong>5.0 m</strong>. This is much coarser than what a 600 MHz bandwidth would give (0.25 m), and it illustrates a key tradeoff in our system: the FCC bandwidth restriction limits range resolution. Note that resolution depends <em>only</em> on bandwidth, not on carrier frequency — a wider sweep gives finer range resolution.</p>
+<p>For B = 30 MHz: ΔR = 3×10⁸ / (2 × 30×10⁶) = <strong>5.0 m</strong>. This is much coarser than what a 600 MHz bandwidth would give (0.25 m), and it illustrates a key tradeoff in our system: the FCC bandwidth restriction limits range resolution. Note that resolution depends <em>only</em> on bandwidth, not on carrier frequency - a wider sweep gives finer range resolution.</p>
 
 <table>
   <tr><th>Mode</th><th>Bandwidth</th><th>Range Resolution ΔR</th><th>Regulatory Basis</th></tr>
@@ -268,12 +268,12 @@
 
 <div class="callout">
   <strong><span class="tag tag-tradeoff">TRADEOFF</span> Bandwidth vs. range resolution</strong>
-  <p>The VCO can tune over 600 MHz, which would yield 0.25 m resolution — but FCC regulations limit outdoor radiated bandwidth. Under §15.245 (original): 30 MHz, giving 5.0 m resolution. Under §15.247 ISM (proposed): 125 MHz, giving 1.2 m — a 4× improvement that requires no baseband hardware changes. The full 600 MHz (0.25 m) is available in shielded environments or under experimental license. For comparison, 77 GHz automotive radar with 4 GHz bandwidth achieves ~3.75 cm resolution.</p>
+  <p>The VCO can tune over 600 MHz, which would yield 0.25 m resolution - but FCC regulations limit outdoor radiated bandwidth. Under §15.245 (original): 30 MHz, giving 5.0 m resolution. Under §15.247 ISM (proposed): 125 MHz, giving 1.2 m - a 4× improvement that requires no baseband hardware changes. The full 600 MHz (0.25 m) is available in shielded environments or under experimental license. For comparison, 77 GHz automotive radar with 4 GHz bandwidth achieves ~3.75 cm resolution.</p>
 </div>
 
 <h4>Maximum Unambiguous Range</h4>
 
-<p>The maximum range is limited by the sweep period — the reflected signal must return before the current sweep ends. Additionally, the beat frequency must be below the ADC's Nyquist frequency (f<sub>s</sub>/2):</p>
+<p>The maximum range is limited by the sweep period - the reflected signal must return before the current sweep ends. Additionally, the beat frequency must be below the ADC's Nyquist frequency (f<sub>s</sub>/2):</p>
 
 <span class="eq">R<sub>max</sub> = (f<sub>s</sub> · c · T<sub>sweep</sub>) / (4B)</span>
 
@@ -304,8 +304,8 @@
 
 <div class="callout">
   <strong><span class="tag tag-decision">DECISION</span> Baseband design implication</strong>
-  <p>The Doppler shift is small compared to the beat frequency bandwidth (hundreds of Hz vs. thousands of Hz). Our baseband circuit does not need to separate range and velocity — it just needs to faithfully digitize the beat signal during both the up-ramp and down-ramp with enough resolution and bandwidth to preserve both components. The separation happens in the MCU via FFT on each half-cycle independently.</p>
-  <p>The triangular modulation does mean the baseband must handle <em>both</em> ramp directions cleanly. The signal chain is symmetric around VCM — it amplifies and filters regardless of whether the beat frequency was generated during the up-ramp or down-ramp.</p>
+  <p>The Doppler shift is small compared to the beat frequency bandwidth (hundreds of Hz vs. thousands of Hz). Our baseband circuit does not need to separate range and velocity - it just needs to faithfully digitize the beat signal during both the up-ramp and down-ramp with enough resolution and bandwidth to preserve both components. The separation happens in the MCU via FFT on each half-cycle independently.</p>
+  <p>The triangular modulation does mean the baseband must handle <em>both</em> ramp directions cleanly. The signal chain is symmetric around VCM - it amplifies and filters regardless of whether the beat frequency was generated during the up-ramp or down-ramp.</p>
 </div>
 
 <h3 id="s1-5">1.5 Our System: 5.8 GHz, 3-Receiver Configuration</h3>
@@ -324,15 +324,15 @@
   </tr>
   <tr>
     <td>Antenna</td><td>Patch array on RF PCB</td>
-    <td>Planar, low-profile, co-fabricated with RF circuitry on the same 4-layer OSHPark board. At 5.8 GHz, λ ≈ 52 mm, so patch elements are ~25 mm — compatible with standard PCB form factors.</td>
+    <td>Planar, low-profile, co-fabricated with RF circuitry on the same 4-layer OSHPark board. At 5.8 GHz, λ ≈ 52 mm, so patch elements are ~25 mm - compatible with standard PCB form factors.</td>
   </tr>
   <tr>
     <td>VCO</td><td>HMC431LP4E (free-running)</td>
-    <td>600 MHz tuning range, ~2 dBm output. No PLL — VCO nonlinearity is negligible over the 30 MHz legal bandwidth (5% of tuning range). Frequency drift is common-mode across all LO and TX paths.</td>
+    <td>600 MHz tuning range, ~2 dBm output. No PLL - VCO nonlinearity is negligible over the 30 MHz legal bandwidth (5% of tuning range). Frequency drift is common-mode across all LO and TX paths.</td>
   </tr>
   <tr>
     <td>LNA</td><td>HMC717ALP3E</td>
-    <td>12.5 dB gain, 1.3 dB noise figure. Low NF is critical — the Friis equation shows that the first-stage noise figure dominates the system noise floor. A 1.3 dB NF degrades the received SNR by only 1.3 dB.</td>
+    <td>12.5 dB gain, 1.3 dB noise figure. Low NF is critical - the Friis equation shows that the first-stage noise figure dominates the system noise floor. A 1.3 dB NF degrades the received SNR by only 1.3 dB.</td>
   </tr>
   <tr>
     <td>Mixer</td><td>HMC218BMS8GE (×3)</td>
@@ -347,7 +347,7 @@
 <div class="callout callout-teal">
   <strong><span class="tag tag-physics">PHYSICS</span> Why 3 receivers for angular detection</strong>
   <p>A single receiver can only measure range (from beat frequency) and velocity (from Doppler). To determine the <em>direction</em> of a target, you need multiple spatially-separated receivers. When a wavefront arrives at angle θ, receiver B sees it slightly delayed relative to receiver A by Δt = (d · sin θ) / c, where d is the inter-receiver spacing. This delay appears as a phase difference in the beat signal. By measuring this phase difference across three receivers, the system can estimate the target's azimuth and elevation.</p>
-  <p>This is why the original HOTRODS system had 3 identical baseband channels — one per receiver. Rev B focuses on a single channel (the fundamental building block) designed to professional standards, which can be replicated for a multi-channel system.</p>
+  <p>This is why the original HOTRODS system had 3 identical baseband channels - one per receiver. Rev B focuses on a single channel (the fundamental building block) designed to professional standards, which can be replicated for a multi-channel system.</p>
 </div>
 
 <h3 id="s1-6">1.6 Where the Baseband Fits In</h3>
@@ -370,7 +370,7 @@
   <div class="block" style="background:#1a2a3a;">MCU / DSP<br><small>FFT → Range</small></div>
 </div>
 
-<p>The mixer outputs the beat signal — a low-frequency sinusoid (or sum of sinusoids for multiple targets) whose frequency encodes range information. But this signal has several problems that the baseband must solve:</p>
+<p>The mixer outputs the beat signal - a low-frequency sinusoid (or sum of sinusoids for multiple targets) whose frequency encodes range information. But this signal has several problems that the baseband must solve:</p>
 
 <table>
   <tr><th>Problem</th><th>Cause</th><th>Baseband Solution</th></tr>
@@ -403,28 +403,28 @@
 
 <div class="callout callout-green">
   <strong>Key insight: the baseband is a <em>signal conditioning</em> system, not a signal processing system</strong>
-  <p>The baseband does not extract range, velocity, or angle information — that happens in the MCU via FFT. The baseband's job is simpler but critical: present the ADC with a clean, properly-scaled, properly-filtered analog signal that preserves all the information the mixer output contained. Any noise, distortion, or aliasing introduced by the baseband is <em>permanent</em> — no amount of digital processing can recover it.</p>
+  <p>The baseband does not extract range, velocity, or angle information - that happens in the MCU via FFT. The baseband's job is simpler but critical: present the ADC with a clean, properly-scaled, properly-filtered analog signal that preserves all the information the mixer output contained. Any noise, distortion, or aliasing introduced by the baseband is <em>permanent</em> - no amount of digital processing can recover it.</p>
   <p>This is why the design philosophy is conservative: low-noise components, generous filtering, precision references, and comprehensive test infrastructure to verify every stage independently.</p>
 </div>
 
 <h3 id="s1-7">1.7 System Operating Modes &amp; Adaptive Chirp</h3>
 
-<p>The FMCW radar equation (§1.3) reveals that sweep bandwidth B directly controls range resolution, while sweep period T<sub>sweep</sub> and transmit power control maximum detectable range. These are not fixed constants — they are <em>system parameters</em> that can be changed dynamically. This section explores what happens when we treat them as variables rather than constants, and how the baseband design supports this without hardware modification.</p>
+<p>The FMCW radar equation (§1.3) reveals that sweep bandwidth B directly controls range resolution, while sweep period T<sub>sweep</sub> and transmit power control maximum detectable range. These are not fixed constants - they are <em>system parameters</em> that can be changed dynamically. This section explores what happens when we treat them as variables rather than constants, and how the baseband design supports this without hardware modification.</p>
 
 <h4>1.7.1 Adaptive Chirp Bandwidth: Narrow vs. Wide Sweep</h4>
 
-<p>The HMC431LP4E VCO tunes over ~600 MHz, but the MCU's DAC waveform controls how much of that range is exercised during each sweep. By changing the DAC waveform amplitude, we change the effective sweep bandwidth — and with it, the range resolution and maximum detectable range.</p>
+<p>The HMC431LP4E VCO tunes over ~600 MHz, but the MCU's DAC waveform controls how much of that range is exercised during each sweep. By changing the DAC waveform amplitude, we change the effective sweep bandwidth - and with it, the range resolution and maximum detectable range.</p>
 
 <table>
   <tr><th>Mode</th><th>Sweep BW</th><th>Range Resolution ΔR</th><th>Max Range (at 15 kHz filter)</th><th>Beat Frequency Scale</th><th>Best For</th></tr>
   <tr style="background:#1a2a1a;">
-    <td><strong>Narrow</strong></td><td>30 MHz</td><td>5.0 m</td><td>375 km</td><td>0.04 Hz/m</td><td>Initial search — long range, coarse. Beat frequencies very low; best with longer integration or faster ADC.</td>
+    <td><strong>Narrow</strong></td><td>30 MHz</td><td>5.0 m</td><td>375 km</td><td>0.04 Hz/m</td><td>Initial search - long range, coarse. Beat frequencies very low; best with longer integration or faster ADC.</td>
   </tr>
   <tr style="background:#1a2a3a;">
-    <td><strong>Medium</strong></td><td>200 MHz</td><td>0.75 m</td><td>56 km</td><td>0.27 Hz/m</td><td>Classification — determine target size and structure</td>
+    <td><strong>Medium</strong></td><td>200 MHz</td><td>0.75 m</td><td>56 km</td><td>0.27 Hz/m</td><td>Classification - determine target size and structure</td>
   </tr>
   <tr style="background:#2a1a2a;">
-    <td><strong>Wide</strong></td><td>600 MHz</td><td>0.25 m</td><td>18.75 km</td><td>0.8 Hz/m</td><td>Precision tracking — fine-grained range measurement. Best match for sub-km detection with 5 ms ramp.</td>
+    <td><strong>Wide</strong></td><td>600 MHz</td><td>0.25 m</td><td>18.75 km</td><td>0.8 Hz/m</td><td>Precision tracking - fine-grained range measurement. Best match for sub-km detection with 5 ms ramp.</td>
   </tr>
 </table>
 
@@ -432,7 +432,7 @@
   <strong><span class="tag tag-physics">PHYSICS</span> Implementation: it's a firmware change, not a hardware change</strong>
   <p>The VCO tuning voltage is generated by the MCU's DAC through a ×3 gain op-amp. A ~100 Hz triangular waveform at full DAC amplitude (0–3.3V → 0–10V tuning) exercises the full 600 MHz range. Reducing the DAC amplitude to 5% of full scale (0–0.165V → 0–0.5V tuning) restricts the sweep to ~30 MHz.</p>
   <p>The baseband is transparent to this change: the beat frequencies for targets within the filter passband remain within the ADC's sampling bandwidth regardless of sweep width. No analog component needs to change.</p>
-  <p>The FPGA (or MCU) simply reprograms the DAC lookup table between sweep modes. This can happen on a per-sweep basis — every ~10 ms (one complete triangular cycle at 100 Hz) — enabling rapid mode switching.</p>
+  <p>The FPGA (or MCU) simply reprograms the DAC lookup table between sweep modes. This can happen on a per-sweep basis - every ~10 ms (one complete triangular cycle at 100 Hz) - enabling rapid mode switching.</p>
 </div>
 
 <h4>1.7.2 Time-Division Multi-Scale Radar</h4>
@@ -457,38 +457,38 @@
 
 <div class="callout">
   <strong><span class="tag tag-tradeoff">TRADEOFF</span> Update rate vs. number of modes</strong>
-  <p>With N sweep modes, each mode's update rate drops to 1/N of the single-mode rate. At 3 modes and ~100 Hz base rate: each mode updates at ~33 Hz (30 ms per cycle). For a target moving at 30 m/s, the position changes by 0.9 m between complete cycles. At 600 MHz bandwidth (0.25 m resolution), the target moves ~3.6 range bins between updates — trackable with a Kalman filter but the track will lag. At 30 MHz bandwidth (5 m resolution), 0.9 m is less than one range bin — no issue at all. The multi-scale approach naturally matches: the coarse mode (which needs fewer updates) gets adequate update rate, while the fine mode (which is more sensitive to motion) can be allocated more sweep periods if needed.</p>
+  <p>With N sweep modes, each mode's update rate drops to 1/N of the single-mode rate. At 3 modes and ~100 Hz base rate: each mode updates at ~33 Hz (30 ms per cycle). For a target moving at 30 m/s, the position changes by 0.9 m between complete cycles. At 600 MHz bandwidth (0.25 m resolution), the target moves ~3.6 range bins between updates - trackable with a Kalman filter but the track will lag. At 30 MHz bandwidth (5 m resolution), 0.9 m is less than one range bin - no issue at all. The multi-scale approach naturally matches: the coarse mode (which needs fewer updates) gets adequate update rate, while the fine mode (which is more sensitive to motion) can be allocated more sweep periods if needed.</p>
 </div>
 
 <h4>1.7.3 Historical Parallel: Chain Home Layered Defense</h4>
 
-<p>This multi-scale concept has a direct historical precedent in the British Chain Home radar network of World War II — the first operational radar early-warning system.</p>
+<p>This multi-scale concept has a direct historical precedent in the British Chain Home radar network of World War II - the first operational radar early-warning system.</p>
 
 <table>
   <tr><th>System</th><th>Frequency</th><th>Range</th><th>Resolution</th><th>Role</th></tr>
   <tr>
-    <td><strong>Chain Home (CH)</strong></td><td>20–30 MHz (HF/VHF)</td><td>~190 km</td><td>~5 km (coarse)</td><td>Long-range early warning — detect incoming bomber formations</td>
+    <td><strong>Chain Home (CH)</strong></td><td>20–30 MHz (HF/VHF)</td><td>~190 km</td><td>~5 km (coarse)</td><td>Long-range early warning - detect incoming bomber formations</td>
   </tr>
   <tr>
-    <td><strong>Chain Home Low (CHL)</strong></td><td>200 MHz (VHF)</td><td>~48 km</td><td>~1 km (medium)</td><td>Low-altitude gap filler — detect aircraft below CH's beam</td>
+    <td><strong>Chain Home Low (CHL)</strong></td><td>200 MHz (VHF)</td><td>~48 km</td><td>~1 km (medium)</td><td>Low-altitude gap filler - detect aircraft below CH's beam</td>
   </tr>
   <tr>
-    <td><strong>Chain Home Extra Low (CHEL)</strong></td><td>3 GHz (S-band, magnetron)</td><td>~50 km</td><td>~100 m (fine)</td><td>Very-low-altitude tracking — detect aircraft down to 15 m altitude</td>
+    <td><strong>Chain Home Extra Low (CHEL)</strong></td><td>3 GHz (S-band, magnetron)</td><td>~50 km</td><td>~100 m (fine)</td><td>Very-low-altitude tracking - detect aircraft down to 15 m altitude</td>
   </tr>
 </table>
 
 <p>The British needed three separate hardware systems because the technology of 1940 could not make one system operate across such different frequencies. Each system required different antennas (110 m steel towers for CH, rotatable arrays for CHL, parabolic dishes for CHEL), different transmitters, and different receivers.</p>
 
 <div class="callout callout-teal">
-  <strong><span class="tag tag-physics">PHYSICS</span> Why our system can do what Chain Home couldn't — the FMCW advantage</strong>
+  <strong><span class="tag tag-physics">PHYSICS</span> Why our system can do what Chain Home couldn't - the FMCW advantage</strong>
   <p>In FMCW radar, resolution is determined by <em>sweep bandwidth</em>, not carrier frequency. Chain Home's resolution was tied to its wavelength (6–15 m), which dictated antenna size, beam width, and minimum resolvable distance. To improve resolution, the British had to move to higher carrier frequencies (200 MHz for CHL, 3 GHz for CHEL), requiring entirely different hardware.</p>
-  <p>Our system operates at a fixed carrier frequency (5.8 GHz) and varies only the sweep amplitude. The antenna, mixer, LNA, and baseband are the same regardless of sweep width. This means a single hardware platform can replicate the functionality of all three Chain Home systems by changing a DAC register — a capability that would have seemed miraculous in 1940.</p>
-  <p>One advantage the British had that we don't: their three systems operated at different carrier frequencies, which meant different angular resolution characteristics (shorter wavelength → narrower beam → better angular accuracy). Our system's angular resolution is fixed at λ = 52 mm regardless of sweep mode, because the carrier frequency doesn't change. To improve angular resolution, we would need to move to a higher carrier frequency (e.g., 24 GHz or 77 GHz) or use a larger antenna aperture — changes that go beyond sweep parameter tuning.</p>
+  <p>Our system operates at a fixed carrier frequency (5.8 GHz) and varies only the sweep amplitude. The antenna, mixer, LNA, and baseband are the same regardless of sweep width. This means a single hardware platform can replicate the functionality of all three Chain Home systems by changing a DAC register - a capability that would have seemed miraculous in 1940.</p>
+  <p>One advantage the British had that we don't: their three systems operated at different carrier frequencies, which meant different angular resolution characteristics (shorter wavelength → narrower beam → better angular accuracy). Our system's angular resolution is fixed at λ = 52 mm regardless of sweep mode, because the carrier frequency doesn't change. To improve angular resolution, we would need to move to a higher carrier frequency (e.g., 24 GHz or 77 GHz) or use a larger antenna aperture - changes that go beyond sweep parameter tuning.</p>
 </div>
 
 <h4>1.7.4 Multi-Channel Architecture: Staggered Filter Bandwidths</h4>
 
-<p>The original HOTRODS system used three identical RX channels for triangulation. An alternative architecture — more academic than immediately practical, but instructive — would use three channels with <em>different</em> anti-alias filter cutoffs, even with the same transmitted chirp:</p>
+<p>The original HOTRODS system used three identical RX channels for triangulation. An alternative architecture - more academic than immediately practical, but instructive - would use three channels with <em>different</em> anti-alias filter cutoffs, even with the same transmitted chirp:</p>
 
 <table>
   <tr><th>Channel</th><th>Filter Cutoff</th><th>Noise BW</th><th>Effective Range Window</th><th>Relative SNR</th></tr>
@@ -506,10 +506,10 @@
 <p>All three channels see the same reflected signal (same chirp, same target, same beat frequency), but each channel's filter passes a different range window. Since noise power scales with bandwidth (N = e<sub>n</sub>² × BW), the narrow channel has ~9 dB better SNR than the wide channel for targets within its range window.</p>
 
 <div class="callout callout-blue">
-  <strong><span class="tag tag-physics">PHYSICS</span> What this buys you — and what it costs</strong>
-  <p><strong>Benefit:</strong> Simultaneous cross-check. If a target appears in the 2 kHz channel (best SNR) but is marginal in the 40 kHz channel, you have real-time confirmation that the detection is genuine and not a noise artifact. This is a form of <em>detection confidence estimation</em> — you're measuring the same target at three different noise floors simultaneously.</p>
+  <strong><span class="tag tag-physics">PHYSICS</span> What this buys you - and what it costs</strong>
+  <p><strong>Benefit:</strong> Simultaneous cross-check. If a target appears in the 2 kHz channel (best SNR) but is marginal in the 40 kHz channel, you have real-time confirmation that the detection is genuine and not a noise artifact. This is a form of <em>detection confidence estimation</em> - you're measuring the same target at three different noise floors simultaneously.</p>
   <p><strong>Cost:</strong> You lose triangulation. With three different filter bandwidths, the three channels no longer see the same phase response for the same signal, so phase-difference angle estimation becomes unreliable. You would need to choose: either all channels have matched filters (for triangulation) or staggered filters (for multi-scale detection). You cannot do both simultaneously with only three receivers.</p>
-  <p>A practical compromise: use matched filters for all three channels during normal operation (preserving triangulation), but allow the FPGA to digitally apply different filter bandwidths in post-processing. Since the ADC captures the full-bandwidth signal, digital filtering after the ADC can create multiple virtual channels from a single physical channel — each with a different effective bandwidth — without any hardware changes. This is the strongest argument for the FPGA-based digital filtering approach discussed in the system evolution roadmap.</p>
+  <p>A practical compromise: use matched filters for all three channels during normal operation (preserving triangulation), but allow the FPGA to digitally apply different filter bandwidths in post-processing. Since the ADC captures the full-bandwidth signal, digital filtering after the ADC can create multiple virtual channels from a single physical channel - each with a different effective bandwidth - without any hardware changes. This is the strongest argument for the FPGA-based digital filtering approach discussed in the system evolution roadmap.</p>
 </div>
 
 <h4>1.7.5 Baseband Design Implications</h4>
@@ -518,17 +518,17 @@
 
 <table>
   <tr><th>Feature</th><th>Required for Adaptive Chirp?</th><th>Current Rev B Status</th></tr>
-  <tr><td>Anti-alias filter ≥15 kHz</td><td>Yes — must pass beat frequencies for all modes</td><td>15 kHz Sallen-Key (could be relaxed to 25–40 kHz for wide mode support)</td></tr>
-  <tr><td>Programmable gain (PGA113)</td><td>Yes — wider sweeps may need different gain settings</td><td>1–200× via SPI, gain changes in ~10 µs</td></tr>
-  <tr><td>18-bit ADC at 100 kS/s</td><td>Yes — wide dynamic range handles all modes</td><td>ADS8881, 100 kS/s, 18-bit</td></tr>
-  <tr><td>SPI control interface</td><td>Yes — FPGA needs to command PGA gain per sweep</td><td>Shared SPI bus with chip-select isolation</td></tr>
-  <tr><td>DFT infrastructure</td><td>Valuable — characterize each mode's noise floor independently</td><td>J_DFT header, 17 TPs, 5 MMCX, 6 isolation R's</td></tr>
+  <tr><td>Anti-alias filter ≥15 kHz</td><td>Yes - must pass beat frequencies for all modes</td><td>15 kHz Sallen-Key (could be relaxed to 25–40 kHz for wide mode support)</td></tr>
+  <tr><td>Programmable gain (PGA113)</td><td>Yes - wider sweeps may need different gain settings</td><td>1–200× via SPI, gain changes in ~10 µs</td></tr>
+  <tr><td>18-bit ADC at 100 kS/s</td><td>Yes - wide dynamic range handles all modes</td><td>ADS8881, 100 kS/s, 18-bit</td></tr>
+  <tr><td>SPI control interface</td><td>Yes - FPGA needs to command PGA gain per sweep</td><td>Shared SPI bus with chip-select isolation</td></tr>
+  <tr><td>DFT infrastructure</td><td>Valuable - characterize each mode's noise floor independently</td><td>J_DFT header, 17 TPs, 5 MMCX, 6 isolation R's</td></tr>
   <tr><td>Digital filter (FPGA)</td><td>Enables virtual multi-channel from single hardware</td><td>Future Phase 4B enhancement</td></tr>
 </table>
 
 <div class="callout callout-green">
   <strong>Design philosophy: build the foundation right, and advanced modes emerge naturally</strong>
-  <p>The baseband was not designed with adaptive chirp specifically in mind — it was designed with low noise, wide dynamic range, programmable gain, and comprehensive test access. These properties are <em>sufficient</em> for adaptive chirp to work without modification. This is the hallmark of good system design: a well-engineered subsystem supports use cases the designer didn't explicitly plan for, because the fundamentals are sound.</p>
+  <p>The baseband was not designed with adaptive chirp specifically in mind - it was designed with low noise, wide dynamic range, programmable gain, and comprehensive test access. These properties are <em>sufficient</em> for adaptive chirp to work without modification. This is the hallmark of good system design: a well-engineered subsystem supports use cases the designer didn't explicitly plan for, because the fundamentals are sound.</p>
 </div>
 
 <h4>1.7.6 Regulatory Landscape: FCC Bands for Unlicensed Radar</h4>
@@ -560,9 +560,9 @@
 
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> What 125 MHz / 1 W buys you quantitatively</strong>
-  <p><strong>Resolution:</strong> ΔR = c/(2 × 125 MHz) = 1.2 m — a 4× improvement over the current 5.0 m. Two targets 1.2 m apart can now be distinguished.</p>
+  <p><strong>Resolution:</strong> ΔR = c/(2 × 125 MHz) = 1.2 m - a 4× improvement over the current 5.0 m. Two targets 1.2 m apart can now be distinguished.</p>
   <p><strong>Link budget:</strong> The radar range equation gives received power as P<sub>r</sub> ∝ P<sub>t</sub>/R⁴. With P<sub>t</sub> increasing from 75 mW to 1 W (13.2 dB): the range at which you receive the same signal level increases by 10^(13.2/40) = 1.9×, roughly doubling the useful detection range from ~100–200 m to ~200–400 m.</p>
-  <p><strong>Beat frequency scale:</strong> At 125 MHz BW, 5 ms ramp: f<sub>beat</sub> = 0.167 Hz/m. A target at 200 m produces 33 Hz; a target at 1 km produces 167 Hz. With a 512-point FFT at 100 kSPS (195 Hz/bin), useful targets within the power-limited range land in the first few FFT bins — adequate for detection and coarse ranging.</p>
+  <p><strong>Beat frequency scale:</strong> At 125 MHz BW, 5 ms ramp: f<sub>beat</sub> = 0.167 Hz/m. A target at 200 m produces 33 Hz; a target at 1 km produces 167 Hz. With a 512-point FFT at 100 kSPS (195 Hz/bin), useful targets within the power-limited range land in the first few FFT bins - adequate for detection and coarse ranging.</p>
   <p><strong>Combined with the 600 MHz wide mode:</strong> The system can use the 125 MHz ISM mode as the primary legal outdoor mode and switch to 600 MHz (in a shielded environment or under experimental license) for precision tracking. The ISM mode provides the long-range search capability with legal compliance; the wide mode provides sub-meter resolution for close-in work.</p>
 </div>
 
@@ -570,12 +570,12 @@
 
 <table>
   <tr><th>Subsystem</th><th>Change Required</th><th>Complexity</th></tr>
-  <tr><td>VCO (HMC431LP4E)</td><td>None — tuning range already covers 5.725–5.850 GHz</td><td style="color:var(--green);">None</td></tr>
-  <tr><td>Mixers (HMC218BMS8GE)</td><td>None — rated to 8 GHz</td><td style="color:var(--green);">None</td></tr>
-  <tr><td>LNA (HMC717ALP3E)</td><td>None — operates at 5.8 GHz</td><td style="color:var(--green);">None</td></tr>
-  <tr><td>Antennas</td><td>None — resonant at 5.8 GHz, 125 MHz is ±1% of center</td><td style="color:var(--green);">None</td></tr>
+  <tr><td>VCO (HMC431LP4E)</td><td>None - tuning range already covers 5.725–5.850 GHz</td><td style="color:var(--green);">None</td></tr>
+  <tr><td>Mixers (HMC218BMS8GE)</td><td>None - rated to 8 GHz</td><td style="color:var(--green);">None</td></tr>
+  <tr><td>LNA (HMC717ALP3E)</td><td>None - operates at 5.8 GHz</td><td style="color:var(--green);">None</td></tr>
+  <tr><td>Antennas</td><td>None - resonant at 5.8 GHz, 125 MHz is ±1% of center</td><td style="color:var(--green);">None</td></tr>
   <tr><td>PA (SST11CP16)</td><td>Remove/reduce 7 dB attenuator for ~160 mW. Full 1 W requires PA upgrade.</td><td style="color:var(--amber);">Minor RF board mod</td></tr>
-  <tr><td><strong>Baseband PCB</strong></td><td><strong>None — anti-alias filter, ADC, PGA, FDA, references all unchanged</strong></td><td style="color:var(--green);"><strong>None</strong></td></tr>
+  <tr><td><strong>Baseband PCB</strong></td><td><strong>None - anti-alias filter, ADC, PGA, FDA, references all unchanged</strong></td><td style="color:var(--green);"><strong>None</strong></td></tr>
   <tr><td>PGA gain algorithm</td><td>Start at low gain, ramp up (13 dB more input power from stronger returns at close range)</td><td style="color:var(--amber);">Firmware only</td></tr>
   <tr><td>DAC waveform</td><td>Wider amplitude swing for 125 MHz sweep vs. 30 MHz</td><td style="color:var(--amber);">Firmware only</td></tr>
   <tr><td>FCC compliance</td><td>Verify FMCW chirp qualifies under §15.247 spread spectrum rules</td><td style="color:var(--amber);">Regulatory research</td></tr>
@@ -583,8 +583,8 @@
 
 <div class="callout callout-green">
   <strong><span class="tag tag-decision">DECISION</span> Baseband design validated by band upgrade analysis</strong>
-  <p>The ISM band upgrade requires <strong>zero hardware changes</strong> to the baseband PCB. The signal conditioning path — input protection, variable gain, anti-alias filtering, single-to-differential conversion, and 18-bit digitization — handles the upgraded parameters transparently. This is a direct consequence of designing the analog chain with margin: the 15 kHz filter passes beat frequencies for all bandwidth modes, the 18-bit ADC has sufficient dynamic range to accommodate 13 dB more signal without clipping (at reduced PGA gain), and the programmable gain compensates for the wider range of input levels.</p>
-  <p>For the portfolio narrative: "the baseband was designed with sufficient headroom that upgrading from 30 MHz / 75 mW to 125 MHz / 1 W required zero hardware changes to the signal conditioning path — only firmware adjustments to the sweep generator and gain control algorithm."</p>
+  <p>The ISM band upgrade requires <strong>zero hardware changes</strong> to the baseband PCB. The signal conditioning path - input protection, variable gain, anti-alias filtering, single-to-differential conversion, and 18-bit digitization - handles the upgraded parameters transparently. This is a direct consequence of designing the analog chain with margin: the 15 kHz filter passes beat frequencies for all bandwidth modes, the 18-bit ADC has sufficient dynamic range to accommodate 13 dB more signal without clipping (at reduced PGA gain), and the programmable gain compensates for the wider range of input levels.</p>
+  <p>For the portfolio narrative: "the baseband was designed with sufficient headroom that upgrading from 30 MHz / 75 mW to 125 MHz / 1 W required zero hardware changes to the signal conditioning path - only firmware adjustments to the sweep generator and gain control algorithm."</p>
 </div>
 
 <!-- ================================================================ -->
@@ -605,7 +605,7 @@
 
 <div class="callout">
   <strong><span class="tag tag-physics">PHYSICS</span> Why is the IF signal low-frequency?</strong>
-  As derived in <a href="#s1-3">Section 1.3</a>, the FMCW mixer output (beat signal) has a frequency proportional to target range: f<sub>beat</sub> = 2BR/(c·T<sub>sweep</sub>). With a 5 ms ramp, the beat frequencies are very low at 30 MHz bandwidth (0.04 Hz/m) but scale up to 0.8 Hz/m at 600 MHz bandwidth. Even at 600 MHz BW, a target at 500 m produces only 400 Hz — well within the baseband's DC–15 kHz passband. This is the fundamental advantage of FMCW: it converts nanosecond propagation delays into easily-measured low-frequency signals.
+  As derived in <a href="#s1-3">Section 1.3</a>, the FMCW mixer output (beat signal) has a frequency proportional to target range: f<sub>beat</sub> = 2BR/(c·T<sub>sweep</sub>). With a 5 ms ramp, the beat frequencies are very low at 30 MHz bandwidth (0.04 Hz/m) but scale up to 0.8 Hz/m at 600 MHz bandwidth. Even at 600 MHz BW, a target at 500 m produces only 400 Hz, well within the baseband's DC-15 kHz passband. This is the fundamental advantage of FMCW: it converts nanosecond propagation delays into easily-measured low-frequency signals.
 </div>
 
 <h3 id="s2-2">2.2 Signal Flow &amp; Component Map</h3>
@@ -660,7 +660,7 @@
 
 <h3 id="s2-3">2.3 The Fundamental Constraints That Drive Every Decision</h3>
 
-<p>Every component choice in this design traces back to a small set of physical constraints. Understanding these constraints is more important than memorizing the BOM — if you know the constraints, you can re-derive the design.</p>
+<p>Every component choice in this design traces back to a small set of physical constraints. Understanding these constraints is more important than memorizing the BOM - if you know the constraints, you can re-derive the design.</p>
 
 <h4>Constraint 1: The ADC Defines the Entire Analog Budget</h4>
 
@@ -669,8 +669,8 @@
   <p>The ADS8881 is an 18-bit SAR ADC with a full-scale differential input range of ±V<sub>REF</sub> (where V<sub>REF</sub> = 2.500V from the REF5025). This means the total input span is 5.000V peak-to-peak differential, centered on VOCM.</p>
   <p>The LSB size is:</p>
   <span class="eq">V<sub>LSB</sub> = 2 × V<sub>REF</sub> / 2<sup>18</sup> = 5.000V / 262144 = <strong>19.07 µV</strong></span>
-  <p>This number — 19 µV — sets the noise floor target for the entire analog chain. Every amplifier, filter, and reference must contribute less noise than this at the ADC input, or we're wasting resolution.</p>
-  <p>The ADC's own noise is specified as 4.2 µV<sub>RMS</sub> (typical), which corresponds to about 15.3 LSBs peak-to-peak (assuming 3.6× crest factor). This means the ADC itself uses about 14.2 effective bits of its 18-bit range for noise-free resolution — the remaining 3.8 bits are in the noise. Our analog chain needs to not significantly degrade this.</p>
+  <p>This number - 19 µV - sets the noise floor target for the entire analog chain. Every amplifier, filter, and reference must contribute less noise than this at the ADC input, or we're wasting resolution.</p>
+  <p>The ADC's own noise is specified as 4.2 µV<sub>RMS</sub> (typical), which corresponds to about 15.3 LSBs peak-to-peak (assuming 3.6× crest factor). This means the ADC itself uses about 14.2 effective bits of its 18-bit range for noise-free resolution - the remaining 3.8 bits are in the noise. Our analog chain needs to not significantly degrade this.</p>
 </div>
 
 <h4>Constraint 2: Sampling Rate and Anti-Alias Requirements</h4>
@@ -686,7 +686,7 @@
     <li>At 50 kHz (first Nyquist zone edge): attenuation ≈ 80 × log₁₀(50/15) = <strong>42 dB</strong></li>
     <li>At 100 kHz (2× Nyquist): attenuation ≈ 80 × log₁₀(100/15) = <strong>66 dB</strong></li>
   </ul>
-  <p>This is adequate for our 18-bit system. A 2nd-order filter would only give 40 dB/decade — just 21 dB at 50 kHz — which is insufficient. A 4th-order filter is the <em>minimum</em> order that works here.</p>
+  <p>This is adequate for our 18-bit system. A 2nd-order filter would only give 40 dB/decade - just 21 dB at 50 kHz - which is insufficient. A 4th-order filter is the <em>minimum</em> order that works here.</p>
 </div>
 
 <h4>Constraint 3: Single-Supply Operation Demands Careful Biasing</h4>
@@ -694,21 +694,21 @@
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> Why VCM = V<sub>DD</sub>/2 = 1.650V</strong>
   <p>All active components run from a single 3.3V supply (no negative rail). An AC signal must be biased to the midpoint of the supply range to maximize the available voltage swing before clipping.</p>
-  <p>If we biased at, say, 1.0V, the signal could only swing +2.3V above and −1.0V below before hitting the rails — asymmetric clipping. At VCM = VDD/2 = 1.650V, we get ±1.65V of symmetric headroom (minus op-amp saturation voltage, typically 100–200mV from each rail).</p>
-  <p>This VCM voltage appears everywhere: it biases the IF input (Sheet B), sets the PGA113 reference voltage (Sheet C), and drives the FDA's VOCM pin to center the differential output (Sheet D). A single, buffered, low-impedance VCM source (the OPA320 on Sheet A) ensures all stages share the same common-mode voltage — any mismatch would appear as a DC offset that wastes ADC range.</p>
+  <p>If we biased at, say, 1.0V, the signal could only swing +2.3V above and −1.0V below before hitting the rails - asymmetric clipping. At VCM = VDD/2 = 1.650V, we get ±1.65V of symmetric headroom (minus op-amp saturation voltage, typically 100–200mV from each rail).</p>
+  <p>This VCM voltage appears everywhere: it biases the IF input (Sheet B), sets the PGA113 reference voltage (Sheet C), and drives the FDA's VOCM pin to center the differential output (Sheet D). A single, buffered, low-impedance VCM source (the OPA320 on Sheet A) ensures all stages share the same common-mode voltage - any mismatch would appear as a DC offset that wastes ADC range.</p>
 </div>
 
 <h4>Constraint 4: Analog/Digital Isolation</h4>
 
 <div class="callout callout-blue">
-  <strong><span class="tag tag-physics">PHYSICS</span> Why supply splitting matters — from the physics of current loops</strong>
-  <p>Digital signals (SPI clock, chip selects) have fast edges — typically 1–10 ns rise times. The frequency content of a digital edge extends to:</p>
+  <strong><span class="tag tag-physics">PHYSICS</span> Why supply splitting matters - from the physics of current loops</strong>
+  <p>Digital signals (SPI clock, chip selects) have fast edges - typically 1–10 ns rise times. The frequency content of a digital edge extends to:</p>
   <span class="eq">f<sub>knee</sub> = 0.35 / t<sub>rise</sub></span>
   <p>For a 5 ns rise time: f<sub>knee</sub> = 70 MHz. This means every SPI clock edge injects current transients with frequency content up to 70 MHz into whatever power rail it's connected to.</p>
   <p>If analog and digital circuits share a supply rail, the digital current transients create voltage ripple on the analog supply through the rail's parasitic impedance (ESR of decoupling caps, trace inductance). At 70 MHz, even a few nH of trace inductance creates significant impedance:</p>
   <span class="eq">V<sub>noise</sub> = L<sub>trace</sub> × dI/dt</span>
-  <p>For L = 2 nH and dI/dt = 50 mA / 5 ns = 10⁷ A/s: V<sub>noise</sub> = 2×10⁻⁹ × 10⁷ = <strong>20 mV</strong>. This is over 1000 LSBs at the ADC — catastrophic for an 18-bit system.</p>
-  <p>The solution is a ferrite bead (FB1, BLM18PG221SN1D) between 3V3A and 3V3D. At 100 MHz, this bead presents 220Ω of impedance, attenuating the digital noise before it reaches the analog supply. The bead is essentially a frequency-dependent resistor — low impedance at DC (allowing power to flow) and high impedance at RF (blocking noise).</p>
+  <p>For L = 2 nH and dI/dt = 50 mA / 5 ns = 10⁷ A/s: V<sub>noise</sub> = 2×10⁻⁹ × 10⁷ = <strong>20 mV</strong>. This is over 1000 LSBs at the ADC - catastrophic for an 18-bit system.</p>
+  <p>The solution is a ferrite bead (FB1, BLM18PG221SN1D) between 3V3A and 3V3D. At 100 MHz, this bead presents 220Ω of impedance, attenuating the digital noise before it reaches the analog supply. The bead is essentially a frequency-dependent resistor - low impedance at DC (allowing power to flow) and high impedance at RF (blocking noise).</p>
 </div>
 
 <h3 id="s2-4">2.4 Signal Budget: Voltage, Noise, and Dynamic Range</h3>
@@ -779,19 +779,19 @@
     <td><code>REF5025</code><br>Voltage ref</td>
     <td>0.05% initial accuracy, 3 µV<sub>pp</sub> noise, 8 ppm/°C drift</td>
     <td>Resistor divider, LM4040 shunt ref, REF3025</td>
-    <td><span class="tag tag-physics">PHYSICS</span> V<sub>REF</sub> defines the ADC's full-scale range. A 0.1% error in V<sub>REF</sub> maps to a 0.1% gain error on every measurement. The REF5025's 3 µV<sub>pp</sub> noise is below 1 LSB — it doesn't limit resolution. A resistor divider would have ~100× worse noise and no temperature stability.</td>
+    <td><span class="tag tag-physics">PHYSICS</span> V<sub>REF</sub> defines the ADC's full-scale range. A 0.1% error in V<sub>REF</sub> maps to a 0.1% gain error on every measurement. The REF5025's 3 µV<sub>pp</sub> noise is below 1 LSB - it doesn't limit resolution. A resistor divider would have ~100× worse noise and no temperature stability.</td>
   </tr>
   <tr>
     <td><code>OPA320</code><br>VCM buffer</td>
     <td>Rail-to-rail output, 7 nV/√Hz noise, 110 dB CMRR</td>
     <td>Resistor divider (unbuffered), TLV9001, OPA2340</td>
-    <td><span class="tag tag-physics">PHYSICS</span> VCM drives the bias point for every stage. If VCM shifts due to load current (PGA input, FDA VOCM, bias resistors), the entire signal chain sees a common-mode offset. A buffer with <1Ω output impedance ensures VCM is stiff under load. A resistor divider's output impedance would be ~kΩ — any load current would shift VCM by mV.</td>
+    <td><span class="tag tag-physics">PHYSICS</span> VCM drives the bias point for every stage. If VCM shifts due to load current (PGA input, FDA VOCM, bias resistors), the entire signal chain sees a common-mode offset. A buffer with <1Ω output impedance ensures VCM is stiff under load. A resistor divider's output impedance would be ~kΩ - any load current would shift VCM by mV.</td>
   </tr>
   <tr>
     <td><code>PGA113</code><br>Programmable<br>gain amplifier</td>
     <td>SPI-controlled gain (1–200×), internal gain resistors (precise, matched), SPI interface (no analog noise injection)</td>
     <td>MCP4017 digital pot (Rev A), discrete VGA, AD8338</td>
-    <td><span class="tag tag-physics">PHYSICS</span> The PGA113 uses internal precision resistors for gain setting, controlled digitally via SPI. The MCP4017 in Rev A placed I²C bus transitions directly in the analog feedback loop — every I²C clock edge coupled into the gain path. SPI transactions happen only when gain changes (not continuously), and the PGA113's internal architecture isolates the digital interface from the signal path.</td>
+    <td><span class="tag tag-physics">PHYSICS</span> The PGA113 uses internal precision resistors for gain setting, controlled digitally via SPI. The MCP4017 in Rev A placed I²C bus transitions directly in the analog feedback loop - every I²C clock edge coupled into the gain path. SPI transactions happen only when gain changes (not continuously), and the PGA113's internal architecture isolates the digital interface from the signal path.</td>
   </tr>
   <tr>
     <td><code>LTC6242</code><br>Dual op-amp<br>(filter)</td>
@@ -802,8 +802,8 @@
   <tr>
     <td><code>THS4531A</code><br>Fully diff. amp</td>
     <td>True FDA (not just two op-amps), VOCM pin for output common-mode control, 36 MHz BW, low distortion</td>
-    <td>LTC6242 (Rev A — not a true FDA), AD8138, THS4521</td>
-    <td><span class="tag tag-physics">PHYSICS</span> A SAR ADC's input samples charge from a capacitive DAC. During acquisition, the input pins draw transient current pulses that disturb the driving amplifier. A true FDA with matched differential outputs absorbs this disturbance symmetrically — any charge kickback appears as common-mode (rejected by the ADC's CMRR) rather than differential (signal error). The VOCM pin independently controls the output common-mode, which must match the ADC's optimal input common-mode for maximum SFDR.</td>
+    <td>LTC6242 (Rev A - not a true FDA), AD8138, THS4521</td>
+    <td><span class="tag tag-physics">PHYSICS</span> A SAR ADC's input samples charge from a capacitive DAC. During acquisition, the input pins draw transient current pulses that disturb the driving amplifier. A true FDA with matched differential outputs absorbs this disturbance symmetrically - any charge kickback appears as common-mode (rejected by the ADC's CMRR) rather than differential (signal error). The VOCM pin independently controls the output common-mode, which must match the ADC's optimal input common-mode for maximum SFDR.</td>
   </tr>
   <tr>
     <td><code>ADS8881</code><br>18-bit SAR ADC</td>
@@ -840,8 +840,8 @@
   <div class="rev-b">
     <h4 style="color:var(--green);">Rev B Solution</h4>
     <p><strong>3V3A / 3V3D split via ferrite bead</strong></p>
-    <p>BLM18PG221SN1D: 220Ω at 100 MHz, <1Ω at DC. Digital noise is attenuated by >40 dB before reaching the analog rail. Single ground plane — no ground splits (ground splits create return current discontinuities that are worse than the problem they try to solve).</p>
-    <p><span class="tag tag-physics">PHYSICS</span> The ferrite bead is a frequency-dependent lossy inductor. At DC, it's a near-short (power flows freely). At RF, it presents high impedance (noise is blocked). The key insight is that the energy is <em>dissipated</em> as heat in the ferrite, not reflected — reflected energy would ring and create new problems.</p>
+    <p>BLM18PG221SN1D: 220Ω at 100 MHz, <1Ω at DC. Digital noise is attenuated by >40 dB before reaching the analog rail. Single ground plane - no ground splits (ground splits create return current discontinuities that are worse than the problem they try to solve).</p>
+    <p><span class="tag tag-physics">PHYSICS</span> The ferrite bead is a frequency-dependent lossy inductor. At DC, it's a near-short (power flows freely). At RF, it presents high impedance (noise is blocked). The key insight is that the energy is <em>dissipated</em> as heat in the ferrite, not reflected - reflected energy would ring and create new problems.</p>
   </div>
 </div>
 
@@ -854,8 +854,8 @@
   <div class="rev-b">
     <h4 style="color:var(--green);">Rev B Solution</h4>
     <p><strong>PGA113 with internal precision gain resistors</strong></p>
-    <p>Gain is set via SPI register write — digital activity occurs <em>only</em> when gain changes (not continuously). Internal resistors are laser-trimmed for gain accuracy and matched for temperature tracking. The analog signal path and digital control interface are architecturally isolated inside the IC.</p>
-    <p><span class="tag tag-tradeoff">TRADEOFF</span> The PGA113 costs more than a digital pot + op-amp, but eliminates an entire category of noise coupling. The gain steps are fixed (1, 2, 5, 10, 20, 50, 100, 200) rather than continuously variable — acceptable for our application where we're adjusting for target range, not fine-tuning.</p>
+    <p>Gain is set via SPI register write - digital activity occurs <em>only</em> when gain changes (not continuously). Internal resistors are laser-trimmed for gain accuracy and matched for temperature tracking. The analog signal path and digital control interface are architecturally isolated inside the IC.</p>
+    <p><span class="tag tag-tradeoff">TRADEOFF</span> The PGA113 costs more than a digital pot + op-amp, but eliminates an entire category of noise coupling. The gain steps are fixed (1, 2, 5, 10, 20, 50, 100, 200) rather than continuously variable - acceptable for our application where we're adjusting for target range, not fine-tuning.</p>
   </div>
 </div>
 
@@ -863,13 +863,13 @@
   <div class="rev-a">
     <h4 style="color:var(--red);">Rev A Problem</h4>
     <p><strong>LTC6242 used for single-to-differential (not a true FDA)</strong></p>
-    <p>Two op-amps wired as an improvised differential driver. No VOCM control — output common-mode determined by resistor matching. Any mismatch appears as DC offset at the ADC input, wasting dynamic range.</p>
+    <p>Two op-amps wired as an improvised differential driver. No VOCM control - output common-mode determined by resistor matching. Any mismatch appears as DC offset at the ADC input, wasting dynamic range.</p>
   </div>
   <div class="rev-b">
     <h4 style="color:var(--green);">Rev B Solution</h4>
     <p><strong>THS4531A fully differential amplifier with VOCM pin</strong></p>
     <p>A true FDA uses internal common-mode feedback to independently control the output common-mode voltage via the VOCM pin. This is connected to our VCM buffer (1.650V), ensuring the ADC sees a precisely centered differential signal regardless of component tolerances.</p>
-    <p><span class="tag tag-physics">PHYSICS</span> The FDA's common-mode feedback loop has its own bandwidth and settling time. The THS4531A's common-mode bandwidth is ~40 MHz — far above our signal bandwidth. This means the output common-mode settles completely between each ADC acquisition cycle (10 µs at 100 kS/s), even after charge kickback from the ADC's sampling capacitor.</p>
+    <p><span class="tag tag-physics">PHYSICS</span> The FDA's common-mode feedback loop has its own bandwidth and settling time. The THS4531A's common-mode bandwidth is ~40 MHz - far above our signal bandwidth. This means the output common-mode settles completely between each ADC acquisition cycle (10 µs at 100 kS/s), even after charge kickback from the ADC's sampling capacitor.</p>
   </div>
 </div>
 
@@ -883,7 +883,7 @@
     <h4 style="color:var(--green);">Rev B Solution</h4>
     <p><strong>Comprehensive DFT: J_DFT header, 17 TPs, 5 MMCX, 6 isolation resistors</strong></p>
     <p>Every critical net is observable. Analog monitor signals (PGA_OUT, LPF_OUT, AINP, AINN, FDA_OUTP, FDA_OUTN) are routed through 10kΩ isolation resistors to the DFT header, preventing probe capacitance from loading the signal chain.</p>
-    <p><span class="tag tag-physics">PHYSICS</span> A scope probe presents ~12 pF of capacitance. At 15 kHz, this is Z = 1/(2π × 15k × 12p) ≈ 884 kΩ — negligible. But the probe also has bandwidth into hundreds of MHz where its impedance drops. With a 10kΩ isolation resistor, the probe's low-frequency loading is 10kΩ + 884kΩ ≈ 894kΩ (still negligible), but at high frequencies the 10kΩ resistor limits the current that can flow into the probe capacitance, effectively decoupling it from the signal chain. The measurement bandwidth through the isolation resistor is limited to f<sub>-3dB</sub> = 1/(2π × 10k × 12p) ≈ 1.3 MHz — more than adequate for our 15 kHz signals.</p>
+    <p><span class="tag tag-physics">PHYSICS</span> A scope probe presents ~12 pF of capacitance. At 15 kHz, this is Z = 1/(2π × 15k × 12p) ≈ 884 kΩ - negligible. But the probe also has bandwidth into hundreds of MHz where its impedance drops. With a 10kΩ isolation resistor, the probe's low-frequency loading is 10kΩ + 884kΩ ≈ 894kΩ (still negligible), but at high frequencies the 10kΩ resistor limits the current that can flow into the probe capacitance, effectively decoupling it from the signal chain. The measurement bandwidth through the isolation resistor is limited to f<sub>-3dB</sub> = 1/(2π × 10k × 12p) ≈ 1.3 MHz - more than adequate for our 15 kHz signals.</p>
   </div>
 </div>
 
@@ -906,7 +906,7 @@
 <h2 id="s3">3. Sheet A — Power + References</h2>
 <!-- ================================================================ -->
 
-<p>Sheet A is the foundation of the entire system. Every other sheet depends on the quality of the power rails and reference voltages generated here. A noisy supply or inaccurate reference propagates through the entire signal chain and becomes indistinguishable from the signal itself — no amount of filtering or gain adjustment downstream can recover information lost to supply noise.</p>
+<p>Sheet A is the foundation of the entire system. Every other sheet depends on the quality of the power rails and reference voltages generated here. A noisy supply or inaccurate reference propagates through the entire signal chain and becomes indistinguishable from the signal itself - no amount of filtering or gain adjustment downstream can recover information lost to supply noise.</p>
 
 <h3>3.1 Power Architecture Overview</h3>
 
@@ -946,10 +946,10 @@
 <h4>3.1.2 Input Decoupling: C1, C2</h4>
 
 <div class="callout callout-blue">
-  <strong><span class="tag tag-physics">PHYSICS</span> Why two capacitors at the LDO input — and why these specific values?</strong>
+  <strong><span class="tag tag-physics">PHYSICS</span> Why two capacitors at the LDO input - and why these specific values?</strong>
   <p>C1 (CL21A106KPFNNNF) is 10 µF and C2 (GRM155Z71A105KE01J) is 1 µF. They serve different purposes in the frequency domain:</p>
-  <p><strong>C1 (10 µF, 0805, X5R ceramic):</strong> Provides bulk energy storage. When the LDO's load current changes suddenly (e.g., during an SPI transaction), C1 supplies the transient current while the external 5V source responds. The time constant for the source cable to respond might be microseconds — during that time, C1 must supply the current without letting the input voltage droop below the LDO's minimum input.</p>
-  <p><strong>C2 (1 µF, 0402, X7R ceramic):</strong> Provides high-frequency bypassing. At frequencies above ~1 MHz, the 10 µF cap's impedance is dominated by its ESL (equivalent series inductance, typically 0.5–1 nH for 0805). The smaller 0402 package has lower ESL (~0.3 nH), so its self-resonant frequency (SRF) is higher. The two caps together provide low impedance across a wider frequency range — the 10 µF dominates below ~1 MHz, and the 1 µF takes over from ~1 MHz to ~50 MHz.</p>
+  <p><strong>C1 (10 µF, 0805, X5R ceramic):</strong> Provides bulk energy storage. When the LDO's load current changes suddenly (e.g., during an SPI transaction), C1 supplies the transient current while the external 5V source responds. The time constant for the source cable to respond might be microseconds - during that time, C1 must supply the current without letting the input voltage droop below the LDO's minimum input.</p>
+  <p><strong>C2 (1 µF, 0402, X7R ceramic):</strong> Provides high-frequency bypassing. At frequencies above ~1 MHz, the 10 µF cap's impedance is dominated by its ESL (equivalent series inductance, typically 0.5–1 nH for 0805). The smaller 0402 package has lower ESL (~0.3 nH), so its self-resonant frequency (SRF) is higher. The two caps together provide low impedance across a wider frequency range - the 10 µF dominates below ~1 MHz, and the 1 µF takes over from ~1 MHz to ~50 MHz.</p>
   <span class="eq">Z<sub>cap</sub>(f) = √(ESR² + (2πf·ESL − 1/(2πf·C))²)</span>
   <p>This is the "capacitor nets paired together" concept that Shield AI's feedback specifically called out. The answer from first principles is: a single cap has a U-shaped impedance curve with a minimum at its SRF. Two caps with different SRFs create overlapping low-impedance regions that cover a broader frequency range.</p>
 </div>
@@ -960,7 +960,7 @@
   <strong><span class="tag tag-decision">DECISION</span> Why the TPS7A20 family specifically?</strong>
   <p>The TPS7A2033 was selected for three quantitative reasons:</p>
   <ol style="padding-left: 1.5rem;">
-    <li><strong>Output noise: 4.4 µV<sub>RMS</sub></strong> (10 Hz – 100 kHz). Our ADC LSB is 19.07 µV. Supply noise couples into the signal path through the power supply rejection ratio (PSRR) of each IC. Even with 60 dB of PSRR (1000:1 attenuation), a supply with 50 µV<sub>RMS</sub> noise (typical for a commodity LDO like the AMS1117) would contribute 0.05 µV at the signal node — negligible. But PSRR degrades with frequency. At 100 kHz, PSRR might be only 30 dB (31:1), so that 50 µV becomes 1.6 µV — approaching 10% of a LSB. The TPS7A20's 4.4 µV<sub>RMS</sub> total integrated noise means even at 30 dB PSRR, the contribution is 0.14 µV — safely below 1% of an LSB.</li>
+    <li><strong>Output noise: 4.4 µV<sub>RMS</sub></strong> (10 Hz – 100 kHz). Our ADC LSB is 19.07 µV. Supply noise couples into the signal path through the power supply rejection ratio (PSRR) of each IC. Even with 60 dB of PSRR (1000:1 attenuation), a supply with 50 µV<sub>RMS</sub> noise (typical for a commodity LDO like the AMS1117) would contribute 0.05 µV at the signal node - negligible. But PSRR degrades with frequency. At 100 kHz, PSRR might be only 30 dB (31:1), so that 50 µV becomes 1.6 µV - approaching 10% of a LSB. The TPS7A20's 4.4 µV<sub>RMS</sub> total integrated noise means even at 30 dB PSRR, the contribution is 0.14 µV - safely below 1% of an LSB.</li>
     <li><strong>PSRR: 72 dB at 1 kHz</strong>, 52 dB at 100 kHz. This high PSRR means the LDO actively suppresses noise from the 5V input source (which could be a noisy USB supply or bench supply). At 1 kHz, a 10 mV ripple on the 5V input becomes 2.5 µV at the output.</li>
     <li><strong>Low dropout: ~300 mV</strong>. Allows operation from a 3.6V minimum input, giving margin even after the Schottky diode and PTC fuse drops.</li>
   </ol>
@@ -968,26 +968,26 @@
 
 <h4>Output Decoupling: C3</h4>
 
-<p><code>C3</code> (GRM155Z71A105KE01J, 1 µF, 0402, X7R) is placed directly at the LDO output pin. The TPS7A2033 datasheet specifies a minimum output capacitance of 1 µF with ESR between 0.1Ω and 1Ω for stability. X7R ceramic meets this requirement — its ESR at the LDO's unity-gain crossover frequency (~200 kHz) is typically 10–50 mΩ, which is below the specified range but acceptable because the TPS7A20 uses an NMOS pass transistor with an internal compensation network that is stable with ceramic caps (unlike some older LDOs that require tantalum caps with higher ESR for stability).</p>
+<p><code>C3</code> (GRM155Z71A105KE01J, 1 µF, 0402, X7R) is placed directly at the LDO output pin. The TPS7A2033 datasheet specifies a minimum output capacitance of 1 µF with ESR between 0.1Ω and 1Ω for stability. X7R ceramic meets this requirement - its ESR at the LDO's unity-gain crossover frequency (~200 kHz) is typically 10–50 mΩ, which is below the specified range but acceptable because the TPS7A20 uses an NMOS pass transistor with an internal compensation network that is stable with ceramic caps (unlike some older LDOs that require tantalum caps with higher ESR for stability).</p>
 
 <div class="callout callout-teal">
   <strong><span class="tag tag-physics">PHYSICS</span> Why X7R and not Y5V or Z5U dielectric?</strong>
-  <p>Ceramic capacitors lose capacitance under DC bias. A 1 µF Y5V cap rated at 10V might have only 0.3 µF at 3.3V DC bias — a 70% loss. X7R typically loses only 10–15% under the same conditions. Since the LDO requires a <em>minimum</em> output capacitance for stability, using a Y5V cap could cause the effective capacitance to drop below the stable operating region, leading to oscillation. X7R (or better, C0G for critical applications) guarantees the capacitance you designed for is the capacitance you get.</p>
-  <p>This extends to every decoupling cap in the design — all are X5R or X7R, never Y5V/Z5U.</p>
+  <p>Ceramic capacitors lose capacitance under DC bias. A 1 µF Y5V cap rated at 10V might have only 0.3 µF at 3.3V DC bias - a 70% loss. X7R typically loses only 10–15% under the same conditions. Since the LDO requires a <em>minimum</em> output capacitance for stability, using a Y5V cap could cause the effective capacitance to drop below the stable operating region, leading to oscillation. X7R (or better, C0G for critical applications) guarantees the capacitance you designed for is the capacitance you get.</p>
+  <p>This extends to every decoupling cap in the design - all are X5R or X7R, never Y5V/Z5U.</p>
 </div>
 
 <h3>3.3 The Ferrite Bead: FB1 (BLM18PG221SN1D)</h3>
 
 <div class="callout callout-blue">
-  <strong><span class="tag tag-physics">PHYSICS</span> How a ferrite bead works — and why impedance vs. frequency is the key specification</strong>
-  <p>A ferrite bead is <em>not</em> an inductor, though it's often modeled as one. An inductor stores energy in its magnetic field and returns it — it's lossless (ideally). A ferrite bead is deliberately lossy: it converts RF energy into heat in the ferrite material. This distinction matters because a lossless inductor would <em>reflect</em> noise back toward the source, potentially causing ringing. A lossy ferrite bead <em>absorbs</em> the noise.</p>
+  <strong><span class="tag tag-physics">PHYSICS</span> How a ferrite bead works - and why impedance vs. frequency is the key specification</strong>
+  <p>A ferrite bead is <em>not</em> an inductor, though it's often modeled as one. An inductor stores energy in its magnetic field and returns it - it's lossless (ideally). A ferrite bead is deliberately lossy: it converts RF energy into heat in the ferrite material. This distinction matters because a lossless inductor would <em>reflect</em> noise back toward the source, potentially causing ringing. A lossy ferrite bead <em>absorbs</em> the noise.</p>
   <p>The BLM18PG221SN1D's impedance-vs-frequency characteristic:</p>
   <table>
     <tr><th>Frequency</th><th>Impedance |Z|</th><th>Behavior</th></tr>
     <tr><td>DC</td><td>~0.15 Ω (DCR)</td><td>Near-short: power flows freely to 3V3D</td></tr>
-    <tr><td>1 MHz</td><td>~5 Ω</td><td>Beginning to impede — but still low enough for slow transients</td></tr>
+    <tr><td>1 MHz</td><td>~5 Ω</td><td>Beginning to impede - but still low enough for slow transients</td></tr>
     <tr><td>10 MHz</td><td>~60 Ω</td><td>Significant attenuation of SPI clock harmonics</td></tr>
-    <tr><td>100 MHz</td><td>~220 Ω</td><td>Maximum impedance — blocks most digital switching noise</td></tr>
+    <tr><td>100 MHz</td><td>~220 Ω</td><td>Maximum impedance - blocks most digital switching noise</td></tr>
     <tr><td>1 GHz</td><td>~150 Ω</td><td>Still effective at GHz frequencies (parasitic coupling)</td></tr>
   </table>
   <p>The SPI clock (SCLK) on the 3V3D side has a rise time of ~5 ns, giving a knee frequency of f<sub>knee</sub> = 0.35 / 5 ns = 70 MHz. At 70 MHz, the ferrite bead presents ~180 Ω. Combined with the decoupling capacitor on the 3V3D side (C9, 100 nF), this forms a low-pass filter with a cutoff of:</p>
@@ -998,29 +998,29 @@
 <div class="callout">
   <strong><span class="tag tag-decision">DECISION</span> Why not split the ground plane instead?</strong>
   <p>A common but often counterproductive approach to analog/digital isolation is splitting the ground plane. The problem: any signal trace that crosses the ground split forces its return current to take a long detour around the split, creating a large current loop that acts as an antenna (both radiating and receiving EMI). The cure is worse than the disease.</p>
-  <p>Our approach — single continuous ground plane with supply splitting via ferrite bead — keeps all return currents flowing directly under their signal traces (minimum loop area) while isolating the <em>supply</em> currents. This follows the recommendation from both Henry Ott (EMC Engineering, Ch. 18) and TI's application notes SLYT499/SLYT512 on mixed-signal grounding.</p>
+  <p>Our approach - single continuous ground plane with supply splitting via ferrite bead - keeps all return currents flowing directly under their signal traces (minimum loop area) while isolating the <em>supply</em> currents. This follows the recommendation from both Henry Ott (EMC Engineering, Ch. 18) and TI's application notes SLYT499/SLYT512 on mixed-signal grounding.</p>
 </div>
 
 <h3>3.4 The Voltage Reference: REF5025 (U_REF)</h3>
 
 <div class="callout callout-blue">
-  <strong><span class="tag tag-physics">PHYSICS</span> Why a precision reference — and what "precision" means quantitatively</strong>
+  <strong><span class="tag tag-physics">PHYSICS</span> Why a precision reference - and what "precision" means quantitatively</strong>
   <p>The REF5025 provides the 2.500V reference that defines the ADS8881's full-scale input range. Any error in V<sub>REF</sub> maps <em>directly</em> to a gain error on every ADC reading:</p>
   <span class="eq">Gain Error = ΔV<sub>REF</sub> / V<sub>REF,nominal</sub></span>
   <p>The REF5025's specifications and their system-level implications:</p>
   <table>
     <tr><th>Parameter</th><th>REF5025 Spec</th><th>System Impact</th></tr>
-    <tr><td>Initial accuracy</td><td>±0.05% (±1.25 mV)</td><td>1.25 mV / 2500 mV = 0.05% gain error = 131 LSBs offset at full scale. Acceptable — calibrated out in software.</td></tr>
+    <tr><td>Initial accuracy</td><td>±0.05% (±1.25 mV)</td><td>1.25 mV / 2500 mV = 0.05% gain error = 131 LSBs offset at full scale. Acceptable - calibrated out in software.</td></tr>
     <tr><td>Temperature drift</td><td>8 ppm/°C</td><td>Over a 50°C range: 400 ppm = 0.04% = 1.0 mV drift. Adds ~52 LSBs of gain drift across temperature. Acceptable for lab environment.</td></tr>
-    <tr><td>Noise (0.1–10 Hz)</td><td>3 µV<sub>pp</sub></td><td>3 µV / 19.07 µV/LSB = 0.16 LSBs peak-to-peak. Negligible — well below 1 LSB.</td></tr>
-    <tr><td>Noise (10 Hz–10 kHz)</td><td>8 µV<sub>RMS</sub></td><td>8 µV × 3.6 (crest factor) = 29 µV<sub>pp</sub> ≈ 1.5 LSBs. This is the dominant reference noise contribution. Still acceptable — it adds less than 0.3 bits of effective noise.</td></tr>
+    <tr><td>Noise (0.1–10 Hz)</td><td>3 µV<sub>pp</sub></td><td>3 µV / 19.07 µV/LSB = 0.16 LSBs peak-to-peak. Negligible - well below 1 LSB.</td></tr>
+    <tr><td>Noise (10 Hz–10 kHz)</td><td>8 µV<sub>RMS</sub></td><td>8 µV × 3.6 (crest factor) = 29 µV<sub>pp</sub> ≈ 1.5 LSBs. This is the dominant reference noise contribution. Still acceptable - it adds less than 0.3 bits of effective noise.</td></tr>
     <tr><td>Load regulation</td><td>±0.25 mV/mA</td><td>ADS8881 reference input draws ~100 µA average → 25 µV shift. Negligible.</td></tr>
   </table>
 </div>
 
 <h4>VREF Decoupling: C5 + C4</h4>
 
-<p><code>C5</code> (CL21A106KPFNNNF, 10 µF, 0805, X5R) provides bulk decoupling — the REF5025 datasheet requires ≥1 µF on the output for stability. <code>C4</code> (0402YC104JAT4A, 100 nF, 0402, X7R) provides high-frequency bypass. Same paired-capacitor strategy as the LDO input, same frequency-domain reasoning: the 10 µF handles low-frequency transients from ADC sampling, the 100 nF handles high-frequency noise.</p>
+<p><code>C5</code> (CL21A106KPFNNNF, 10 µF, 0805, X5R) provides bulk decoupling - the REF5025 datasheet requires ≥1 µF on the output for stability. <code>C4</code> (0402YC104JAT4A, 100 nF, 0402, X7R) provides high-frequency bypass. Same paired-capacitor strategy as the LDO input, same frequency-domain reasoning: the 10 µF handles low-frequency transients from ADC sampling, the 100 nF handles high-frequency noise.</p>
 
 <h4>REF_TEMP Output</h4>
 
@@ -1029,30 +1029,30 @@
 <h3>3.5 The VCM Buffer: OPA320 (U_VCM)</h3>
 
 <div class="callout callout-blue">
-  <strong><span class="tag tag-physics">PHYSICS</span> Why VCM needs a buffer — the impedance argument</strong>
+  <strong><span class="tag tag-physics">PHYSICS</span> Why VCM needs a buffer - the impedance argument</strong>
   <p>VCM (1.650V) is generated by a resistor divider (R1 + R2, both 10kΩ from 3V3A) and buffered by the OPA320. Without the buffer, the divider's output impedance is R1‖R2 = 5kΩ. The loads on VCM include:</p>
   <ul style="padding-left: 1.5rem;">
-    <li><strong>R_BIAS (Sheet B):</strong> 4.7kΩ to signal path — draws ~350 µA from VCM</li>
+    <li><strong>R_BIAS (Sheet B):</strong> 4.7kΩ to signal path - draws ~350 µA from VCM</li>
     <li><strong>PGA113 VREF pin (Sheet C):</strong> High-impedance input (~10 MΩ), negligible current</li>
     <li><strong>THS4531A VOCM pin (Sheet D):</strong> ~100 kΩ input impedance, draws ~16.5 µA</li>
-    <li><strong>C_VOCM (Sheet D):</strong> 100 nF — draws transient current during charging</li>
+    <li><strong>C_VOCM (Sheet D):</strong> 100 nF - draws transient current during charging</li>
   </ul>
   <p>Total DC load: ~370 µA. Through a 5kΩ source impedance, this causes a voltage drop of:</p>
   <span class="eq">ΔV<sub>CM</sub> = 370 µA × 5 kΩ = 1.85 V</span>
-  <p>This would completely collapse VCM — from 1.650V to near zero. Even a smaller load creates unacceptable offset.</p>
+  <p>This would completely collapse VCM - from 1.650V to near zero. Even a smaller load creates unacceptable offset.</p>
   <p>The OPA320 buffer has an output impedance of <1Ω at DC (from its open-loop gain of 114 dB). The same 370 µA load causes only:</p>
   <span class="eq">ΔV<sub>CM</sub> = 370 µA × 1 Ω = 0.37 mV</span>
-  <p>This is 0.02 LSBs — negligible. The buffer transforms a fragile, load-dependent voltage into a stiff, low-impedance source that doesn't move regardless of how many stages tap into it.</p>
+  <p>This is 0.02 LSBs - negligible. The buffer transforms a fragile, load-dependent voltage into a stiff, low-impedance source that doesn't move regardless of how many stages tap into it.</p>
 </div>
 
 <div class="callout">
   <strong><span class="tag tag-decision">DECISION</span> Why OPA320 specifically?</strong>
-  <p>The OPA320 was selected for: rail-to-rail output (needed to drive 1.650V from a 3.3V supply without headroom issues), very low noise (7 nV/√Hz — any VCM noise adds directly to the signal as common-mode noise), low offset voltage (±0.15 mV max — adds directly to VCM error), and unity-gain stability (it's used as a voltage follower). Its 20 MHz GBW is far more than needed for a DC buffer, but the excess bandwidth ensures fast settling after any transient load change.</p>
+  <p>The OPA320 was selected for: rail-to-rail output (needed to drive 1.650V from a 3.3V supply without headroom issues), very low noise (7 nV/√Hz - any VCM noise adds directly to the signal as common-mode noise), low offset voltage (±0.15 mV max - adds directly to VCM error), and unity-gain stability (it's used as a voltage follower). Its 20 MHz GBW is far more than needed for a DC buffer, but the excess bandwidth ensures fast settling after any transient load change.</p>
 </div>
 
 <h4>VCM Decoupling: C6, C7, C8</h4>
 
-<p>The VCM node has three capacitors: <code>C6</code> (1 µF, X7R) at the OPA320 output, <code>C7</code> (10 µF, X5R) for bulk energy storage, and <code>C8</code> (100 nF, 1206, X7R) as an additional high-frequency bypass. Three caps may seem excessive for a DC reference, but VCM drives multiple stages across multiple sheets — the wiring inductance between the buffer output and the farthest load (C_VOCM on Sheet D) could be several nH. Local decoupling at the source ensures the buffer sees a stable load regardless of PCB routing.</p>
+<p>The VCM node has three capacitors: <code>C6</code> (1 µF, X7R) at the OPA320 output, <code>C7</code> (10 µF, X5R) for bulk energy storage, and <code>C8</code> (100 nF, 1206, X7R) as an additional high-frequency bypass. Three caps may seem excessive for a DC reference, but VCM drives multiple stages across multiple sheets - the wiring inductance between the buffer output and the farthest load (C_VOCM on Sheet D) could be several nH. Local decoupling at the source ensures the buffer sees a stable load regardless of PCB routing.</p>
 
 <h3>3.6 Component Summary — Sheet A</h3>
 
@@ -1084,7 +1084,7 @@
 <h2 id="s4">4. Sheet B — IF Input, Protection &amp; Bias</h2>
 <!-- ================================================================ -->
 
-<p>Sheet B is the simplest sheet in the design — only 7 components, no ICs, no supply rails. Its job is deceptively simple: accept the mixer's IF output, protect the downstream electronics, and DC-bias the signal to VCM (1.65V) for single-supply processing. Despite its simplicity, every component has a physics-based reason for its value.</p>
+<p>Sheet B is the simplest sheet in the design - only 7 components, no ICs, no supply rails. Its job is deceptively simple: accept the mixer's IF output, protect the downstream electronics, and DC-bias the signal to VCM (1.65V) for single-supply processing. Despite its simplicity, every component has a physics-based reason for its value.</p>
 
 <h3 id="s4-1">4.1 Signal Flow</h3>
 
@@ -1111,7 +1111,7 @@
 <div class="callout callout-blue">
   <strong><span class="tag tag-decision">DECISION</span> Edge-mount SMA, not through-hole BNC</strong>
   <p>The Amphenol 132289 is a 50Ω edge-mount SMA connector. SMA is chosen over BNC or MMCX for the primary input because: (1) the RF front end uses SMA on its mixer output, so no adapter is needed; (2) the 50Ω impedance is matched to the coax and mixer output impedance; (3) the edge-mount footprint minimizes the stub length between the connector and the first component (R_IN), reducing reflections at higher frequencies.</p>
-  <p>At our signal frequencies (DC to 15 kHz), impedance matching is electrically irrelevant — the wavelength at 15 kHz is 20 km, so the entire PCB is an infinitesimal fraction of a wavelength. The SMA choice is about mechanical compatibility and good practice, not electrical necessity.</p>
+  <p>At our signal frequencies (DC to 15 kHz), impedance matching is electrically irrelevant - the wavelength at 15 kHz is 20 km, so the entire PCB is an infinitesimal fraction of a wavelength. The SMA choice is about mechanical compatibility and good practice, not electrical necessity.</p>
 </div>
 
 <h3 id="s4-3">4.3 Current Limiting: R_IN (200Ω)</h3>
@@ -1127,7 +1127,7 @@
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> Purpose 2: Signal attenuation context</strong>
   <p>R_IN forms a voltage divider with the PGA113 input impedance. The PGA113 input impedance is very high (~10 GΩ in the datasheet's equivalent circuit), so the attenuation from R_IN is negligible: V<sub>out</sub>/V<sub>in</sub> = 10G / (10G + 200) ≈ 1.000. The 200Ω is effectively transparent to the signal.</p>
-  <p>However, R_IN does form a low-pass filter with any parasitic capacitance at the D_ESD input. The TPD1E10B06 has ~0.5 pF junction capacitance. The resulting pole is at f = 1/(2π × 200 × 0.5p) = 1.6 GHz — far above our 15 kHz signal band. No signal degradation.</p>
+  <p>However, R_IN does form a low-pass filter with any parasitic capacitance at the D_ESD input. The TPD1E10B06 has ~0.5 pF junction capacitance. The resulting pole is at f = 1/(2π × 200 × 0.5p) = 1.6 GHz - far above our 15 kHz signal band. No signal degradation.</p>
 </div>
 
 <div class="callout">
@@ -1142,15 +1142,15 @@
 <table>
   <tr><th>Parameter</th><th>Value</th><th>Why It Matters</th></tr>
   <tr><td>Package</td><td>X1SON-2 (0402 size)</td><td>Minimal PCB footprint, short trace to signal path</td></tr>
-  <tr><td>Junction capacitance</td><td>0.5 pF typical</td><td>Negligible loading on 15 kHz signal. A 10 pF diode would form a 80 MHz pole with 200Ω — still fine, but 0.5 pF gives two decades of margin.</td></tr>
+  <tr><td>Junction capacitance</td><td>0.5 pF typical</td><td>Negligible loading on 15 kHz signal. A 10 pF diode would form a 80 MHz pole with 200Ω - still fine, but 0.5 pF gives two decades of margin.</td></tr>
   <tr><td>Clamping voltage</td><td>8.5V at 1A (5V device)</td><td>Protects PGA113 inputs (abs max ±0.3V beyond supply, so 3.6V max). The PGA113 is further protected by its own internal diodes.</td></tr>
   <tr><td>ESD rating</td><td>±16 kV HBM, ±750V CDM</td><td>Exceeds IEC 61000-4-2 Level 4 (±8 kV contact, ±15 kV air). Sufficient for bench handling without a wrist strap.</td></tr>
-  <tr><td>Leakage current</td><td>1 nA typical</td><td>At our signal frequencies, 1 nA leakage is negligible — it would require a 1 GΩ impedance to produce even 1 mV of error.</td></tr>
+  <tr><td>Leakage current</td><td>1 nA typical</td><td>At our signal frequencies, 1 nA leakage is negligible - it would require a 1 GΩ impedance to produce even 1 mV of error.</td></tr>
 </table>
 
 <div class="callout callout-teal">
   <strong><span class="tag tag-decision">DECISION</span> Shunt topology, not series</strong>
-  <p>D_ESD connects from signal to GND (shunt). In normal operation, the diode is reverse-biased and invisible — its only effect is 0.5 pF of parasitic capacitance. During an ESD event, the diode forward-biases and clamps the voltage. This is the correct topology for a unidirectional TVS on a signal that swings around a DC bias (VCM = 1.65V). The diode sees at most ~1.65V in normal operation — well below its breakdown voltage.</p>
+  <p>D_ESD connects from signal to GND (shunt). In normal operation, the diode is reverse-biased and invisible - its only effect is 0.5 pF of parasitic capacitance. During an ESD event, the diode forward-biases and clamps the voltage. This is the correct topology for a unidirectional TVS on a signal that swings around a DC bias (VCM = 1.65V). The diode sees at most ~1.65V in normal operation - well below its breakdown voltage.</p>
 </div>
 
 <h3 id="s4-5">4.5 AC Coupling: C_AC (100nF, C0G/NP0)</h3>
@@ -1159,7 +1159,7 @@
 
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> Why AC coupling is needed</strong>
-  <p>The HMC218BMS8GE mixer's IF output has an undefined DC bias — it depends on the LO drive level, mixer balance, and temperature. The baseband signal chain is biased at VCM = 1.65V (set by Sheet A). If the mixer's DC output were, say, 0.3V, connecting it directly would force the PGA113 input to 0.3V instead of 1.65V, wasting most of the ADC's input range on a DC offset.</p>
+  <p>The HMC218BMS8GE mixer's IF output has an undefined DC bias - it depends on the LO drive level, mixer balance, and temperature. The baseband signal chain is biased at VCM = 1.65V (set by Sheet A). If the mixer's DC output were, say, 0.3V, connecting it directly would force the PGA113 input to 0.3V instead of 1.65V, wasting most of the ADC's input range on a DC offset.</p>
   <p>C_AC strips the DC component and passes only the AC beat frequency (DC to ~15 kHz). R_BIAS (downstream) then re-biases the signal to VCM.</p>
 </div>
 
@@ -1167,12 +1167,12 @@
   <strong><span class="tag tag-physics">PHYSICS</span> High-pass corner frequency</strong>
   <p>C_AC and R_BIAS form a high-pass filter. The corner frequency is:</p>
   <p style="font-family:monospace; margin:0.5rem 0;">f<sub>HP</sub> = 1 / (2π × R_BIAS × C_AC) = 1 / (2π × 47kΩ × 100nF) = <strong>33.9 Hz</strong></p>
-  <p>This means the signal is attenuated by 3 dB at 33.9 Hz and by 20 dB/decade below that. At DC, the signal is completely blocked (as intended). At the minimum useful beat frequency (~0.04 Hz at 30 MHz BW for a 1 m target), the attenuation is significant — but targets at 1 m are well within the "too close to resolve" zone anyway. At the ISM band's more practical detection range of 200+ m (33 Hz at 125 MHz BW), the signal passes with essentially no attenuation.</p>
+  <p>This means the signal is attenuated by 3 dB at 33.9 Hz and by 20 dB/decade below that. At DC, the signal is completely blocked (as intended). At the minimum useful beat frequency (~0.04 Hz at 30 MHz BW for a 1 m target), the attenuation is significant - but targets at 1 m are well within the "too close to resolve" zone anyway. At the ISM band's more practical detection range of 200+ m (33 Hz at 125 MHz BW), the signal passes with essentially no attenuation.</p>
 </div>
 
 <div class="callout">
   <strong><span class="tag tag-tradeoff">TRADEOFF</span> C0G/NP0 dielectric, not X7R</strong>
-  <p>C0G (also called NP0) ceramic capacitors have zero voltage coefficient — their capacitance does not change with applied DC bias. X7R capacitors lose 30–80% of their rated capacitance at their rated voltage. For a 100nF cap in the signal path, the capacitance must be stable to keep the HP corner frequency predictable. If C_AC were X7R and lost 50% capacitance, f<sub>HP</sub> would shift from 33.9 Hz to 67.8 Hz — potentially attenuating near-range targets.</p>
+  <p>C0G (also called NP0) ceramic capacitors have zero voltage coefficient - their capacitance does not change with applied DC bias. X7R capacitors lose 30–80% of their rated capacitance at their rated voltage. For a 100nF cap in the signal path, the capacitance must be stable to keep the HP corner frequency predictable. If C_AC were X7R and lost 50% capacitance, f<sub>HP</sub> would shift from 33.9 Hz to 67.8 Hz - potentially attenuating near-range targets.</p>
   <p>The tradeoff: C0G caps are larger and more expensive than X7R at the same capacitance. 100nF in C0G is available in 0805 or 1206 size. For a signal-path cap that defines a filter corner, the size and cost penalty is justified.</p>
 </div>
 
@@ -1182,14 +1182,14 @@
 
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> How the bias works</strong>
-  <p>With no signal applied, C_AC is charged to VCM through R_BIAS. The signal side of C_AC sits at 1.65V — exactly mid-supply. When an AC signal arrives through C_AC, it swings symmetrically around 1.65V. The PGA113 sees a signal centered at VCM regardless of the mixer's DC output.</p>
-  <p>R_BIAS must be large enough to avoid loading the signal. The signal source impedance (mixer output through R_IN) is ~200Ω. R_BIAS at 47kΩ is 235× larger, so the voltage divider ratio is 47k / (47k + 200) ≈ 0.996 — less than 0.04 dB of signal loss. The bias network is essentially invisible to the signal.</p>
+  <p>With no signal applied, C_AC is charged to VCM through R_BIAS. The signal side of C_AC sits at 1.65V - exactly mid-supply. When an AC signal arrives through C_AC, it swings symmetrically around 1.65V. The PGA113 sees a signal centered at VCM regardless of the mixer's DC output.</p>
+  <p>R_BIAS must be large enough to avoid loading the signal. The signal source impedance (mixer output through R_IN) is ~200Ω. R_BIAS at 47kΩ is 235× larger, so the voltage divider ratio is 47k / (47k + 200) ≈ 0.996 - less than 0.04 dB of signal loss. The bias network is essentially invisible to the signal.</p>
 </div>
 
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> Current draw from VCM buffer</strong>
-  <p>R_BIAS draws a DC current from the VCM rail: I = VCM / R_BIAS = 1.65V / 47kΩ = 35 µA. This is negligible for the OPA320 buffer (output current capability: ±20 mA). Even with three RX channels (future expansion), the total VCM load from bias resistors would be 105 µA — still negligible.</p>
-  <p>This is why the VCM buffer exists on Sheet A: if the VCM were an unbuffered resistor divider, R_BIAS would form a voltage divider with the source impedance (5kΩ from two 10kΩ resistors in parallel), pulling VCM down by 35µA × 5kΩ/(5kΩ+47kΩ) ≈ 3.4 mV. With the OPA320 buffer (output impedance ~1Ω), the pull-down is 35µA × 1Ω = 0.035 mV — 100× less error.</p>
+  <p>R_BIAS draws a DC current from the VCM rail: I = VCM / R_BIAS = 1.65V / 47kΩ = 35 µA. This is negligible for the OPA320 buffer (output current capability: ±20 mA). Even with three RX channels (future expansion), the total VCM load from bias resistors would be 105 µA - still negligible.</p>
+  <p>This is why the VCM buffer exists on Sheet A: if the VCM were an unbuffered resistor divider, R_BIAS would form a voltage divider with the source impedance (5kΩ from two 10kΩ resistors in parallel), pulling VCM down by 35µA × 5kΩ/(5kΩ+47kΩ) ≈ 3.4 mV. With the OPA320 buffer (output impedance ~1Ω), the pull-down is 35µA × 1Ω = 0.035 mV - 100× less error.</p>
 </div>
 
 <div class="callout">
@@ -1199,7 +1199,7 @@
 
 <h3 id="s4-7">4.7 Inter-Sheet Connections</h3>
 
-<p>Sheet B has only two hierarchical label connections — the minimum required for signal flow:</p>
+<p>Sheet B has only two hierarchical label connections - the minimum required for signal flow:</p>
 
 <table>
   <tr><th>Signal</th><th>Direction</th><th>From</th><th>To</th><th>Purpose</th></tr>
@@ -1207,7 +1207,7 @@
   <tr><td style="color:var(--blue); font-weight:600;">IF_BIASED</td><td>Output</td><td>C_AC/R_BIAS junction</td><td>Sheet C (PGA113 CH0 input)</td><td>AC-coupled, DC-biased IF signal</td></tr>
 </table>
 
-<p>Sheet B requires no power supply connections — it is entirely passive. All 7 components (J_IF, R_IN, D_ESD, C_AC, R_BIAS, TP_IF_RAW, TP_PGA_IN) are either passive or connectors. This makes Sheet B the easiest to validate during bringup: with VCM confirmed on Sheet A, measuring 1.65V DC at TP_PGA_IN confirms the entire bias network is working correctly.</p>
+<p>Sheet B requires no power supply connections - it is entirely passive. All 7 components (J_IF, R_IN, D_ESD, C_AC, R_BIAS, TP_IF_RAW, TP_PGA_IN) are either passive or connectors. This makes Sheet B the easiest to validate during bringup: with VCM confirmed on Sheet A, measuring 1.65V DC at TP_PGA_IN confirms the entire bias network is working correctly.</p>
 
 <h3 id="s4-8">4.8 Component Summary — Sheet B</h3>
 
@@ -1253,7 +1253,7 @@
 
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> Why variable gain is necessary</strong>
-  <p>The radar's received signal power varies as R⁻⁴ (the radar range equation). A target at 10 m returns 10,000× more power than the same target at 100 m. Without variable gain, the ADC would either clip on close targets or waste resolution on far targets. The PGA113 provides 8 discrete gain settings (1×, 2×, 5×, 10×, 20×, 50×, 100×, 200×) that span a 46 dB range — enough to keep the signal within the ADC's optimal input window regardless of target distance.</p>
+  <p>The radar's received signal power varies as R⁻⁴ (the radar range equation). A target at 10 m returns 10,000× more power than the same target at 100 m. Without variable gain, the ADC would either clip on close targets or waste resolution on far targets. The PGA113 provides 8 discrete gain settings (1×, 2×, 5×, 10×, 20×, 50×, 100×, 200×) that span a 46 dB range - enough to keep the signal within the ADC's optimal input window regardless of target distance.</p>
   <p>The gain is set digitally via SPI (from the FPGA/MCU through J_DFT on Sheet D), allowing the system to implement adaptive gain control: start at low gain, check the ADC output, and increase gain until the signal fills the desired fraction of the ADC range.</p>
 </div>
 
@@ -1278,13 +1278,13 @@
 
 <div class="callout callout-red">
   <strong><span class="tag tag-decision">DECISION</span> DVDD (Pin 10) connects to 3V3A, NOT 3V3D</strong>
-  <p>Despite the "D" in DVDD, this pin powers the PGA113's analog output stage — the final amplifier that drives VOUT (Pin 5). Connecting it to the noisy post-ferrite 3V3D rail would inject MCU switching noise directly into the signal path. Both AVDD (Pin 1) and DVDD (Pin 10) connect to 3V3A with individual 100nF 0402 bypass caps (C11, C12) placed within 2 mm of the pins.</p>
+  <p>Despite the "D" in DVDD, this pin powers the PGA113's analog output stage - the final amplifier that drives VOUT (Pin 5). Connecting it to the noisy post-ferrite 3V3D rail would inject MCU switching noise directly into the signal path. Both AVDD (Pin 1) and DVDD (Pin 10) connect to 3V3A with individual 100nF 0402 bypass caps (C11, C12) placed within 2 mm of the pins.</p>
   <p>DVDD also powers the SPI interface logic, but SPI transactions draw only µA during the brief command window. The SPI clock noise that couples through DVDD into the analog supply is attenuated by the bypass cap's low impedance at SPI frequencies (100nF at 10 MHz SCLK → Z = 0.16Ω). The analog output stage dominates the DVDD current draw.</p>
 </div>
 
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> PGA113 SPI interface</strong>
-  <p>The PGA113 uses a simple 16-bit SPI protocol: 8-bit register address + 8-bit gain/channel code. A gain change command is 0x2A followed by the gain code (bits 7:4) and channel select (bits 3:0). The SPI clock maximum is 10 MHz. With only 16 bits per command, a gain change takes 1.6 µs at full speed — fast enough to change gain between chirp ramps (~5 ms apart) with negligible dead time.</p>
+  <p>The PGA113 uses a simple 16-bit SPI protocol: 8-bit register address + 8-bit gain/channel code. A gain change command is 0x2A followed by the gain code (bits 7:4) and channel select (bits 3:0). The SPI clock maximum is 10 MHz. With only 16 bits per command, a gain change takes 1.6 µs at full speed - fast enough to change gain between chirp ramps (~5 ms apart) with negligible dead time.</p>
   <p>The SPI bus is shared with the ADS8881 ADC (on Sheet D). The PGA113 is selected by CS_PGA (active low), while the ADC uses a separate ~CS line. The 33Ω SCLK damping resistor (R_SCLK_DAMP1 on Sheet D) is placed near the ADC, not the PGA, because the ADC is more sensitive to clock edge ringing.</p>
 </div>
 
@@ -1299,23 +1299,23 @@
 
 <h3 id="s5-4">5.4 Anti-Alias Filter: 4th-Order Sallen-Key Butterworth</h3>
 
-<p>The anti-alias filter is the most important analog block in the baseband. Its job is absolute: <strong>remove all signal content above the Nyquist frequency (50 kHz at 100 kS/s) before the ADC samples it</strong>. Any noise or signal above Nyquist that reaches the ADC is aliased irrecoverably into the passband — no digital filter can undo aliasing after the fact.</p>
+<p>The anti-alias filter is the most important analog block in the baseband. Its job is absolute: <strong>remove all signal content above the Nyquist frequency (50 kHz at 100 kS/s) before the ADC samples it</strong>. Any noise or signal above Nyquist that reaches the ADC is aliased irrecoverably into the passband - no digital filter can undo aliasing after the fact.</p>
 
 <h4>Why 4th-Order Butterworth?</h4>
 
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> Filter order determines alias rejection</strong>
-  <p>The ADC (ADS8881) has 18-bit resolution, which corresponds to a dynamic range of 6.02 × 18 + 1.76 = 110 dB. For aliased noise to be below 1 LSB, the filter must attenuate signals at Nyquist (50 kHz) by at least the ADC's dynamic range. In practice, we need the filter attenuation at 50 kHz to exceed the noise floor, not the full dynamic range — but more attenuation is always better.</p>
+  <p>The ADC (ADS8881) has 18-bit resolution, which corresponds to a dynamic range of 6.02 × 18 + 1.76 = 110 dB. For aliased noise to be below 1 LSB, the filter must attenuate signals at Nyquist (50 kHz) by at least the ADC's dynamic range. In practice, we need the filter attenuation at 50 kHz to exceed the noise floor, not the full dynamic range - but more attenuation is always better.</p>
   <p>A 4th-order filter rolls off at 80 dB/decade (24 dB/octave). With a 15 kHz cutoff, the attenuation at 50 kHz is:</p>
   <p style="font-family:monospace; margin:0.5rem 0;">A(50 kHz) = 80 × log₁₀(50/15) = 80 × 0.523 = <strong>41.8 dB</strong></p>
-  <p>This provides 41.8 dB of alias rejection — sufficient for the practical dynamic range of the system (limited by PGA noise and mixer noise to roughly 70–80 dB, not the full 110 dB of the ADC).</p>
+  <p>This provides 41.8 dB of alias rejection - sufficient for the practical dynamic range of the system (limited by PGA noise and mixer noise to roughly 70–80 dB, not the full 110 dB of the ADC).</p>
 </div>
 
 <div class="callout">
   <strong><span class="tag tag-tradeoff">TRADEOFF</span> Why Butterworth, not Chebyshev or Bessel?</strong>
-  <p><strong>Butterworth:</strong> Maximally flat passband magnitude. No ripple in the passband, which means the gain is constant across the signal band (DC to ~15 kHz). The phase response has moderate nonlinearity, but for FFT-based radar processing, phase linearity is less critical than magnitude flatness — the FFT primarily uses magnitude to determine range.</p>
-  <p><strong>Chebyshev (rejected):</strong> Steeper rolloff per order but has passband ripple. A 4th-order Chebyshev with 1 dB ripple would give ~55 dB at 50 kHz — better alias rejection. But the 1 dB passband variation means the gain changes across the signal band, distorting the relative amplitudes of beat frequencies from different targets. For radar, flat passband is more important than steep rolloff.</p>
-  <p><strong>Bessel (rejected):</strong> Maximally flat group delay (best phase linearity) but the weakest rolloff — only ~30 dB at 50 kHz for a 4th-order design. Insufficient alias rejection.</p>
+  <p><strong>Butterworth:</strong> Maximally flat passband magnitude. No ripple in the passband, which means the gain is constant across the signal band (DC to ~15 kHz). The phase response has moderate nonlinearity, but for FFT-based radar processing, phase linearity is less critical than magnitude flatness - the FFT primarily uses magnitude to determine range.</p>
+  <p><strong>Chebyshev (rejected):</strong> Steeper rolloff per order but has passband ripple. A 4th-order Chebyshev with 1 dB ripple would give ~55 dB at 50 kHz - better alias rejection. But the 1 dB passband variation means the gain changes across the signal band, distorting the relative amplitudes of beat frequencies from different targets. For radar, flat passband is more important than steep rolloff.</p>
+  <p><strong>Bessel (rejected):</strong> Maximally flat group delay (best phase linearity) but the weakest rolloff - only ~30 dB at 50 kHz for a 4th-order design. Insufficient alias rejection.</p>
 </div>
 
 <h4>Two-Stage Cascaded Design</h4>
@@ -1324,14 +1324,14 @@
 
 <table>
   <tr><th>Stage</th><th>Op-Amp Section</th><th>Q Factor</th><th>R Values</th><th>C Values</th><th>Character</th></tr>
-  <tr><td><strong>Stage 1</strong></td><td>Section A (Pins 1,2,3)</td><td>1.306</td><td>R3=1.62kΩ, R4=5.76kΩ</td><td>C13=11nF, C14=1.1nF</td><td>High-Q — provides the "knee" of the Butterworth rolloff, with slight peaking near f<sub>c</sub></td></tr>
-  <tr><td><strong>Stage 2</strong></td><td>Section B (Pins 5,6,7)</td><td>0.541</td><td>R5=17.4kΩ, R6=536Ω</td><td>C15=11nF, C16=1.1nF</td><td>Low-Q — overdamped response that flattens the peaking from Stage 1</td></tr>
+  <tr><td><strong>Stage 1</strong></td><td>Section A (Pins 1,2,3)</td><td>1.306</td><td>R3=1.62kΩ, R4=5.76kΩ</td><td>C13=11nF, C14=1.1nF</td><td>High-Q - provides the "knee" of the Butterworth rolloff, with slight peaking near f<sub>c</sub></td></tr>
+  <tr><td><strong>Stage 2</strong></td><td>Section B (Pins 5,6,7)</td><td>0.541</td><td>R5=17.4kΩ, R6=536Ω</td><td>C15=11nF, C16=1.1nF</td><td>Low-Q - overdamped response that flattens the peaking from Stage 1</td></tr>
 </table>
 
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> Why the Q values are different</strong>
   <p>A 4th-order Butterworth has poles at angles of ±22.5° and ±67.5° from the negative real axis in the s-plane. The Q factor of each 2nd-order section is determined by the pole angle: Q = 1/(2·cos(θ)). For θ = 22.5°: Q = 1/(2·cos(22.5°)) = 1/(2×0.924) = 0.541. For θ = 67.5°: Q = 1/(2·cos(67.5°)) = 1/(2×0.383) = 1.306.</p>
-  <p>The high-Q stage (1.306) produces a ~2 dB peak near the cutoff frequency. The low-Q stage (0.541) has a gentle, overdamped rolloff. When multiplied together, the peaks and dips cancel exactly, producing the maximally-flat Butterworth response. This is only true for these specific Q values — using identical Q in both stages would produce a different (non-Butterworth) response shape.</p>
+  <p>The high-Q stage (1.306) produces a ~2 dB peak near the cutoff frequency. The low-Q stage (0.541) has a gentle, overdamped rolloff. When multiplied together, the peaks and dips cancel exactly, producing the maximally-flat Butterworth response. This is only true for these specific Q values - using identical Q in both stages would produce a different (non-Butterworth) response shape.</p>
 </div>
 
 <h4>Sallen-Key Topology</h4>
@@ -1339,22 +1339,22 @@
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> How Sallen-Key works</strong>
   <p>Each stage uses a unity-gain Sallen-Key low-pass topology. The op-amp is configured as a voltage follower (−IN tied to OUT, gain = 1). Two series resistors and two capacitors form the frequency-selective network:</p>
-  <p><strong>C_shunt</strong> (C13, C15): connects from the R-R junction (Node A) to GND. This is the "expected" capacitor in an RC low-pass — it shunts high-frequency signals to ground.</p>
-  <p><strong>C_feedback</strong> (C14, C16): connects from the R-R junction (Node B) to the op-amp output. This is the critical component — it creates positive feedback that controls the Q factor. Without C_feedback, the circuit is just a passive 2-pole RC with Q = 0.5 (overdamped). C_feedback adds the energy storage needed to achieve Q > 0.5.</p>
+  <p><strong>C_shunt</strong> (C13, C15): connects from the R-R junction (Node A) to GND. This is the "expected" capacitor in an RC low-pass - it shunts high-frequency signals to ground.</p>
+  <p><strong>C_feedback</strong> (C14, C16): connects from the R-R junction (Node B) to the op-amp output. This is the critical component - it creates positive feedback that controls the Q factor. Without C_feedback, the circuit is just a passive 2-pole RC with Q = 0.5 (overdamped). C_feedback adds the energy storage needed to achieve Q > 0.5.</p>
   <p>The relationship: larger C_feedback → higher Q → more peaking near f<sub>c</sub> → sharper rolloff. The component values are calculated from the Butterworth Q requirements using standard Sallen-Key design equations.</p>
 </div>
 
 <div class="callout callout-red">
-  <strong><span class="tag tag-risk">RISK</span> C_feedback must NOT go to GND — the Rev A wiring error</strong>
-  <p>In the initial Rev B schematic wiring, C14 Pin 2 was accidentally connected to GND instead of OUT_A. This converts the Sallen-Key into a passive 3-pole RC filter with no Q control — the Butterworth response shape is lost, and attenuation at 50 kHz drops from −41.8 dB to approximately −20 dB. This error was caught during the schematic review (see <a href="https://pike1950.github.io/fmcw-radar-portfolio/docs/analysis/SheetC_Filter_Analysis.html">Filter Analysis</a>) and corrected. The corrected wiring routes C14.Pin2 to OUT_A and C16.Pin2 to OUT_B.</p>
+  <strong><span class="tag tag-risk">RISK</span> C_feedback must NOT go to GND - the Rev A wiring error</strong>
+  <p>In the initial Rev B schematic wiring, C14 Pin 2 was accidentally connected to GND instead of OUT_A. This converts the Sallen-Key into a passive 3-pole RC filter with no Q control - the Butterworth response shape is lost, and attenuation at 50 kHz drops from −41.8 dB to approximately −20 dB. This error was caught during the schematic review (see <a href="https://pike1950.github.io/fmcw-radar-portfolio/docs/analysis/SheetC_Filter_Analysis.html">Filter Analysis</a>) and corrected. The corrected wiring routes C14.Pin2 to OUT_A and C16.Pin2 to OUT_B.</p>
 </div>
 
 <h4>Component Value Selection</h4>
 
 <div class="callout callout-teal">
   <strong><span class="tag tag-decision">DECISION</span> C0G/NP0 capacitors for all filter caps</strong>
-  <p>All four filter capacitors (C13, C14, C15, C16) use C0G (NP0) dielectric. C0G has zero voltage coefficient and zero temperature coefficient (±30 ppm/°C) — the capacitance does not change with applied voltage or temperature. X7R capacitors can lose 30–80% of rated capacitance at DC bias, which would shift the filter's cutoff frequency and Q unpredictably.</p>
-  <p>For a filter that defines the system's anti-alias performance, capacitor stability is not optional — it's a requirement. The tradeoff is size: 11nF in C0G requires 0805 or 1206 package, while X7R would fit in 0402. The larger footprint is an acceptable price for predictable filter response.</p>
+  <p>All four filter capacitors (C13, C14, C15, C16) use C0G (NP0) dielectric. C0G has zero voltage coefficient and zero temperature coefficient (±30 ppm/°C) - the capacitance does not change with applied voltage or temperature. X7R capacitors can lose 30–80% of rated capacitance at DC bias, which would shift the filter's cutoff frequency and Q unpredictably.</p>
+  <p>For a filter that defines the system's anti-alias performance, capacitor stability is not optional - it's a requirement. The tradeoff is size: 11nF in C0G requires 0805 or 1206 package, while X7R would fit in 0402. The larger footprint is an acceptable price for predictable filter response.</p>
 </div>
 
 <h3 id="s5-5">5.5 Unused Op-Amp Sections</h3>
@@ -1408,14 +1408,14 @@
 
 <div class="callout callout-green">
   <strong>Design philosophy: the filter is the system's immune system</strong>
-  <p>Every dB of alias rejection the filter provides is a dB of signal integrity preserved for the FFT. The 4th-order Butterworth at 15 kHz provides 41.8 dB at Nyquist — enough that aliased noise is below the system's practical noise floor. The C0G capacitors ensure this performance is stable across temperature and voltage. The DFT infrastructure (TP_PGA_OUT, TP_LPF_OUT, J_MMCX_PGA, J_MMCX_LPF, R_FILT_ISO) enables independent characterization of the PGA and filter, so any performance shortfall can be isolated to a specific block during bringup.</p>
+  <p>Every dB of alias rejection the filter provides is a dB of signal integrity preserved for the FFT. The 4th-order Butterworth at 15 kHz provides 41.8 dB at Nyquist - enough that aliased noise is below the system's practical noise floor. The C0G capacitors ensure this performance is stable across temperature and voltage. The DFT infrastructure (TP_PGA_OUT, TP_LPF_OUT, J_MMCX_PGA, J_MMCX_LPF, R_FILT_ISO) enables independent characterization of the PGA and filter, so any performance shortfall can be isolated to a specific block during bringup.</p>
 </div>
 
 <!-- ================================================================ -->
 <h2 id="s6">6. Sheet D — FDA Driver, ADC &amp; SPI Interface</h2>
 <!-- ================================================================ -->
 
-<p>Sheet D is the most complex sheet in the design — 35 components including two ICs, the primary DFT header, and the SPI interface that connects the analog signal chain to the digital world. It performs three functions: single-ended to differential conversion (THS4531A FDA), 18-bit digitization (ADS8881 SAR ADC), and external test access (J_DFT header with 6× isolation resistors).</p>
+<p>Sheet D is the most complex sheet in the design - 35 components including two ICs, the primary DFT header, and the SPI interface that connects the analog signal chain to the digital world. It performs three functions: single-ended to differential conversion (THS4531A FDA), 18-bit digitization (ADS8881 SAR ADC), and external test access (J_DFT header with 6× isolation resistors).</p>
 
 <h3 id="s6-1">6.1 Signal Flow</h3>
 
@@ -1437,8 +1437,8 @@
 
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> Why single-ended to differential conversion is required</strong>
-  <p>The ADS8881 is a differential-input ADC: it digitizes the voltage difference between AINP and AINN. The signal from the filter (LPF_OUT) is single-ended — it swings around VCM with respect to GND. A fully differential amplifier (FDA) converts this single-ended signal into a balanced differential pair centered at VCM, which:</p>
-  <p><strong>1. Rejects common-mode noise.</strong> Any noise that appears equally on both AINP and AINN (supply noise, ground bounce, EMI) is rejected by the ADC's differential input. The CMRR of the ADS8881 is >80 dB — common-mode noise is attenuated by 10,000×.</p>
+  <p>The ADS8881 is a differential-input ADC: it digitizes the voltage difference between AINP and AINN. The signal from the filter (LPF_OUT) is single-ended - it swings around VCM with respect to GND. A fully differential amplifier (FDA) converts this single-ended signal into a balanced differential pair centered at VCM, which:</p>
+  <p><strong>1. Rejects common-mode noise.</strong> Any noise that appears equally on both AINP and AINN (supply noise, ground bounce, EMI) is rejected by the ADC's differential input. The CMRR of the ADS8881 is >80 dB - common-mode noise is attenuated by 10,000×.</p>
   <p><strong>2. Doubles the signal swing.</strong> A single-ended signal swinging ±1V around VCM becomes a differential signal of ±2V (AINP goes +1V while AINN goes −1V). This fills more of the ADC's input range, improving effective resolution.</p>
   <p><strong>3. Sets the output common mode.</strong> The VOCM pin (connected to VCM = 1.65V) forces both outputs to sit at 1.65V with zero differential signal. This is exactly the mid-scale input the ADC expects.</p>
 </div>
@@ -1457,7 +1457,7 @@
 
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> Gain and impedance balance</strong>
-  <p>The differential gain is G<sub>diff</sub> = R<sub>f</sub> / R<sub>g</sub> = 1kΩ / 1kΩ = <strong>1 V/V</strong>. Unity gain is chosen because the PGA113 has already amplified the signal to the desired level — the FDA's job is format conversion (SE→Diff), not amplification.</p>
+  <p>The differential gain is G<sub>diff</sub> = R<sub>f</sub> / R<sub>g</sub> = 1kΩ / 1kΩ = <strong>1 V/V</strong>. Unity gain is chosen because the PGA113 has already amplified the signal to the desired level - the FDA's job is format conversion (SE→Diff), not amplification.</p>
   <p>All four resistors are 1kΩ to maintain impedance symmetry between the two signal paths. Mismatched impedances degrade the FDA's output balance, which reduces the differential signal's CMRR benefit at the ADC. Using 0.1% tolerance resistors (or 4-resistor matched arrays) is recommended for best balance.</p>
 </div>
 
@@ -1467,15 +1467,15 @@
   <strong><span class="tag tag-physics">PHYSICS</span> Why 33Ω series resistors and a differential capacitor are needed</strong>
   <p>The ADS8881 is a SAR ADC. During the acquisition phase, an internal sampling capacitor (C<sub>SH</sub> ≈ 30 pF) connects directly to the input pins. When the sample switch closes, the capacitor demands a burst of charge from the driving amplifier. Without series resistors, this charge demand causes a current spike that rings with the parasitic inductance of the PCB traces, degrading settling accuracy.</p>
   <p>R_OUTP and R_OUTM (33Ω each) limit the peak charging current and damp the ringing. C_DIFF (470 pF C0G, connected differentially between AINP and AINN) acts as a local charge reservoir that supplies the sampling capacitor's initial charge demand, reducing the current the FDA must supply transiently.</p>
-  <p>The RC time constant is: τ = R_OUT × (C_DIFF + C<sub>SH</sub>) = 33 × (470p + 30p) = 33 × 500p = <strong>16.5 ns</strong>. At 100 kS/s (10 µs per sample), the acquisition window is approximately 4 µs after the conversion completes. The number of time constants in the acquisition window is 4 µs / 16.5 ns = <strong>242τ</strong>. For 18-bit settling (1 part in 262,144), you need ln(262144) = 12.5τ. We have 242τ — a margin of 19×. Settling is not a concern.</p>
+  <p>The RC time constant is: τ = R_OUT × (C_DIFF + C<sub>SH</sub>) = 33 × (470p + 30p) = 33 × 500p = <strong>16.5 ns</strong>. At 100 kS/s (10 µs per sample), the acquisition window is approximately 4 µs after the conversion completes. The number of time constants in the acquisition window is 4 µs / 16.5 ns = <strong>242τ</strong>. For 18-bit settling (1 part in 262,144), you need ln(262144) = 12.5τ. We have 242τ - a margin of 19×. Settling is not a concern.</p>
 </div>
 
 <h3 id="s6-3">6.3 18-Bit SAR ADC: ADS8881 (U_ADC)</h3>
 
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> Why 18-bit, why SAR</strong>
-  <p>The ADS8881 provides 18-bit resolution at up to 1 MSPS (we use 100 kSPS). At 18 bits, the least significant bit represents VREF / 2¹⁸ = 2.5V / 262,144 = <strong>9.5 µV</strong>. This means the ADC can resolve voltage changes as small as 9.5 µV — critical for detecting weak radar returns from distant targets.</p>
-  <p>SAR (Successive Approximation Register) topology is chosen over sigma-delta because SAR ADCs sample at discrete, deterministic instants. Each conversion produces a single sample at a known time. Sigma-delta ADCs inherently average over time (decimation filtering), which would smear the instantaneous beat frequency and degrade FFT performance. For FFT-based radar processing, the sample must represent the signal at a precise instant — SAR delivers this.</p>
+  <p>The ADS8881 provides 18-bit resolution at up to 1 MSPS (we use 100 kSPS). At 18 bits, the least significant bit represents VREF / 2¹⁸ = 2.5V / 262,144 = <strong>9.5 µV</strong>. This means the ADC can resolve voltage changes as small as 9.5 µV - critical for detecting weak radar returns from distant targets.</p>
+  <p>SAR (Successive Approximation Register) topology is chosen over sigma-delta because SAR ADCs sample at discrete, deterministic instants. Each conversion produces a single sample at a known time. Sigma-delta ADCs inherently average over time (decimation filtering), which would smear the instantaneous beat frequency and degrade FFT performance. For FFT-based radar processing, the sample must represent the signal at a precise instant - SAR delivers this.</p>
 </div>
 
 <div class="callout callout-teal">
@@ -1485,7 +1485,7 @@
 
 <div class="callout callout-teal">
   <strong><span class="tag tag-decision">DECISION</span> DOUT pull-up for busy-indicator mode</strong>
-  <p>R13 (10kΩ) pulls DOUT (Pin 7) to 3V3A. When CONVST is asserted, the ADS8881 drives DOUT low during conversion and releases it (tri-state) when conversion is complete. The pull-up returns DOUT high, creating a falling-edge → low-period → rising-edge pattern that the FPGA/MCU can use as a "conversion complete" interrupt. This eliminates the need to poll or use a fixed delay — the firmware simply waits for the rising edge on DOUT, then clocks out 18 bits.</p>
+  <p>R13 (10kΩ) pulls DOUT (Pin 7) to 3V3A. When CONVST is asserted, the ADS8881 drives DOUT low during conversion and releases it (tri-state) when conversion is complete. The pull-up returns DOUT high, creating a falling-edge → low-period → rising-edge pattern that the FPGA/MCU can use as a "conversion complete" interrupt. This eliminates the need to poll or use a fixed delay - the firmware simply waits for the rising edge on DOUT, then clocks out 18 bits.</p>
 </div>
 
 <div class="callout callout-teal">
@@ -1495,7 +1495,7 @@
 
 <h3 id="s6-4">6.4 DFT Header: J_DFT (2×10, 2.54mm)</h3>
 
-<p>J_DFT is the single external interface for the entire baseband. It provides power monitoring, analog signal observation, SPI control, and ADC readout — all through one 20-pin connector. This is the connector that the ESP32 (bringup) or FPGA (production) connects to.</p>
+<p>J_DFT is the single external interface for the entire baseband. It provides power monitoring, analog signal observation, SPI control, and ADC readout - all through one 20-pin connector. This is the connector that the ESP32 (bringup) or FPGA (production) connects to.</p>
 
 <table>
   <tr><th>Pin</th><th>Signal</th><th>Type</th><th>Isolation</th><th>Purpose</th></tr>
@@ -1523,8 +1523,8 @@
 
 <div class="callout callout-blue">
   <strong><span class="tag tag-physics">PHYSICS</span> Why 10kΩ isolation resistors on analog monitor pins</strong>
-  <p>The six analog monitor pins (PGA_OUT, LPF_OUT, AINP, AINN, FDA_OUTP, FDA_OUTN) pass through 10kΩ series resistors (R7–R12) before reaching J_DFT. This protects the signal chain from probe loading: a 15 pF oscilloscope probe tip at J_DFT forms a low-pass filter with the 10kΩ isolation resistor at f = 1/(2π × 10k × 15p) = 1.06 MHz — well above the 15 kHz signal band. Without isolation, the 15 pF probe would load the FDA output directly, potentially causing instability.</p>
-  <p>The resistors are always populated — they protect the signal chain even when J_DFT is unconnected (the header pins act as antennas that could couple noise into the signal chain without series impedance).</p>
+  <p>The six analog monitor pins (PGA_OUT, LPF_OUT, AINP, AINN, FDA_OUTP, FDA_OUTN) pass through 10kΩ series resistors (R7–R12) before reaching J_DFT. This protects the signal chain from probe loading: a 15 pF oscilloscope probe tip at J_DFT forms a low-pass filter with the 10kΩ isolation resistor at f = 1/(2π × 10k × 15p) = 1.06 MHz - well above the 15 kHz signal band. Without isolation, the 15 pF probe would load the FDA output directly, potentially causing instability.</p>
+  <p>The resistors are always populated - they protect the signal chain even when J_DFT is unconnected (the header pins act as antennas that could couple noise into the signal chain without series impedance).</p>
 </div>
 
 <h3 id="s6-5">6.5 Inter-Sheet Connections</h3>
@@ -1571,7 +1571,7 @@
 
 <div class="callout callout-green">
   <strong>Design philosophy: the interface defines the system</strong>
-  <p>Sheet D is where the analog world meets the digital world. The FDA converts format (SE→Diff), the ADC converts domain (analog→digital), and J_DFT provides the interface to control and observe everything. Every analog signal in the chain is observable through J_DFT with 10kΩ isolation. Every digital control signal (SCLK, SDI, CS_PGA, CONVST) is accessible. The entire baseband can be characterized, debugged, and operated through a single 20-pin connector — this is what DFT-first design means in practice.</p>
+  <p>Sheet D is where the analog world meets the digital world. The FDA converts format (SE→Diff), the ADC converts domain (analog→digital), and J_DFT provides the interface to control and observe everything. Every analog signal in the chain is observable through J_DFT with 10kΩ isolation. Every digital control signal (SCLK, SDI, CS_PGA, CONVST) is accessible. The entire baseband can be characterized, debugged, and operated through a single 20-pin connector - this is what DFT-first design means in practice.</p>
 </div>
 
 <!-- ================================================================ -->
@@ -1584,13 +1584,13 @@
 <table>
   <tr><th>Resource</th><th>Why It Matters</th><th>Relevant To</th></tr>
   <tr>
-    <td><strong>Eric Bogatin, <em>Signal and Power Integrity — Simplified</em></strong> (Prentice Hall)</td>
+    <td><strong>Eric Bogatin, <em>Signal and Power Integrity - Simplified</em></strong> (Prentice Hall)</td>
     <td>Derives transmission line theory, return current paths, and impedance-vs-frequency from first principles. The "why" behind every PCB layout rule. Directly addresses the Shield AI "first principles" feedback.</td>
     <td>§7 Layout, all sheets</td>
   </tr>
   <tr>
     <td><strong>Henry Ott, <em>Electromagnetic Compatibility Engineering</em></strong> (Wiley, 2009)</td>
-    <td>Chapters 17–18 cover PCB layout/stackup and mixed-signal PCB layout specifically. Also covers digital circuit power distribution, decoupling, grounding, and filtering. 872 pages — the comprehensive reference.</td>
+    <td>Chapters 17–18 cover PCB layout/stackup and mixed-signal PCB layout specifically. Also covers digital circuit power distribution, decoupling, grounding, and filtering. 872 pages - the comprehensive reference.</td>
     <td>§3 (decoupling, supply splitting), §7 (layout, grounding)</td>
   </tr>
 </table>
@@ -1599,27 +1599,27 @@
 <table>
   <tr><th>Resource</th><th>Why It Matters</th><th>Relevant To</th></tr>
   <tr>
-    <td><strong>TI SLYT499</strong> — "Grounding in mixed-signal systems demystified, Part 1" (free PDF)</td>
+    <td><strong>TI SLYT499</strong> - "Grounding in mixed-signal systems demystified, Part 1" (free PDF)</td>
     <td>Explains why splitting ground planes creates more problems than it solves. Shows return current path analysis for mixed-signal PCBs. Directly supports our single-ground-plane + supply-splitting architecture.</td>
     <td>§3.3 (ferrite bead), §7 (layout)</td>
   </tr>
   <tr>
-    <td><strong>TI SLYT512</strong> — "Grounding in mixed-signal systems demystified, Part 2" (free PDF)</td>
+    <td><strong>TI SLYT512</strong> - "Grounding in mixed-signal systems demystified, Part 2" (free PDF)</td>
     <td>Practical layout examples showing partitioning into analog and digital sections on a single ground plane.</td>
     <td>§7 (layout)</td>
   </tr>
   <tr>
-    <td><strong>Analog Devices</strong> — "Successful PCB Grounding with Mixed-Signal Chips — Follow the Path of Least Impedance"</td>
+    <td><strong>Analog Devices</strong> - "Successful PCB Grounding with Mixed-Signal Chips - Follow the Path of Least Impedance"</td>
     <td>Step-by-step mixed-signal layout walkthrough. Central argument: proper partitioning and routing discipline, not split ground planes, is the key to success.</td>
     <td>§7 (layout)</td>
   </tr>
   <tr>
-    <td><strong>Analog Devices</strong> — "Staying Well Grounded" (Analog Dialogue)</td>
+    <td><strong>Analog Devices</strong> - "Staying Well Grounded" (Analog Dialogue)</td>
     <td>Comprehensive grounding tutorial covering star ground, multicard systems, and the AGND/DGND pin confusion on ADCs.</td>
     <td>§6 (ADS8881 grounding), §7 (layout)</td>
   </tr>
   <tr>
-    <td><strong>TI Precision Labs</strong> — "PCB Layout for Op Amps: Mixed Signals, Grounding, and Bypass Capacitors" (video)</td>
+    <td><strong>TI Precision Labs</strong> - "PCB Layout for Op Amps: Mixed Signals, Grounding, and Bypass Capacitors" (video)</td>
     <td>30-minute visual tutorial on analog/digital separation, grounding, and bypass cap placement. Immediate, practical payoff.</td>
     <td>All sheets</td>
   </tr>
@@ -1629,12 +1629,12 @@
 <table>
   <tr><th>Resource</th><th>Why It Matters</th><th>Relevant To</th></tr>
   <tr>
-    <td><strong>Murata</strong> — "Basics of Capacitors" technical library (murata.com)</td>
+    <td><strong>Murata</strong> - "Basics of Capacitors" technical library (murata.com)</td>
     <td>Impedance-vs-frequency curves for every dielectric type (C0G, X7R, Y5V). Explains self-resonant frequency, DC bias derating, and why you pair different-valued caps. Directly addresses the "capacitor nets paired together" feedback from Shield AI.</td>
     <td>§3 (LDO/ref decoupling), all sheets</td>
   </tr>
   <tr>
-    <td><strong>TI SLTA055</strong> — "Bypass Capacitor Selection for High-Speed ADCs" (free PDF)</td>
+    <td><strong>TI SLTA055</strong> - "Bypass Capacitor Selection for High-Speed ADCs" (free PDF)</td>
     <td>Frequency-domain reasoning for decoupling cap selection around SAR ADCs. Directly relevant to ADS8881 AVDD/DVDD decoupling on Sheet D.</td>
     <td>§6 (ADS8881 decoupling)</td>
   </tr>
@@ -1644,7 +1644,7 @@
 <table>
   <tr><th>Resource</th><th>Why It Matters</th><th>Relevant To</th></tr>
   <tr>
-    <td><strong>TI SLOA024B</strong> — "Analysis of the Sallen-Key Architecture" (free PDF)</td>
+    <td><strong>TI SLOA024B</strong> - "Analysis of the Sallen-Key Architecture" (free PDF)</td>
     <td>Derives the Sallen-Key transfer function from first principles. Shows how component tolerances affect filter response. Essential for §5 documentation.</td>
     <td>§5 (Sallen-Key filter, Sheet C)</td>
   </tr>
@@ -1659,17 +1659,17 @@
 <table>
   <tr><th>Resource</th><th>Why It Matters</th><th>Relevant To</th></tr>
   <tr>
-    <td><strong>TI SLOA054</strong> — "Fully Differential Amplifiers" (free PDF)</td>
+    <td><strong>TI SLOA054</strong> - "Fully Differential Amplifiers" (free PDF)</td>
     <td>Canonical reference on FDA architecture: why FDAs exist, how VOCM control works, gain equations, and how to interface with SAR ADCs.</td>
     <td>§6 (THS4531A, Sheet D)</td>
   </tr>
   <tr>
-    <td><strong>THS4531A datasheet</strong> — Application section</td>
+    <td><strong>THS4531A datasheet</strong> - Application section</td>
     <td>Contains specific guidance on driving the ADS8881, including output resistor selection and settling time analysis.</td>
     <td>§6 (FDA→ADC interface)</td>
   </tr>
   <tr>
-    <td><strong>ADS8881 datasheet</strong> — Timing diagrams and SPI interface</td>
+    <td><strong>ADS8881 datasheet</strong> - Timing diagrams and SPI interface</td>
     <td>SPI timing budget, acquisition time requirements, and CONVST/DOUT/SCLK relationships. Essential for the SystemVerilog SPI controller (Phase 4).</td>
     <td>§6 (SPI timing), Phase 4</td>
   </tr>
@@ -1684,7 +1684,7 @@
     <td>§1 (FMCW principles)</td>
   </tr>
   <tr>
-    <td><strong>Analog Devices</strong> — "FMCW Radar" technical article</td>
+    <td><strong>Analog Devices</strong> - "FMCW Radar" technical article</td>
     <td>Concise treatment of beat frequency derivation, triangular vs. sawtooth modulation, and range/velocity extraction.</td>
     <td>§1 (FMCW principles)</td>
   </tr>
@@ -1699,11 +1699,11 @@
 <div class="callout callout-green">
   <strong>Prioritized for immediate impact on portfolio and interview readiness:</strong>
   <ol style="padding-left: 1.5rem;">
-    <li><strong>TI Precision Labs PCB layout videos</strong> — Free, 30 min, immediate payoff on layout fundamentals</li>
-    <li><strong>SLYT499 + SLYT512</strong> — Free PDFs, directly applicable to our layout phase</li>
-    <li><strong>Murata capacitor impedance resources</strong> — Fills the specific "cap pairing" gap from Shield AI feedback</li>
-    <li><strong>Eric Bogatin, Signal &amp; Power Integrity</strong> — The book that builds the first-principles muscle</li>
-    <li><strong>Henry Ott, EMC Engineering (Ch. 17–18)</strong> — Longer-term reference for PCB layout and mixed-signal design</li>
+    <li><strong>TI Precision Labs PCB layout videos</strong> - Free, 30 min, immediate payoff on layout fundamentals</li>
+    <li><strong>SLYT499 + SLYT512</strong> - Free PDFs, directly applicable to our layout phase</li>
+    <li><strong>Murata capacitor impedance resources</strong> - Fills the specific "cap pairing" gap from Shield AI feedback</li>
+    <li><strong>Eric Bogatin, Signal &amp; Power Integrity</strong> - The book that builds the first-principles muscle</li>
+    <li><strong>Henry Ott, EMC Engineering (Ch. 17–18)</strong> - Longer-term reference for PCB layout and mixed-signal design</li>
   </ol>
 </div>
 

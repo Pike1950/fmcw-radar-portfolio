@@ -47,7 +47,7 @@ RF Mixer → SMA Input → ESD Protection → PGA (1–200×) → Anti-Alias Fil
 │       └── sim/                # Simulation scripts and results
 │
 └── docs/
-    ├── design-rationale/       # First-principles analysis (the "why" document)
+    ├── system-design/          # System design document (the "why" for every decision)
     ├── block-diagrams/         # System and sheet-level block diagrams
     ├── analysis/               # Filter analysis, schematic review
     ├── specifications/         # Sheet specifications, IC pin wiring guides
@@ -67,7 +67,7 @@ This project is one track of a broader engineering portfolio spanning processor 
 
 | Document | Description |
 |----------|-------------|
-| [Design Rationale](https://pike1950.github.io/fmcw-radar-portfolio/docs/design-rationale/RevB_Design_Rationale.html) | First-principles analysis of every design decision across all four sheets. FMCW operating principles (§1) with three-band beat frequency comparison, adaptive chirp modes, FCC regulatory landscape, and ISM band upgrade path. System overview (§2). Sheet A power (§3): LDO, ferrite bead, voltage reference, VCM buffer. Sheet B input (§4): ESD protection, AC coupling, DC bias. Sheet C gain+filter (§5): PGA113 variable gain, 4th-order Sallen-Key Butterworth with Q derivation. Sheet D digitization (§6): FDA SE→Diff, ADS8881 18-bit SAR, J_DFT header with isolation. |
+| [System Design Document](https://pike1950.github.io/fmcw-radar-portfolio/docs/system-design/System_Design_Document.html) | First-principles system design document covering all four sheets. FMCW operating principles (§1) with three-band beat frequency comparison, adaptive chirp modes, FCC regulatory landscape, and ISM band upgrade path. System overview (§2). Sheet A power (§3): LDO, ferrite bead, voltage reference, VCM buffer. Sheet B input (§4): ESD protection, AC coupling, DC bias. Sheet C gain+filter (§5): PGA113 variable gain, 4th-order Sallen-Key Butterworth with Q derivation. Sheet D digitization (§6): FDA SE→Diff, ADS8881 18-bit SAR, J_DFT header with isolation. |
 | [Block Diagrams](https://pike1950.github.io/fmcw-radar-portfolio/docs/block-diagrams/RevB_Block_Diagrams.html) | Pin tables, signal maps, DFT reference, inter-sheet signal summary, hierarchical label directions. The "what" companion to the Design Rationale's "why." |
 | [Schematic Review](https://pike1950.github.io/fmcw-radar-portfolio/docs/analysis/SchematicReview.html) | Systematic review of all four schematic sheets. |
 | [Filter Analysis](https://pike1950.github.io/fmcw-radar-portfolio/docs/analysis/SheetC_Filter_Analysis.html) | Sheet C anti-alias filter analysis with transfer function derivation. |
