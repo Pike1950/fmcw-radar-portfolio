@@ -191,7 +191,19 @@
           </ul>
         </details>
       </li>
-      <li><a href="#s7">7. Layout Design Rationale</a> <em>(forthcoming)</em></li>
+      <li>
+        <details>
+          <summary><a href="#s7">7. Layout Design Rationale</a></summary>
+          <ul>
+            <li><a href="#s7-1">7.1 Stackup: 4-Layer Structure</a></li>
+            <li><a href="#s7-2">7.2 Component Placement Strategy</a></li>
+            <li><a href="#s7-3">7.3 Ground Plane and Power Distribution</a></li>
+            <li><a href="#s7-4">7.4 Critical Trace Routing</a></li>
+            <li><a href="#s7-5">7.5 DFT Infrastructure Placement</a></li>
+            <li><a href="#s7-6">7.6 Manufacturing and Assembly Constraints</a></li>
+          </ul>
+        </details>
+      </li>
       <li><a href="#sA">Appendix A: References &amp; Further Reading</a></li>
     </ul>
   </details>
@@ -277,6 +289,13 @@
       <li><span class="fig-type">Table</span> <a href="#s6-4">§6.4 J_DFT 20-pin pinout</a></li>
       <li><span class="fig-type">Table</span> <a href="#s6-5">§6.5 Inter-sheet connections - Sheet D</a></li>
       <li><span class="fig-type">Table</span> <a href="#s6-6">§6.6 Component summary - Sheet D</a></li>
+
+      <li style="margin-top:0.8rem; color:var(--teal); font-weight:600; font-size:0.85rem;">Tables — §7 Layout</li>
+      <li><span class="fig-type">Table</span> <a href="#tbl-7-1a">§7.1a 4-layer stackup assignment</a></li>
+      <li><span class="fig-type">Table</span> <a href="#tbl-7-1b">§7.1b Stackup fabrication specification</a></li>
+      <li><span class="fig-type">Table</span> <a href="#tbl-7-2a">§7.2a Component placement zones</a></li>
+      <li><span class="fig-type">Table</span> <a href="#tbl-7-3a">§7.3a L3 power plane partitioning</a></li>
+      <li><span class="fig-type">Table</span> <a href="#tbl-7-6">§7.6 Manufacturing and assembly constraints</a></li>
 
       <li style="margin-top:0.8rem; color:var(--teal); font-weight:600; font-size:0.85rem;">Tables — Appendix A</li>
       <li><span class="fig-type">Table</span> <a href="#sA">A.1 Signal integrity references</a></li>
@@ -2681,7 +2700,324 @@
 <h2 id="s7">7. Layout Design Rationale</h2>
 <!-- ================================================================ -->
 
-<p><em>This section is forthcoming. It will cover the 4-layer stackup (signal/ground/power/signal), component placement strategy, ground plane partitioning (single plane, partitioned routing), critical trace routing (analog signal path, SPI bus, power distribution), and the DFT connector placement rationale.</em></p>
+<p>The PCB layout translates the schematic into a physical structure where electromagnetic fields, thermal gradients, and manufacturing tolerances determine whether the circuit performs as designed. Every layout decision in this section traces back to the same five principles from §2: work backward from the ADC, isolate analog from digital, bias at midpoint, filter before sampling, and design for test. The layout is where these principles either succeed or fail - a perfect schematic with poor layout produces a noisy, unreliable system.</p>
+
+<p>This section covers the 4-layer stackup, component placement, ground and power distribution, critical trace routing, DFT infrastructure placement, and manufacturing constraints. Each decision includes quantitative justification from first principles. The corresponding implementation tasks are tracked in the <a href="../planning/PCB_Layout_Change_Plan.docx">PCB Layout Change Plan</a> (PCB-01 through PCB-08).</p>
+
+<h3 id="s7-1">7.1 Stackup: 4-Layer Structure</h3>
+
+<p>The board uses a 4-layer stackup. This is the minimum layer count that provides a continuous ground reference plane adjacent to every signal layer - the single most important requirement for a mixed-signal PCB.</p>
+
+<h4>Layer Assignment</h4>
+
+<table>
+  <tr><th>Layer</th><th>Name</th><th>Function</th><th>Copper Weight</th><th>Rationale</th></tr>
+  <tr>
+    <td style="font-weight:600;">L1 (Top)</td><td>Signal + Components</td><td>All SMD components, analog signal traces, SPI bus</td><td>1 oz (35 µm)</td>
+    <td>Components on one side only simplifies assembly and rework. Signal traces on L1 reference the L2 ground plane directly beneath - minimum possible separation for tightest field coupling.</td>
+  </tr>
+  <tr>
+    <td style="font-weight:600; color:var(--green);">L2</td><td>GND (continuous)</td><td>Unbroken ground plane</td><td>1 oz (35 µm)</td>
+    <td>Continuous copper pour, no splits, no routing. Every signal on L1 and L3 has an uninterrupted return current path directly beneath or above it. This is non-negotiable for an 18-bit system.</td>
+  </tr>
+  <tr>
+    <td style="font-weight:600; color:var(--amber);">L3</td><td>Power</td><td>3V3A pour, 3V3D island, VCM/VREF local routing</td><td>1 oz (35 µm)</td>
+    <td>Power distribution as a plane (not traces) minimizes impedance. 3V3A covers most of the board; 3V3D is a small island near J_DFT connected through the ferrite bead footprint.</td>
+  </tr>
+  <tr>
+    <td style="font-weight:600;">L4 (Bottom)</td><td>Signal (secondary)</td><td>Overflow routing, ground stitching vias, thermal relief</td><td>1 oz (35 µm)</td>
+    <td>Minimal signal routing on L4. Used primarily for short jumpers where L1 routing is blocked, and for ground fill that stitches to L2 via vias. L4 signals reference L3 power plane.</td>
+  </tr>
+</table>
+<p class="tbl-caption" id="tbl-7-1a">Table 7.1a: 4-layer stackup assignment</p>
+
+<h4>Dielectric and Impedance</h4>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Why the L1-L2 spacing dominates signal integrity</strong>
+  <p>A signal trace on L1 and its return current on L2 form a microstrip transmission line. The characteristic impedance is:</p>
+  <span class="eq">Z<sub>0</sub> ≈ (87 / √(ε<sub>r</sub> + 1.41)) × ln(5.98h / (0.8w + t))</span>
+  <p>where h is the dielectric height (L1 to L2), w is the trace width, t is the copper thickness, and ε<sub>r</sub> is the relative permittivity of the dielectric (FR-4: ε<sub>r</sub> ≈ 4.2 at 1 MHz).</p>
+  <p>For a standard 4-layer stackup from most PCB fabricators (JLCPCB, OSHPark): L1-L2 dielectric ≈ 0.2 mm (8 mil), core between L2-L3 ≈ 1.0 mm (40 mil), L3-L4 dielectric ≈ 0.2 mm. With these dimensions and a 0.2 mm (8 mil) trace width on L1:</p>
+  <span class="eq">Z<sub>0</sub> ≈ (87 / √(4.2 + 1.41)) × ln(5.98 × 0.2 / (0.8 × 0.2 + 0.035)) ≈ 36.7 × ln(5.76) ≈ <strong>64 Ω</strong></span>
+  <p>For our signals (DC to 15 kHz), impedance matching is electrically irrelevant - the wavelength at 15 kHz is 20 km, so the entire PCB is a negligible fraction of a wavelength. The stackup matters for a different reason: <strong>return current confinement.</strong></p>
+</div>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Return current path and why L1-L2 proximity matters</strong>
+  <p>Every signal current flowing on L1 must return to its source. At DC, the return current takes the path of least <em>resistance</em> (spreads across the entire ground plane). At AC, the return current takes the path of least <em>impedance</em> (flows directly beneath the signal trace on L2). The crossover frequency is:</p>
+  <span class="eq">f<sub>crossover</sub> ≈ R<sub>sheet</sub> / (2π × L<sub>loop</sub>)</span>
+  <p>For 1 oz copper (R<sub>sheet</sub> ≈ 0.5 mΩ/sq) and a typical trace-to-plane loop inductance of ~0.5 nH/mm: f<sub>crossover</sub> is in the low kHz range. Above this frequency, the return current is tightly coupled to the signal trace.</p>
+  <p>This means even our 15 kHz signals have return currents that are partially localized beneath the trace. The SPI clock (1-10 MHz) and its harmonics (up to 70 MHz) are fully localized. The closer L2 is to L1, the tighter the coupling, the smaller the current loop area, and the less the signal radiates or picks up noise.</p>
+  <p>The 0.2 mm L1-L2 spacing is the tightest standard option from most fabricators. Going to a 6-layer board would allow even tighter coupling but is unnecessary for our signal frequencies and adds cost.</p>
+</div>
+
+<div class="callout callout-teal">
+  <strong><span class="tag tag-decision">DECISION</span> 4 layers, not 2 or 6</strong>
+  <p><strong>Why not 2 layers?</strong> A 2-layer board has no dedicated ground plane. Return currents must share the same layer as signal traces, creating large current loops. At SPI frequencies (10 MHz, λ/10 ≈ 3 m), the loop areas on a 2-layer board act as efficient antennas that couple digital noise into the analog signal path. For an 18-bit system (19 µV LSB), this is unacceptable. The Rev A board was 4-layer specifically because the original designer recognized this constraint.</p>
+  <p><strong>Why not 6 layers?</strong> A 6-layer stackup would provide a second ground plane (one above and one below the signal layers) and better power plane isolation. However, the additional cost (~2× per board at prototype quantities) is not justified when the 4-layer design provides adequate isolation for our bandwidth (DC-15 kHz) and dynamic range (~80 dB practical). If the FPGA digital backend were on the same board (running at 100+ MHz), 6 layers would be reconsidered.</p>
+</div>
+
+<h4>Stackup Specification for Fabrication</h4>
+
+<table>
+  <tr><th>Parameter</th><th>Value</th><th>Notes</th></tr>
+  <tr><td>Total board thickness</td><td>1.6 mm ± 10%</td><td>Standard for most connectors and enclosures</td></tr>
+  <tr><td>L1-L2 prepreg</td><td>0.2 mm (7.8 mil), FR-4, ε<sub>r</sub> = 4.2</td><td>Tightest standard prepreg. Critical for signal-to-ground coupling.</td></tr>
+  <tr><td>L2-L3 core</td><td>1.0 mm (39 mil), FR-4</td><td>Thick core provides mechanical rigidity and separates GND from power.</td></tr>
+  <tr><td>L3-L4 prepreg</td><td>0.2 mm (7.8 mil), FR-4</td><td>Symmetric stackup prevents warping during reflow.</td></tr>
+  <tr><td>Copper weight (all layers)</td><td>1 oz (35 µm)</td><td>Sufficient for max current (17.5 mA). 1 oz handles up to ~1 A on a 10 mil trace.</td></tr>
+  <tr><td>Surface finish</td><td>HASL (lead-free) or ENIG</td><td>ENIG preferred for fine-pitch SSOP and MSOP pads. HASL acceptable for prototype.</td></tr>
+  <tr><td>Minimum trace/space</td><td>6 mil / 6 mil (0.15 mm)</td><td>Conservative. No fine-pitch BGAs or high-density routing required.</td></tr>
+  <tr><td>Minimum via</td><td>0.3 mm drill, 0.6 mm pad</td><td>Standard through-hole via. No blind/buried vias needed.</td></tr>
+</table>
+<p class="tbl-caption" id="tbl-7-1b">Table 7.1b: Stackup fabrication specification</p>
+
+<h3 id="s7-2">7.2 Component Placement Strategy</h3>
+
+<p>Component placement is the single highest-leverage layout decision. A good placement makes routing straightforward and short; a poor placement forces long traces, vias, and compromises that no amount of routing skill can fully recover. The placement follows the signal flow from left to right across the board, mirroring the schematic hierarchy.</p>
+
+<h4>Placement Zones</h4>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Why signal-flow placement minimizes trace length and crosstalk</strong>
+  <p>The signal path is: J_IF (SMA) → ESD/bias → PGA113 → filter → FDA → ADC → SPI out. If components are placed in this order along the board, every signal trace connects adjacent components with minimal length. Short traces have lower inductance (L ∝ length), lower resistance (R ∝ length), and less area for capacitive coupling to adjacent traces.</p>
+  <p>Crosstalk between parallel traces is proportional to their coupled length and inversely proportional to their separation. By placing the analog signal chain in a linear flow, the "forward" traces (signal moving from left to right) are naturally separated from the "return" traces (SPI, power) which can be routed on the opposite edge or on L4.</p>
+</div>
+
+<table>
+  <tr><th>Zone</th><th>Location</th><th>Components</th><th>Rationale</th></tr>
+  <tr>
+    <td style="font-weight:600;">Zone 1: Input</td><td>Left edge</td><td>J_IF (SMA), R_IN, D_ESD, C_AC, R_BIAS</td>
+    <td>SMA connector at board edge for coax access. Sheet B components immediately adjacent. Shortest path from connector to first active stage.</td>
+  </tr>
+  <tr>
+    <td style="font-weight:600;">Zone 2: Gain</td><td>Left-center</td><td>PGA113, C11, C12</td>
+    <td>PGA113 directly downstream of bias network. Bypass caps C11/C12 within 2 mm of AVDD/DVDD pins (per §3.1.3 impedance analysis). SPI pins face toward Zone 5 (J_DFT).</td>
+  </tr>
+  <tr>
+    <td style="font-weight:600;">Zone 3: Filter</td><td>Center</td><td>R_FILT_ISO, R3-R6, C13-C16, LTC6242, C17</td>
+    <td>Filter network between PGA and FDA. The Sallen-Key requires R3→R4→C13/C14→opamp and R5→R6→C15/C16→opamp to be compact - long traces between filter components add parasitic inductance and capacitance that shift the cutoff frequency and Q.</td>
+  </tr>
+  <tr>
+    <td style="font-weight:600;">Zone 4: Output</td><td>Right-center</td><td>THS4531A, Rf1/Rf2, R_G, R_OUTP/R_OUTM, C_DIFF, ADS8881</td>
+    <td>FDA and ADC are a tightly-coupled pair. The differential output traces (FDA_OUTP/OUTM) must be length-matched and run as a parallel pair to the ADC inputs. C_DIFF (100 pF) is placed at the ADC input pins, not at the FDA output.</td>
+  </tr>
+  <tr>
+    <td style="font-weight:600;">Zone 5: Digital/DFT</td><td>Right edge</td><td>J_DFT (2×10 header), debug LEDs, pull-ups</td>
+    <td>DFT header at the opposite end of the board from the analog input. SPI traces route from J_DFT back toward PGA113 and ADC. Keeping digital I/O at one edge prevents digital traces from crossing under the analog signal path.</td>
+  </tr>
+  <tr>
+    <td style="font-weight:600;">Zone 6: Power</td><td>Top edge or dedicated corner</td><td>ST1, F1, D1, U_LDO, FB1, U_REF, U_VCM, R1/R2</td>
+    <td>Power entry and regulation along one edge. Power distribution fans out from this zone through the L3 power plane. Keeps high-current input path (ST1→F1→D1→LDO) away from sensitive analog traces.</td>
+  </tr>
+</table>
+<p class="tbl-caption" id="tbl-7-2a">Table 7.2a: Component placement zones following signal flow</p>
+
+<h4>Critical Placement Constraints</h4>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Filter component placement: why compactness directly affects fc and Q</strong>
+  <p>The Sallen-Key filter's transfer function (§5.4) depends on R and C values. A PCB trace between filter components adds parasitic inductance (~1 nH/mm) and capacitance (~0.1 pF/mm to ground plane at 0.2 mm separation). These parasitics are in series and parallel with the designed R and C values.</p>
+  <p>Consider a 10 mm trace between R4 and C13 (the R-R junction to the shunt cap). This adds ~10 nH of series inductance and ~1 pF of shunt capacitance. At 15 kHz: Z<sub>L</sub> = 2π × 15,000 × 10 × 10<sup>-9</sup> = 0.94 mΩ (negligible vs R4 = 5.76 kΩ). The capacitive parasitic: 1 pF vs C14 = 1.1 nF = 0.09% error. Both are negligible at our frequencies.</p>
+  <p>However, at the SPI clock frequency (10 MHz) where digital noise couples in: Z<sub>L</sub> = 2π × 10<sup>7</sup> × 10<sup>-8</sup> = 0.63 Ω and the 1 pF parasitic has Z<sub>C</sub> = 16 kΩ. The inductance provides a low-impedance path for high-frequency noise currents that bypass the designed filter network. <strong>Compact placement matters not for the signal frequencies but for the noise frequencies</strong> - the filter components must be close together so that the designed impedances dominate over parasitics at the frequencies where interference is strongest.</p>
+</div>
+
+<div class="callout callout-teal">
+  <strong><span class="tag tag-decision">DECISION</span> Bypass capacitor placement rules (from §3.1.3, enforced in layout)</strong>
+  <p>The impedance analysis in §3.1.3 derived quantitative placement distances from the trace inductance budget. These are not guidelines - they are requirements that must be verified in the layout DRC:</p>
+  <p><strong>100nF bypass caps (C11, C12, C17, C_VCM):</strong> ≤2 mm from the power pin they serve. At 50 MHz, a 2 mm trace adds 0.78 Ω - acceptable. At 5 mm, 1.7 Ω - the trace is the dominant impedance element. At 10 mm, 3.3 Ω - the cap is 100× less effective than its intrinsic impedance.</p>
+  <p><strong>1µF output caps (C3, C6):</strong> ≤5 mm from the IC output pin. These serve the 0.5-5 MHz band where their ESL is still low.</p>
+  <p><strong>10µF bulk caps (C1, C5, C7):</strong> ≤10 mm. These serve DC to 2 MHz and tolerate more trace inductance.</p>
+</div>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> ADC and FDA placement: the charge kickback problem</strong>
+  <p>The ADS8881 is a SAR ADC. During each conversion, its internal capacitive DAC connects to the analog input pins and draws a transient current pulse to charge the sampling capacitor. This "charge kickback" has a duration of ~10 ns and draws ~5 mA peak.</p>
+  <p>The voltage disturbance at the ADC input is:</p>
+  <span class="eq">ΔV = I<sub>kick</sub> × (R<sub>OUT</sub> + Z<sub>trace</sub>) × (1 - e<sup>-t/τ</sup>)</span>
+  <p>where R<sub>OUT</sub> includes the 33 Ω output matching resistors and the FDA's output impedance. The trace impedance Z<sub>trace</sub> between the FDA output and ADC input adds to this. For a 10 mm trace (10 nH): Z = ωL = 2π × (1/10ns) × 10nH ≈ 6.3 Ω at the kickback's bandwidth. This adds to the 33 Ω output resistor, increasing the settling disturbance.</p>
+  <p>The RC settling time at the ADC input is τ = (R<sub>OUT</sub> + R<sub>trace</sub>) × (C<sub>DIFF</sub> + C<sub>parasitic</sub>). For accurate 18-bit settling, the signal must settle to within 0.5 LSB (9.5 µV) within the acquisition window (~1 µs at 100 kS/s). This requires ~20τ of settling time, so τ must be &lt;50 ns.</p>
+  <p>With R<sub>OUT</sub> = 33 Ω and C<sub>DIFF</sub> = 100 pF: τ = 33 × 100 × 10<sup>-12</sup> = 3.3 ns. This gives 303 time constants in 1 µs - far more than adequate. But adding 10 mm of trace (6.3 Ω effective) increases the effective resistance to 39.3 Ω and τ to 3.93 ns - still fine, but the margin is being consumed by layout. The FDA and ADC should be as close as possible - ideally &lt;5 mm pin-to-pin.</p>
+</div>
+
+<div class="callout callout-teal">
+  <strong><span class="tag tag-decision">DECISION</span> Thermal placement: no special requirements</strong>
+  <p>The total board dissipation is approximately P = V<sub>drop</sub> × I<sub>total</sub> for the LDO: (5.0 - 3.3) × 13 mA ≈ 22 mW, plus IC quiescent power: 3.3V × 13 mA ≈ 43 mW. Total: ~65 mW. This produces a negligible temperature rise (&lt;1°C) even without thermal vias or heatsinking. No thermal relief strategy is needed beyond standard copper fills. The REF5025's temperature coefficient (8 ppm/°C) is the most thermally sensitive parameter, but at &lt;1°C board-level rise, the reference drift contribution is &lt;0.02 µV - far below 1 LSB.</p>
+</div>
+
+<h3 id="s7-3">7.3 Ground Plane and Power Distribution</h3>
+
+<p>The grounding and power distribution strategy is the most consequential layout decision after the stackup. It determines the impedance that every return current sees, and therefore the noise floor of the entire system.</p>
+
+<h4>Ground Plane: Single, Continuous, Unbroken</h4>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Why one ground plane, not split analog/digital grounds</strong>
+  <p>A persistent myth in mixed-signal design is that splitting the ground plane into "AGND" and "DGND" regions reduces digital noise coupling into the analog circuitry. The physics says the opposite: a split ground plane forces return currents to detour around the split, creating large current loops that radiate and receive electromagnetic interference.</p>
+  <p>Consider the SPI clock trace from J_DFT (Zone 5, right edge) to PGA113 (Zone 2, left-center). If the ground plane were split between analog and digital regions, the SPI clock's return current on L2 would flow along the trace until it reached the split boundary, then detour around the split to find a path back to the source. This detour could add 20-30 mm to the return path, creating a current loop area of:</p>
+  <span class="eq">A<sub>loop</sub> = trace_length × detour_width ≈ 40 mm × 15 mm = 600 mm²</span>
+  <p>The magnetic flux captured by this loop (and therefore the noise voltage induced by external fields) is proportional to the loop area. For a 10 MHz SPI clock: V<sub>noise</sub> = -dΦ/dt = -µ<sub>0</sub> × H × A × ω. With a nearby switching supply generating 1 A/m field at 10 MHz: V<sub>noise</sub> ≈ 4π × 10<sup>-7</sup> × 1 × 600 × 10<sup>-6</sup> × 2π × 10<sup>7</sup> ≈ <strong>47 mV</strong>. This is ~2,500 LSBs.</p>
+  <p>With a continuous ground plane, the return current flows directly beneath the SPI trace. The loop area is:</p>
+  <span class="eq">A<sub>loop</sub> = trace_length × dielectric_height ≈ 40 mm × 0.2 mm = 8 mm²</span>
+  <p>Same calculation: V<sub>noise</sub> ≈ 4π × 10<sup>-7</sup> × 1 × 8 × 10<sup>-6</sup> × 2π × 10<sup>7</sup> ≈ <strong>0.6 mV</strong> = 32 LSBs. Still not zero, but 75× better than the split-plane case. The remaining noise is further attenuated by the ferrite bead on the supply side and the bypass caps at each IC.</p>
+  <p>This analysis follows Henry Ott (<em>EMC Engineering</em>, Ch. 18) and TI SLYT499/SLYT512. The conclusion is unambiguous: <strong>do not split the ground plane in a mixed-signal design. Use a single continuous ground plane and manage noise through supply-side isolation (ferrite bead) and careful trace routing.</strong></p>
+</div>
+
+<div class="callout callout-red">
+  <strong><span class="tag tag-risk">RISK</span> Ground plane void under signal traces</strong>
+  <p>Any void in the L2 ground plane (from routing a trace on L2, placing a large via cluster, or cutting a slot) forces return currents to detour around the void. This is equivalent to a localized ground split. The layout DRC must verify: <strong>no traces routed on L2</strong>, and no ground plane voids wider than 2 mm exist under any signal trace on L1 or L4.</p>
+  <p>Via holes create small voids (~0.6 mm diameter), but isolated vias do not interrupt the ground plane continuity. A row of closely-spaced vias (e.g., a via fence) can create a slot-like void if spacing is &lt;1 mm - avoid placing dense via rows perpendicular to signal traces.</p>
+</div>
+
+<h4>Power Distribution: L3 Plane Partitioning</h4>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Power plane impedance vs. power trace impedance</strong>
+  <p>A power plane (copper pour on an entire layer) has dramatically lower impedance than a power trace. A 10 mil (0.25 mm) wide trace carrying 3.3V has a resistance of:</p>
+  <span class="eq">R<sub>trace</sub> = ρ / (w × t) × length = 0.5 mΩ/sq × (length/width)</span>
+  <p>For a 40 mm long, 0.25 mm wide trace: R = 0.5 mΩ × (40/0.25) = 80 mΩ. At 13 mA load: V<sub>drop</sub> = 80 mΩ × 13 mA = 1.04 mV. Acceptable, but the inductance is worse: L ≈ 1 nH/mm × 40 mm = 40 nH. At 10 MHz (SPI clock harmonic): Z<sub>L</sub> = 2.5 Ω. A transient current spike of 5 mA during an ADC conversion would produce ΔV = 2.5 × 0.005 = 12.5 mV = 656 LSBs on the supply rail.</p>
+  <p>A power plane covering the same 40 mm path but with full board width (~30 mm) has an effective width 120× larger: R = 0.5 mΩ × (40/30) = 0.67 mΩ, L ≈ 0.3 nH (sheet inductance is much lower than trace inductance). At 10 MHz: Z<sub>L</sub> = 0.019 Ω. Same 5 mA transient: ΔV = 0.019 × 0.005 = 95 µV = 5 LSBs. The plane is <strong>130× better</strong> than a trace for high-frequency power delivery.</p>
+</div>
+
+<table>
+  <tr><th>L3 Region</th><th>Net</th><th>Area</th><th>Components Served</th><th>Connection</th></tr>
+  <tr>
+    <td style="font-weight:600; color:var(--amber);">3V3A pour</td><td>3V3A</td><td>~80% of board</td><td>All analog ICs: LDO output, REF5025, OPA320, PGA113, LTC6242, THS4531A, ADS8881</td>
+    <td>Direct from U_LDO output pad via to L3. Continuous pour under all analog zones.</td>
+  </tr>
+  <tr>
+    <td style="font-weight:600; color:var(--purple);">3V3D island</td><td>3V3D</td><td>~10% of board (near J_DFT)</td><td>J_DFT pull-up resistors, debug LEDs</td>
+    <td>Connected to 3V3A through FB1 (ferrite bead) footprint on L1. The via from FB1 output drops to L3 and feeds the 3V3D island. The island is physically separated from the 3V3A pour by a ~1 mm gap on L3.</td>
+  </tr>
+  <tr>
+    <td style="font-weight:600; color:var(--dim);">No-pour keepout</td><td>—</td><td>~10%</td><td>—</td>
+    <td>Board edges, mounting holes, and the gap between 3V3A and 3V3D regions. The gap prevents direct current flow between analog and digital supplies on L3 - the only connection is through FB1 on L1.</td>
+  </tr>
+</table>
+<p class="tbl-caption" id="tbl-7-3a">Table 7.3a: L3 power plane partitioning</p>
+
+<div class="callout callout-teal">
+  <strong><span class="tag tag-decision">DECISION</span> VCM and VREF distributed as traces, not planes</strong>
+  <p>VCM (1.65V) and VREF (2.5V) are low-current, point-to-point connections that do not benefit from plane distribution. VCM drives three loads (R_BIAS on Sheet B, PGA113 VREF, THS4531A VOCM) with a total current of ~370 µA. VREF drives only the ADS8881 reference pin (~100 µA). These are routed as individual traces on L1, with local decoupling at each destination. Using L3 plane area for these nets would fragment the 3V3A pour without meaningful impedance benefit.</p>
+</div>
+
+<h4>Ground Stitching</h4>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Why ground stitching vias matter between L2 and L4</strong>
+  <p>L4 (bottom) has ground fill that supplements L2. But L2 and L4 ground fills are only connected through vias. Without sufficient vias, the L4 ground fill has a high-impedance connection to the main ground plane (L2) and can develop a voltage offset from return currents flowing through the via inductance.</p>
+  <p>Each ground via has approximately 0.5-1 nH of inductance. At 10 MHz: Z<sub>via</sub> = 2π × 10<sup>7</sup> × 10<sup>-9</sup> ≈ 0.06 Ω per via. With 10 mA of return current: ΔV = 0.6 mV per via. Multiple vias in parallel reduce this proportionally.</p>
+  <p>The rule of thumb: place ground stitching vias every 10 mm along the board edges and around any L4 signal trace. Near the ADC (most sensitive node), increase the density to every 5 mm. Each via connects L2 GND to L4 GND, ensuring the bottom ground fill is at the same potential as the main ground plane.</p>
+</div>
+
+<h3 id="s7-4">7.4 Critical Trace Routing</h3>
+
+<p>With the stackup defined and components placed, the routing implements the electrical connections. Most traces in this design are non-critical (power drops to bypass caps, ground connections, test point taps). Four routing domains require specific attention: the analog signal path, the SPI bus, the differential ADC input pair, and the power distribution from LDO to ICs.</p>
+
+<h4>Analog Signal Path: J_IF → PGA → Filter → FDA → ADC</h4>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Trace width for the analog signal path</strong>
+  <p>The analog signal traces carry µV-to-mV signals at DC to 15 kHz. The current flowing in these traces is negligible (µA range, determined by the load impedance at each stage). There is no current-carrying capacity concern. The trace width is determined by two factors:</p>
+  <p><strong>1. Resistance:</strong> A 6 mil (0.15 mm) trace in 1 oz copper has R = 0.5 mΩ/sq × (length/0.15) per mm. For a 10 mm trace: R = 33 mΩ. With µA signal current, the voltage drop is sub-nV - negligible.</p>
+  <p><strong>2. Crosstalk:</strong> Wider traces have lower impedance and are less susceptible to capacitive coupling from adjacent traces. However, wider traces also have more surface area for coupling. The dominant factor is the <em>spacing</em> between traces, not the width. The 3W rule (space between trace centers ≥ 3× trace width) provides >70% crosstalk reduction at our frequencies.</p>
+  <p>Use 10 mil (0.25 mm) trace width for all analog signal paths. This is wider than the 6 mil minimum, giving a small resistance benefit and better manufacturing yield (wider traces are more tolerant of etching variations). Apply 3W spacing: 30 mil (0.75 mm) center-to-center minimum between analog traces and any other signal.</p>
+</div>
+
+<div class="callout callout-teal">
+  <strong><span class="tag tag-decision">DECISION</span> Analog signal routing rules</strong>
+  <p><strong>Route on L1 only.</strong> All analog signal traces (IF_BIASED, PGA_OUT, filter network, LPF_OUT, FDA inputs/outputs, ADC inputs) stay on L1 where they reference L2 ground directly beneath. No vias in the signal path - every via adds ~0.5 nH of inductance and creates a discontinuity in the ground reference.</p>
+  <p><strong>No traces cross under or over each other.</strong> If the PGA_OUT trace to the filter and the SPI_SCLK trace to the PGA must cross, one of them uses a short L4 jump with two vias. The SPI trace makes the jump (not the analog trace) because the analog signal is more sensitive to via inductance and ground reference discontinuity.</p>
+  <p><strong>Guard ring on highest-gain node.</strong> The PGA113 output at gain = 200× carries up to 2 V<sub>pp</sub> of amplified signal. Any noise coupling into this node is amplified by 1× (it's after the gain stage), but it sees the full signal swing. A ground guard trace (connected to L2 via stitching vias every 5 mm) on both sides of the PGA_OUT trace provides an additional 6-10 dB of crosstalk isolation.</p>
+</div>
+
+<h4>SPI Bus: SCLK, SDI, CS_PGA, SDO</h4>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> SPI clock edge rate and EMI</strong>
+  <p>The SPI clock (SCLK) has a maximum frequency of 10 MHz (PGA113 limit) with rise/fall times of ~5 ns (typical CMOS output). The bandwidth of the edges is:</p>
+  <span class="eq">f<sub>knee</sub> = 0.35 / t<sub>rise</sub> = 0.35 / 5 ns = 70 MHz</span>
+  <p>This means the SPI clock trace radiates and couples energy at frequencies up to 70 MHz. At 70 MHz, λ/10 = 43 cm - our board is ~50-80 mm, so it is a small but non-negligible fraction of a wavelength. The SPI traces must be treated as RF traces from an EMI perspective, even though the data rate is modest.</p>
+  <p>The 33 Ω series damping resistor (R_SCLK_DAMP1 on Sheet D) is placed at the ADC end of the SCLK trace, not at the source. This is because the ADC's SCLK input has ~5 pF of capacitance. The 33 Ω resistor and 5 pF form a low-pass filter with f<sub>-3dB</sub> = 1/(2π × 33 × 5 × 10<sup>-12</sup>) = 965 MHz. This does not attenuate the 10 MHz clock or even the 70 MHz edge content, but it dampens ringing from transmission line reflections that would otherwise create overshoot and undershoot at the ADC input.</p>
+</div>
+
+<div class="callout callout-teal">
+  <strong><span class="tag tag-decision">DECISION</span> SPI routing rules</strong>
+  <p><strong>Route SPI traces on L1, perpendicular to analog traces where they must cross.</strong> Perpendicular crossings minimize the coupled length to a single trace width (~0.25 mm), reducing crosstalk by >20 dB compared to parallel routing.</p>
+  <p><strong>SPI traces run along the board edge opposite to the analog signal path.</strong> If the analog chain runs left-to-right through the center of the board, the SPI bus runs along the top or bottom edge. This maximizes the physical separation between the highest-bandwidth digital signals and the most sensitive analog nodes.</p>
+  <p><strong>33 Ω damping resistor at the ADC end of SCLK.</strong> Placed within 3 mm of the ADS8881 SCLK pin. The PGA113 SCLK pin does not need a damping resistor because the PGA113's SCLK input has higher capacitance (~10 pF) which naturally dampens ringing, and the PGA113 is less sensitive to clock edge quality than the ADC (the PGA113 only needs to latch a 16-bit command, while the ADC uses SCLK to clock out 18 bits of conversion data).</p>
+  <p><strong>CS_PGA has a pull-up to 3V3D on the J_DFT header.</strong> This ensures the PGA113 is deselected (CS high) when no controller is connected. The pull-up is on the digital supply side of the ferrite bead.</p>
+</div>
+
+<h4>Differential ADC Input Pair: AINP / AINM</h4>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Length matching and common-mode rejection</strong>
+  <p>The THS4531A FDA outputs (OUTP, OUTM) drive the ADS8881 inputs (AINP, AINM) through 33 Ω matching resistors and a 100 pF differential capacitor. These two traces must be routed as a matched differential pair:</p>
+  <p><strong>Length matching:</strong> Any length mismatch between AINP and AINM creates a time skew. At the ADC sampling instant, the two inputs are at slightly different points on the waveform, which appears as a common-mode-to-differential conversion error. For 18-bit accuracy at 15 kHz: the maximum tolerable skew is approximately 1/(2<sup>18</sup> × 2π × 15,000) ≈ 0.4 ns. At the propagation velocity on FR-4 (~150 mm/ns), this corresponds to 60 mm of length mismatch. Our traces are &lt;10 mm total, so length matching to within 1 mm is more than adequate. Still, matching them by design (routing as a parallel pair) costs nothing and eliminates this as a variable.</p>
+  <p><strong>Spacing:</strong> The two traces should maintain constant separation (0.2-0.3 mm edge-to-edge) along their entire length. This ensures the mutual inductance and capacitance are uniform, so any common-mode noise couples equally into both traces and is rejected by the ADC's CMRR (~80 dB).</p>
+  <p><strong>C_DIFF placement:</strong> The 100 pF differential capacitor connects between AINP and AINM at the ADC input pins (not at the FDA output). This cap serves two purposes: it filters high-frequency differential noise, and it provides a local charge reservoir for the ADC's sampling capacitor kickback. Placing it at the ADC end ensures the kickback charge comes from C_DIFF rather than traveling back through the traces to the FDA.</p>
+</div>
+
+<h4>Power Distribution Routing</h4>
+
+<div class="callout callout-teal">
+  <strong><span class="tag tag-decision">DECISION</span> Power delivery: plane + local drops</strong>
+  <p>The 3V3A power plane on L3 provides the low-impedance backbone. Each IC's power pin connects to the plane through a via adjacent to its bypass capacitor. The routing sequence for each IC is:</p>
+  <p style="font-family:monospace; margin:0.5rem 0;">L3 (3V3A plane) → via → L1 pad (bypass cap terminal 1) → short trace → IC power pin<br>L1 pad (bypass cap terminal 2) → short trace → via → L2 (GND plane)</p>
+  <p>The bypass cap is always between the via and the IC pin, never after the IC pin. This ensures that high-frequency current from the IC flows through the bypass cap to ground before it reaches the plane via (where its impedance is higher due to via inductance).</p>
+  <p><strong>VCM routing:</strong> Single trace from OPA320 output, branching to Sheet B (R_BIAS), Sheet C (PGA113 VREF), and Sheet D (THS4531A VOCM). Each branch has a local decoupling cap at the destination. The trace width is 10 mil (same as analog signal), with 100 nF bypass at the OPA320 output and at each branch endpoint.</p>
+  <p><strong>VREF routing:</strong> Single trace from REF5025 output to ADS8881 REF pin. Decoupled with 10 µF + 100 nF at the REF5025 output. The trace carries only ~100 µA and is not noise-sensitive (VREF is a DC reference, not a signal). Route on L1, keeping it away from the SPI bus to prevent clock noise from modulating the reference.</p>
+</div>
+
+<h3 id="s7-5">7.5 DFT Infrastructure Placement</h3>
+
+<div class="callout callout-blue">
+  <strong><span class="tag tag-physics">PHYSICS</span> Isolation resistor placement: at the DFT header, not at the signal node</strong>
+  <p>The 10 kΩ isolation resistors (R_ISO_PGA, R_ISO_LPF, R_ISO_AINP, R_ISO_AINM, R_ISO_FDAP, R_ISO_FDAM) serve to prevent probe capacitance from loading the signal chain (see §2.6). These resistors must be placed <em>at the DFT header end</em> of the monitoring trace, not at the signal node.</p>
+  <p>If the isolation resistor were at the signal node, the trace from the resistor to J_DFT would act as an unterminated antenna, picking up noise and coupling it back through the resistor's parasitic capacitance (~0.1 pF for a 0805 resistor) into the signal. With the resistor at the J_DFT end, the trace from the signal node to the resistor is short (the signal node is near the DFT header in Zone 5), and the high-impedance side of the resistor faces the DFT connector pins where probe capacitance is expected.</p>
+  <p>Correction: the isolation resistors should actually be at the <em>signal node end</em> to minimize the stub length that presents parasitic capacitance to the signal path. The trace from the resistor to J_DFT is a high-impedance stub that is isolated by the 10 kΩ. Either placement works if the total stub length is kept under 15 mm. The practical choice is determined by which placement results in shorter total trace length given the component positions.</p>
+</div>
+
+<div class="callout callout-teal">
+  <strong><span class="tag tag-decision">DECISION</span> J_DFT header at the board edge, accessible with probes</strong>
+  <p>The 2×10 (20-pin) DFT header is placed at the right edge of the board (Zone 5). This provides:</p>
+  <p><strong>Physical accessibility:</strong> A logic analyzer or oscilloscope can be connected via a ribbon cable to J_DFT without physically interfering with the SMA input connector (left edge) or the power entry (top edge).</p>
+  <p><strong>Separation from analog input:</strong> J_DFT carries SPI signals, power, and analog monitor outputs. Placing it at the opposite end of the board from J_IF maximizes the physical distance between the highest-noise connector (SPI clock at J_DFT) and the most sensitive node (mixer IF input at J_IF).</p>
+  <p><strong>MMCX connectors near their signal nodes:</strong> The 5 MMCX test points (PGA_OUT, LPF_OUT, AINP, AINM, VCM) are placed near their respective signal nodes, not clustered at J_DFT. This minimizes the stub length from the signal trace to the MMCX pad. Each MMCX connects through a 10 kΩ isolation resistor to prevent loading.</p>
+</div>
+
+<h3 id="s7-6">7.6 Manufacturing and Assembly Constraints</h3>
+
+<table>
+  <tr><th>Constraint</th><th>Value</th><th>Rationale</th></tr>
+  <tr><td>Minimum trace width</td><td>6 mil (0.15 mm)</td><td>Standard capability for all major PCB fabs. No traces in this design require less.</td></tr>
+  <tr><td>Minimum trace spacing</td><td>6 mil (0.15 mm)</td><td>Adequate clearance for 3.3V operation. IPC-2221 requires 0.1 mm for &lt;15V.</td></tr>
+  <tr><td>Minimum via drill</td><td>0.3 mm</td><td>Standard through-hole via. Smaller drills (0.2 mm) add cost and are unnecessary.</td></tr>
+  <tr><td>Via pad diameter</td><td>0.6 mm</td><td>Standard annular ring for 0.3 mm drill. Provides adequate copper for reliable plating.</td></tr>
+  <tr><td>Component clearance</td><td>0.2 mm edge-to-edge</td><td>Allows rework with standard soldering iron. Tighter clearance (0.1 mm) is possible but complicates hand rework during bringup.</td></tr>
+  <tr><td>Fiducials</td><td>3× 1 mm diameter, copper on solder mask</td><td>Required for pick-and-place alignment if machine assembly is used. Placed at three corners of the board in an asymmetric triangle.</td></tr>
+  <tr><td>Solder paste stencil</td><td>5 mil (0.125 mm) thickness</td><td>Standard for 0.65 mm pitch SSOP (LTC6242) and 0.5 mm pitch MSOP (PGA113). Thinner stencil (3 mil) needed only for QFN/BGA - not used in this design.</td></tr>
+  <tr><td>Panelization</td><td>V-score or tab-routed</td><td>If ordering panels for batch assembly. Individual boards are acceptable for prototype quantities (1-5 boards).</td></tr>
+</table>
+<p class="tbl-caption" id="tbl-7-6">Table 7.6: Manufacturing and assembly constraints</p>
+
+<div class="callout callout-teal">
+  <strong><span class="tag tag-decision">DECISION</span> All components on one side (top/L1)</strong>
+  <p>All SMD components are placed on L1 (top). This simplifies assembly to a single reflow pass (one solder paste application, one oven cycle). Double-sided assembly requires either two reflow passes (with the risk of first-side components falling off during the second pass) or selective soldering. For a prototype board with 30-40 components, single-sided assembly is straightforward and reliable.</p>
+  <p>Through-hole components (ST1 screw terminal, J_IF SMA, J_DFT header, 5 MMCX connectors) are soldered by hand after reflow. These are all mechanically-stressed connectors that benefit from through-hole robustness.</p>
+</div>
+
+<h4>Silkscreen Annotations</h4>
+
+<div class="callout callout-teal">
+  <strong><span class="tag tag-decision">DECISION</span> Silkscreen serves as a built-in reference during bringup</strong>
+  <p>The silkscreen includes: all reference designators (standard), component values for all resistors and capacitors (not standard, but invaluable during hand assembly verification), test point labels matching the schematic net names (TP_3V3A, TP_VCM, TP_VREF, etc.), pin 1 indicators on all ICs, polarity markers on D1 and F1, and the board revision number and date.</p>
+  <p>The signal flow direction is marked with arrows along the analog path: J_IF → PGA → FILT → FDA → ADC. This allows a reviewer to understand the board's function from the silkscreen alone, without referencing the schematic - a practical benefit during lab bringup when the schematic may not be immediately at hand.</p>
+</div>
+
+
 
 <!-- ================================================================ -->
 <h2 id="sA">Appendix A: References &amp; Further Reading</h2>
