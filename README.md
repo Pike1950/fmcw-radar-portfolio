@@ -129,8 +129,6 @@ The radar project connects all four tracks: it's a mixed-signal PCB (track 1) de
   - [x] Sheet B: ESD protection, AC coupling, DC bias
   - [x] Sheet C: PGA113 gain, 4th-order Sallen-Key Butterworth, pin tables
   - [x] Sheet D: FDA SE-to-Diff, ADS8881 18-bit SAR, J_DFT header, SPI interface
-  - [ ] Sheet C block diagram and filter analysis integration (in progress)
-  - [ ] Layout design rationale (§7, forthcoming)
 - [ ] Schematic updates ([change plan](docs/planning/Schematic_Updates_Change_Plan.docx))
   - [ ] SCH-01: Fix C14 grounded feedback cap (should connect to OUT_A)
   - [ ] SCH-02: Fix floating capacitor pins (C13, C15, C16)
