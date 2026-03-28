@@ -121,13 +121,35 @@ The radar project connects all four tracks: it's a mixed-signal PCB (track 1) de
 
 ## Status
 
-- [x] Rev B schematic complete (90 components, 4 sheets, 0 ERC errors)
-- [x] Design rationale: FMCW principles, system overview, Sheet A (power)
-- [x] Design rationale: Sheet B (IF input, protection, bias)
-- [x] Design rationale: Sheet C (PGA, anti-alias filter, Sallen-Key topology)
-- [x] Design rationale: Sheet D (FDA, ADC, SPI interface, J_DFT)
-- [ ] Schematic updates (FPGA connector evaluation, ISM band provisions)
-- [ ] PCB layout
+- [x] Rev B schematic capture (90 components, 4 sheets)
+- [x] System Design Document (2,300+ lines, 14 figures, 40 tables)
+  - [x] FMCW operating principles, adaptive chirp, FCC regulatory landscape
+  - [x] System overview, signal budget, component selection rationale
+  - [x] Sheet A: power architecture, ferrite bead, capacitor placement analysis
+  - [x] Sheet B: ESD protection, AC coupling, DC bias
+  - [x] Sheet C: PGA113 gain, 4th-order Sallen-Key Butterworth, pin tables
+  - [x] Sheet D: FDA SE-to-Diff, ADS8881 18-bit SAR, J_DFT header, SPI interface
+  - [ ] Sheet C block diagram and filter analysis integration (in progress)
+  - [ ] Layout design rationale (§7, forthcoming)
+- [ ] Schematic updates ([change plan](docs/planning/Schematic_Updates_Change_Plan.docx))
+  - [ ] SCH-01: Fix C14 grounded feedback cap (should connect to OUT_A)
+  - [ ] SCH-02: Fix floating capacitor pins (C13, C15, C16)
+  - [ ] SCH-03: Wire LTC6242 op-amp pins (Sections A-D)
+  - [ ] SCH-04: Connect Stage 1 output to Stage 2 input
+  - [ ] SCH-05: Resolve remaining ERC errors (4)
+  - [ ] SCH-06: Add CS_PGA pull-up resistor
+  - [ ] SCH-07: Evaluate FPGA connector for Tang Primer 25K
+  - [ ] SCH-08: Add ISM band provisions (documentation only)
+  - [ ] SCH-09: Final ERC validation and schematic freeze
+- [ ] PCB layout ([change plan](docs/planning/PCB_Layout_Change_Plan.docx))
+  - [ ] PCB-01: Define 4-layer stackup (signal/GND/power/signal)
+  - [ ] PCB-02: Component placement following signal flow
+  - [ ] PCB-03: Ground plane strategy (single plane, partitioned routing)
+  - [ ] PCB-04: Critical trace routing (analog signal path)
+  - [ ] PCB-05: Power distribution routing (3V3A/3V3D zones)
+  - [ ] PCB-06: DFT connector and test point placement
+  - [ ] PCB-07: Design rule check and manufacturing review
+  - [ ] PCB-08: Silkscreen and documentation
 - [ ] FPGA digital backend: SPI controller RTL and verification
 - [ ] FPGA digital backend: DDS chirp generator
 - [ ] FPGA digital backend: Digital FIR filter
