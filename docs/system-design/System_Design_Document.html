@@ -81,6 +81,9 @@
   /* SVG wrap responsive centering */
   .svg-wrap { width: 100%; overflow-x: auto; margin: 0.8rem 0; background: var(--card); border-radius: 8px; border: 1px solid var(--border); padding: 1rem; }
   .svg-wrap svg { display: block; margin: 0 auto; width: 100%; height: auto; }
+  /* KiCad schematic SVG embeds */
+  .sch-wrap { width: 100%; overflow-x: auto; margin: 0.8rem 0; background: #fff; border-radius: 8px; border: 1px solid var(--border); padding: 0.5rem; }
+  .sch-wrap img { display: block; width: 100%; height: auto; }
   .fig-caption { text-align: center; font-size: 0.82rem; font-style: italic; color: var(--dim); margin-top: 0.4rem; margin-bottom: 1rem; }
   .tbl-caption { text-align: center; font-size: 0.82rem; font-style: italic; color: var(--dim); margin-top: 0.3rem; margin-bottom: 1rem; }
 </style>
@@ -212,6 +215,13 @@
       <li><span class="fig-type">Fig.</span> <a href="#fig-5-1b">§5.1b Sheet C block diagram</a></li>
       <li><span class="fig-type">Fig.</span> <a href="#fig-6-1">§6.1 Sheet D signal flow</a></li>
       <li><span class="fig-type">Fig.</span> <a href="#fig-6-1b">§6.1b Sheet D detailed block diagram</a></li>
+      <li style="margin-top:0.5rem; color:var(--amber); font-weight:600; font-size:0.85rem;">KiCad Schematics</li>
+      <li><span class="fig-type">Fig.</span> <a href="#fig-sch-root">§2.2c KiCad root hierarchy</a></li>
+      <li><span class="fig-type">Fig.</span> <a href="#fig-sch-a">§3.1c KiCad Sheet A schematic</a></li>
+      <li><span class="fig-type">Fig.</span> <a href="#fig-sch-b">§4.1c KiCad Sheet B schematic</a></li>
+      <li><span class="fig-type">Fig.</span> <a href="#fig-sch-c">§5.1c KiCad Sheet C schematic</a></li>
+      <li><span class="fig-type">Fig.</span> <a href="#fig-sch-c-audit">§5.4c Sheet C annotated audit</a></li>
+      <li><span class="fig-type">Fig.</span> <a href="#fig-sch-d">§6.1c KiCad Sheet D schematic</a></li>
 
       <li style="margin-top:0.8rem; color:var(--teal); font-weight:600; font-size:0.85rem;">Tables — §1 FMCW Principles</li>
       <li><span class="fig-type">Table</span> <a href="#tbl-1-2">§1.2 System parameters</a></li>
@@ -848,6 +858,14 @@
 </div>
 <p class="fig-caption" id="fig-2-2b">Figure 2.2b: Top-level 4-sheet hierarchy with inter-sheet signal routing (3V3A power bus, VCM/VREF references, SPI control)</p>
 
+<details>
+  <summary style="cursor:pointer; color:var(--amber); font-weight:600; font-size:0.9rem;">▶ KiCad Root Hierarchy Schematic</summary>
+  <div class="sch-wrap">
+    <img src="../../hardware/baseband-revB/exports/Root_Hierarchy.svg" alt="KiCad schematic SVG" style="width:100%; height:auto;">
+  </div>
+  <p class="fig-caption" id="fig-sch-root">Figure 2.2c: KiCad root hierarchy - 4-sheet organization with hierarchical label ports (IF_BIASED, LPF_OUT, VCM, VREF, 3V3A, 3V3D, SPI bus)</p>
+</details>
+
 <table>
   <tr>
     <th>Stage</th><th>Sheet</th><th>Key Components</th><th>Function</th><th>Signal Level</th>
@@ -1208,6 +1226,14 @@
 </div>
 <p class="fig-caption" id="fig-3-1b">Figure 3.1b: Sheet A detailed block diagram - LDO, ferrite bead rail split, VCM generator, and REF5025 with decoupling</p>
 
+<details>
+  <summary style="cursor:pointer; color:var(--amber); font-weight:600; font-size:0.9rem;">▶ KiCad Sheet A Schematic</summary>
+  <div class="sch-wrap">
+    <img src="../../hardware/baseband-revB/exports/Sheet_A_Power_Refs.svg" alt="KiCad schematic SVG" style="width:100%; height:auto;">
+  </div>
+  <p class="fig-caption" id="fig-sch-a">Figure 3.1c: KiCad Sheet A schematic - power input protection (F1, D1), TPS7A2033 LDO, ferrite bead rail split, REF5025, OPA320 VCM buffer</p>
+</details>
+
 <h4>3.1.1 Input Protection: F1 + D1</h4>
 
 <div class="callout callout-blue">
@@ -1544,6 +1570,14 @@
 </div>
 <p class="fig-caption" id="fig-4-1b">Figure 4.1b: Sheet B block diagram - component-level signal path with ESD shunt, AC coupling, and VCM bias network</p>
 
+<details>
+  <summary style="cursor:pointer; color:var(--amber); font-weight:600; font-size:0.9rem;">▶ KiCad Sheet B Schematic</summary>
+  <div class="sch-wrap">
+    <img src="../../hardware/baseband-revB/exports/Sheet_B_IF_Input.svg" alt="KiCad schematic SVG" style="width:100%; height:auto;">
+  </div>
+  <p class="fig-caption" id="fig-sch-b">Figure 4.1c: KiCad Sheet B schematic - J_IF SMA input, R_IN current limit, TPD1E10B06 ESD, C_AC coupling, R_BIAS to VCM</p>
+</details>
+
 <p>Two test points provide visibility: <strong>TP_IF_RAW</strong> (after R_IN, before ESD) monitors the raw input signal, and <strong>TP_PGA_IN</strong> (at the IF_BIASED output) confirms the DC bias is correct before the signal enters the PGA.</p>
 
 <h3 id="s4-2">4.2 Input Connector: J_IF (SMA 132289)</h3>
@@ -1758,6 +1792,14 @@
 <p class="fig-caption" id="fig-5-1b">Figure 5.1b: Sheet C block diagram - PGA113, LTC6242 two-stage filter, unused sections, and power connections</p>
 <p style="font-size:0.82rem; color:var(--dim); text-align:center;">Source: <a href="../block-diagrams/RevB_Block_Diagrams.html#sheet-c" style="color:var(--blue);">Block Diagrams §5</a> (standalone reference with full pin tables)</p>
 
+<details>
+  <summary style="cursor:pointer; color:var(--amber); font-weight:600; font-size:0.9rem;">▶ KiCad Sheet C Schematic</summary>
+  <div class="sch-wrap">
+    <img src="../../hardware/baseband-revB/exports/Sheet_C_PGA_Filter.svg" alt="KiCad schematic SVG" style="width:100%; height:auto;">
+  </div>
+  <p class="fig-caption" id="fig-sch-c">Figure 5.1c: KiCad Sheet C schematic (pre-fix) - PGA113 with SPI/power connections, LTC6242 placed with power pins wired. Filter network R3-R6 and C13-C16 present but incompletely connected. See <a href="#fig-sch-c-audit">annotated audit (Fig. 5.4c)</a> for wiring status.</p>
+</details>
+
 <h3 id="s5-2">5.2 Programmable Gain Amplifier: PGA113 (U_PGA)</h3>
 
 <div class="callout callout-blue">
@@ -1881,6 +1923,14 @@
   <p><strong>Stage 1 to Stage 2 connection is missing.</strong> The Stage1_OUT net label exists at three positions, but one instance (near the R5 input) is isolated from the wire network. R5.Pin1 is floating.</p>
   <p>All of these issues are tracked in the <a href="../planning/Schematic_Updates_Change_Plan.docx">Schematic Updates Change Plan</a> (SCH-01 through SCH-04). The PGA113 wiring is correct - all hierarchical labels (IF_BIASED, VCM, 3V3A, SPI bus, PGA_OUT) connect properly. Sheets A, B, and D are substantially complete.</p>
 </div>
+
+<details open>
+  <summary style="cursor:pointer; color:var(--amber); font-weight:600; font-size:0.9rem;">▶ Sheet C Annotated Audit Overlay</summary>
+  <div class="sch-wrap">
+    <img src="../../hardware/baseband-revB/exports/Sheet_C_Annotated_Audit.svg" alt="KiCad schematic SVG" style="width:100%; height:auto;">
+  </div>
+  <p class="fig-caption" id="fig-sch-c-audit">Figure 5.4c: Sheet C annotated schematic audit - color-coded wiring status overlay on KiCad export. <span style="color:#f85149;">Red circles:</span> floating filter cap pins (C13-C16 Pin 2). <span style="color:#ffaa00;">Orange circles:</span> 7 isolated net labels (placed but not connected to any wire). <span style="color:#00ccdd;">Cyan dashed:</span> missing unity-gain feedback wires (-IN_A→OUT_A, -IN_B→OUT_B). <span style="color:#3fb950;">Green dashed box:</span> PGA113 wiring verified correct.</p>
+</details>
 
 <h4>LTC6242 Pin Connections</h4>
 <p style="font-size:0.85rem; color:var(--dim);">HV variant (LTC6242HVCGN#PBF) placed - 12V max, identical at 3.3V. SSOP-16 package.</p>
@@ -2044,6 +2094,14 @@
 </svg>
 </div>
 <p class="fig-caption" id="fig-6-1b">Figure 6.1b: Sheet D block diagram - FDA with feedback network, RC settling, ADC with reference/power, J_DFT header, and SPI routing to Sheet C</p>
+
+<details>
+  <summary style="cursor:pointer; color:var(--amber); font-weight:600; font-size:0.9rem;">▶ KiCad Sheet D Schematic</summary>
+  <div class="sch-wrap">
+    <img src="../../hardware/baseband-revB/exports/Sheet_D_FDA_ADC_SPI.svg" alt="KiCad schematic SVG" style="width:100%; height:auto;">
+  </div>
+  <p class="fig-caption" id="fig-sch-d">Figure 6.1c: KiCad Sheet D schematic - THS4531A FDA with Rf/Rg feedback, ADS8881 ADC with VREF/decoupling, J_DFT 2x10 header with isolation resistors, SPI bus routing</p>
+</details>
 
 <h3 id="s6-2">6.2 Fully Differential Amplifier: THS4531A (U_FDA)</h3>
 
