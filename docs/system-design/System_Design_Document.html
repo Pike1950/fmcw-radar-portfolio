@@ -1873,8 +1873,13 @@
 </div>
 
 <div class="callout callout-red">
-  <strong><span class="tag tag-risk">RISK</span> C_feedback must NOT go to GND - the Rev A wiring error</strong>
-  <p>In the initial Rev B schematic wiring, C14 Pin 2 was accidentally connected to GND instead of OUT_A. This converts the Sallen-Key into a passive 3-pole RC filter with no Q control - the Butterworth response shape is lost, and attenuation at 50 kHz drops from −41.8 dB to approximately −20 dB. This error was caught during the schematic review (see <a href="https://pike1950.github.io/fmcw-radar-portfolio/docs/analysis/SheetC_Filter_Analysis.html">Filter Analysis</a>) and corrected. The corrected wiring routes C14.Pin2 to OUT_A and C16.Pin2 to OUT_B.</p>
+  <strong><span class="tag tag-risk">RISK</span> Sheet C filter wiring is incomplete - schematic audit findings</strong>
+  <p>A programmatic audit of the KiCad schematic (March 2026) revealed that the Sheet C filter section is more incomplete than originally assessed. Key findings:</p>
+  <p><strong>LTC6242 signal pins are entirely unconnected.</strong> The op-amp is placed in the schematic with power pins (V+, V-) wired to 3V3A and GND, and two no-connect flags on the NC pins (8, 9). However, all signal pins (+IN_A, -IN_A, OUT_A, +IN_B, -IN_B, OUT_B) have net labels placed nearby but the labels are <em>isolated</em> - they do not connect to any wire segment. The op-amp is physically present but electrically invisible to the signal path.</p>
+  <p><strong>No GND power symbols exist on Sheet C.</strong> The shunt capacitors (C13, C15) require GND connections, but there are no GND power symbols placed anywhere on the sheet. This means even if wires were drawn from the cap pins, there is nothing for them to connect to. GND symbols must be added as a prerequisite for any cap grounding.</p>
+  <p><strong>Capacitor connections are floating, not incorrectly grounded.</strong> The earlier filter analysis described C14 as "wired to GND." The schematic audit shows this is incorrect - C14's second pin is floating (unconnected), as are C13.Pin2, C15.Pin2, and C16.Pin2. The issue is incomplete wiring, not incorrect wiring.</p>
+  <p><strong>Stage 1 to Stage 2 connection is missing.</strong> The Stage1_OUT net label exists at three positions, but one instance (near the R5 input) is isolated from the wire network. R5.Pin1 is floating.</p>
+  <p>All of these issues are tracked in the <a href="../planning/Schematic_Updates_Change_Plan.docx">Schematic Updates Change Plan</a> (SCH-01 through SCH-04). The PGA113 wiring is correct - all hierarchical labels (IF_BIASED, VCM, 3V3A, SPI bus, PGA_OUT) connect properly. Sheets A, B, and D are substantially complete.</p>
 </div>
 
 <h4>LTC6242 Pin Connections</h4>

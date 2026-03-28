@@ -219,13 +219,15 @@
 
 <h2>3. Diagnosis Summary</h2>
 <div class="ok"><strong>✓ What's Correct</strong>
-The R-R series chain topology is right for both stages. R3→R4 in series with C13 teeing off the junction, and R5→R6 in series with C15 teeing off the junction — that IS the correct Sallen-Key passive arrangement. The component values are also correct (1.62k/5.76k/11n/1.1n for Stage 1, 17.4k/536Ω/11n/1.1n for Stage 2).</div>
-<div class="err"><strong>⚠ Critical Error: C14 Pin2 is wired to GND</strong>
-C14 is the <em>feedback</em> capacitor — it connects from Node B back to OUT_A (Pin 1). <strong>Grounding the feedback cap turns this into a passive 2-pole RC filter with no Q control.</strong></div>
-<div class="err"><strong>⚠ Floating Pins: C13.Pin2, C15.Pin2, C16.Pin2</strong>
-The shunt caps (C13, C15) each have one pin at the junction but the other is floating — needs GND. C16 should connect Node B' to OUT_B.</div>
-<div class="warn"><strong>⚠ No connections to LTC6242 yet</strong>
-All 16 pins of U_FILT are unconnected. The passive networks don't reach the op-amp pins.</div>
+The R-R series chain topology is right for both stages. R3→R4 in series with C13 teeing off the junction, and R5→R6 in series with C15 teeing off the junction — that IS the correct Sallen-Key passive arrangement. The component values are also correct (1.62k/5.76k/11n/1.1n for Stage 1, 17.4k/536Ω/11n/1.1n for Stage 2). The PGA113 wiring is correct — all hierarchical labels connect properly.</div>
+<div class="err"><strong>⚠ Schematic Audit Update (March 2026): C14 Pin2 is FLOATING, not grounded</strong>
+A programmatic audit of the KiCad schematic found that C14.Pin2 is unconnected (floating), not wired to GND as originally reported. In fact, <strong>no GND power symbols exist on Sheet C at all</strong>. All four filter capacitor second pins (C13, C14, C15, C16) are floating. The earlier claim that "C14 is wired to GND" was incorrect.</div>
+<div class="err"><strong>⚠ LTC6242 signal pins are entirely unconnected</strong>
+All signal pins (+IN_A, -IN_A, OUT_A, +IN_B, -IN_B, OUT_B) have net labels placed nearby in the schematic, but the labels are <em>isolated</em> — they do not connect to any wire segment. The op-amp is placed but electrically invisible. Only power pins (V+, V-) and NC pins appear to have connections.</div>
+<div class="err"><strong>⚠ Stage 1 → Stage 2 connection missing</strong>
+R5.Pin1 is floating. The Stage1_OUT label exists but one instance is isolated from the wire network.</div>
+<div class="warn"><strong>⚠ No GND power symbols on Sheet C</strong>
+GND symbols must be added before shunt caps (C13, C15) can be connected to ground. This is a prerequisite for all filter wiring fixes.</div>
 
 <h2>4. Correct Wiring — Complete Connection List</h2>
 
@@ -238,7 +240,7 @@ All 16 pins of U_FILT are unconnected. The passive networks don't reach the op-a
 <tr><td>C13 GND</td><td>C13.Pin2</td><td>GND</td><td class="no">✗ floating</td><td>Add GND symbol</td></tr>
 <tr><td>Node B</td><td>R4.Pin2</td><td>C14.Pin1</td><td class="yes">✓ same pos</td><td>—</td></tr>
 <tr><td>Node B → +IN_A</td><td>R4.Pin2</td><td>U_FILT.Pin3</td><td class="no">✗ missing</td><td>Wire to +IN_A</td></tr>
-<tr><td>C14 feedback</td><td>C14.Pin2</td><td>U_FILT.Pin1 (OUT_A)</td><td class="no fix">✗ WRONG → GND</td><td><strong>Remove GND. Wire to OUT_A.</strong></td></tr>
+<tr><td>C14 feedback</td><td>C14.Pin2</td><td>U_FILT.Pin1 (OUT_A)</td><td class="no">✗ floating</td><td><strong>Wire to OUT_A (add GND symbol to sheet first)</strong></td></tr>
 <tr><td>Unity gain</td><td>U_FILT.Pin2</td><td>U_FILT.Pin1</td><td class="no">✗ missing</td><td>Wire −IN_A → OUT_A</td></tr>
 <tr><td>Stage 1 out</td><td>U_FILT.Pin1</td><td>R5.Pin1</td><td class="no">✗ missing</td><td>Wire OUT_A → R5</td></tr>
 </table>

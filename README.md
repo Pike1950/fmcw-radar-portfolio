@@ -130,15 +130,15 @@ The radar project connects all four tracks: it's a mixed-signal PCB (track 1) de
   - [x] Sheet C: PGA113 gain, 4th-order Sallen-Key Butterworth, pin tables
   - [x] Sheet D: FDA SE-to-Diff, ADS8881 18-bit SAR, J_DFT header, SPI interface
 - [ ] Schematic updates ([change plan](docs/planning/Schematic_Updates_Change_Plan.docx))
-  - [ ] SCH-01: Fix C14 grounded feedback cap (should connect to OUT_A)
-  - [ ] SCH-02: Fix floating capacitor pins (C13, C15, C16)
-  - [ ] SCH-03: Wire LTC6242 op-amp pins (Sections A-D)
-  - [ ] SCH-04: Connect Stage 1 output to Stage 2 input
-  - [ ] SCH-05: Resolve remaining ERC errors (4)
-  - [ ] SCH-06: Add CS_PGA pull-up resistor
-  - [ ] SCH-07: Evaluate FPGA connector for Tang Primer 25K
-  - [ ] SCH-08: Add ISM band provisions (documentation only)
-  - [ ] SCH-09: Final ERC validation and schematic freeze
+  - [ ] SCH-00: Add GND power symbols to Sheet C (prerequisite)
+  - [ ] SCH-01: Connect filter capacitor pins (C13, C14, C15, C16 - all floating)
+  - [ ] SCH-02: Wire LTC6242 signal pins to filter network (7 isolated labels)
+  - [ ] SCH-03: Connect Stage 1 output to Stage 2 input (R5.Pin1 floating)
+  - [ ] SCH-04: Resolve ERC errors (recount after filter fixes)
+  - [ ] SCH-05: Add CS_PGA pull-up resistor
+  - [ ] SCH-06: Evaluate FPGA connector for Tang Primer 25K
+  - [ ] SCH-07: Add ISM band provisions (documentation only)
+  - [ ] SCH-08: Final ERC validation and schematic freeze
 - [ ] PCB layout ([change plan](docs/planning/PCB_Layout_Change_Plan.docx))
   - [ ] PCB-01: Define 4-layer stackup (signal/GND/power/signal)
   - [ ] PCB-02: Component placement following signal flow
