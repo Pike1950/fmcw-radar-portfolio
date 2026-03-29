@@ -67,7 +67,7 @@ This project is one track of a broader engineering portfolio spanning processor 
 
 | Document | Description |
 |----------|-------------|
-| [System Design Document](https://pike1950.github.io/fmcw-radar-portfolio/docs/system-design/System_Design_Document.html) | First-principles system design document covering all four sheets and layout. FMCW operating principles (§1) with three-band beat frequency comparison, adaptive chirp modes, FCC regulatory landscape, and ISM band upgrade path. System overview (§2) with cascaded parameter chain, power rail specs, current budget, and I/O pin voltages. Sheet A power (§3): LDO, ferrite bead, voltage reference, VCM buffer. Sheet B input (§4): ESD protection, AC coupling, DC bias. Sheet C gain+filter (§5): PGA113 variable gain, 4th-order Sallen-Key Butterworth with transfer function derivation, Bode/phase response plots, sensitivity analysis. Sheet D digitization (§6): FDA SE→Diff, ADS8881 18-bit SAR, J\_DFT header with isolation. Layout design rationale (§7): 4-layer stackup, component placement, ground plane strategy, critical trace routing, DFT placement, manufacturing constraints. KiCad schematic SVGs embedded in all sheet sections. |
+| [System Design Document](https://pike1950.github.io/fmcw-radar-portfolio/docs/system-design/System_Design_Document.html) | First-principles design document following TI datasheet conventions. Features and specifications up front, followed by detailed per-sheet design rationale with physics derivations, then FMCW operating principles, layout rationale, and references. Includes Bode/phase plots, sensitivity analysis, power budgets, I/O specs, and embedded KiCad schematic SVGs. |
 | [Block Diagrams](https://pike1950.github.io/fmcw-radar-portfolio/docs/block-diagrams/RevB_Block_Diagrams.html) | Pin tables, signal maps, DFT reference, inter-sheet signal summary, hierarchical label directions. The "what" companion to the Design Rationale's "why." |
 | [Schematic Review](https://pike1950.github.io/fmcw-radar-portfolio/docs/analysis/SchematicReview.html) | Systematic review of all four schematic sheets. |
 | [Filter Analysis](https://pike1950.github.io/fmcw-radar-portfolio/docs/analysis/SheetC_Filter_Analysis.html) | Sheet C anti-alias filter analysis with transfer function derivation. |
@@ -122,18 +122,14 @@ The radar project connects all four tracks: it's a mixed-signal PCB (track 1) de
 ## Status
 
 - [x] Rev B schematic capture (90 components, 4 sheets)
-- [x] System Design Document (3,100+ lines, 20 figures, 55 tables)
+- [x] System Design Document (TI datasheet format)
+  - [x] Features, specifications, and block diagrams up front
+  - [x] System parameter chain, power rail specs, current budget, I/O pin voltages
+  - [x] Per-sheet detailed design rationale with first-principles derivations
+  - [x] Filter analysis: transfer function, Bode/phase plots, sensitivity, impedance
   - [x] FMCW operating principles, adaptive chirp, FCC regulatory landscape
-  - [x] System overview, signal budget, component selection rationale
-  - [x] System parameter chain (§2.4): cascaded derivation from radar equation through component specs
-  - [x] Power rail specs, current budget (12.8 mA typ), I/O pin voltage specifications
-  - [x] Sheet A: power architecture, ferrite bead, capacitor placement analysis
-  - [x] Sheet B: ESD protection, AC coupling, DC bias
-  - [x] Sheet C: PGA113 gain, 4th-order Sallen-Key Butterworth, pin tables
-  - [x] Sheet C filter analysis: transfer function derivation, Bode magnitude, phase response, sensitivity, impedance
-  - [x] Sheet D: FDA SE-to-Diff, ADS8881 18-bit SAR, J\_DFT header, SPI interface
-  - [x] Layout design rationale (§7): stackup, placement, grounding, routing, DFT, manufacturing
-  - [x] KiCad schematic SVG exports embedded in all sheet sections with annotated audit overlay
+  - [x] Layout design rationale: stackup, placement, grounding, routing, DFT, manufacturing
+  - [x] KiCad schematic SVG exports embedded with annotated audit overlay
 - [ ] Schematic updates ([change plan](docs/planning/Schematic_Updates_Change_Plan.docx))
   - [ ] SCH-00: Add GND power symbols to Sheet C (prerequisite)
   - [ ] SCH-01: Connect filter capacitor pins (C13, C14, C15, C16 - all floating)
