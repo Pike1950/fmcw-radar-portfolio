@@ -1,164 +1,117 @@
-# FMCW Radar — Baseband Signal Conditioning & Digital Backend
+# 24 GHz FMCW Radar Sensor
 
-A personal engineering portfolio project redesigning the baseband signal conditioning path for a 5.8 GHz FMCW radar system. Originally built as a senior capstone project at Texas Tech University (Spring 2020), now being redesigned from scratch with professional engineering discipline informed by 4+ years of hardware validation experience at Texas Instruments.
+A personal engineering portfolio project: a short-range 24 GHz FMCW radar sensor spanning an RF front end, a mixed-signal I/Q baseband, and an FPGA digital backend. It began as a baseband redesign of a Texas Tech senior capstone (HOTRODS, Spring 2020) and has grown into a complete radar sensor design, carried out with the discipline of 4+ years of hardware validation at Texas Instruments.
 
 ## Project Overview
 
-This project demonstrates mixed-signal PCB design, digital hardware design, hardware verification, and system-level engineering through the complete redesign of an FMCW radar baseband — from schematic capture through layout, with first-principles documentation explaining every design decision.
+This project demonstrates RF integration, mixed-signal PCB design, digital hardware design, hardware verification, and system-level engineering, with first-principles documentation explaining every design decision. The completed work is a corrected, first-principles baseband design and its system design document; the active phase is scaling that foundation into a full 24 GHz radar sensor.
 
-### The System
+## The System
 
-An FMCW (Frequency-Modulated Continuous Wave) radar transmits a frequency chirp, receives the reflection from a target, and mixes it with the current transmit frequency to produce a low-frequency beat signal whose frequency is proportional to target range. The **baseband** conditions this beat signal for digitization:
+An FMCW (Frequency-Modulated Continuous Wave) radar transmits a frequency chirp, receives the reflection from a target, and mixes it with the current transmit frequency to produce a low-frequency beat signal. The beat frequency is proportional to range; the chirp-to-chirp phase gives Doppler velocity, and a complex (I/Q) baseband resolves the sign of that velocity (approaching versus receding).
+
+The sensor is built around an integrated 24 GHz transceiver MMIC and is partitioned into two boards plus a downstream digital backend:
 
 ```
-RF Mixer → SMA Input → ESD Protection → PGA (1–200×) → Anti-Alias Filter → FDA → 18-bit ADC → SPI → FPGA/MCU
-           └─────────── Sheet B ──────┘  └── Sheet C ──┘                   └──── Sheet D ────┘
-                                         └──────────────── Sheet A (Power + References) ──────────────────┘
+RF FRONT-END MODULE                       I/Q BASEBAND BOARD                    DIGITAL BACKEND
+BGT24MTR11 (24 GHz, 1 TX / 1 RX)          per channel:                          range-Doppler FFT
+ on-chip VCO, PA, LNA, I/Q mixers   I,Q   VGA -> anti-alias -> 18-bit SAR ADC    (FPGA / MCU) -> host
+ TX/RX antennas, chirp ramp,        --->  I and Q sampled simultaneously
+ first gain stage                  (zero  SPI control of the MMIC
+                                     IF)
 ```
 
-### Rev A → Rev B: What Changed and Why
+The two boards meet at a low-frequency analog I/Q interface, not a 24 GHz one, because the MMIC downconverts on-chip. That seam is what makes the split practical: the costly, iteration-prone 24 GHz RF and antennas stay on a small module, while the baseband stays on inexpensive FR4 and can be brought up and validated on its own.
 
-| Aspect | Rev A (2020) | Rev B (2025–26) |
-|--------|-------------|-----------------|
-| Scope | 3 RX channels, 182 components | 1 RX channel (building block), 90 components |
-| EDA | Eagle 9.5, flat single sheet | KiCad 9, 4-sheet hierarchy |
+## Evolution: Rev A to Rev B to Rev C
+
+- **Rev A (2020).** 5.8 GHz, 3 RX channels, 182 components, Eagle, a single flat sheet. Built as the Texas Tech senior capstone; non-functional. The headline defect was a 10 kHz chirp rate that produced only about 5 ADC samples per ramp, far too few for FFT range extraction.
+- **Rev B (current).** Began as a scaled, corrected 5.8 GHz baseband (one channel, KiCad 9, a modern signal chain, DFT-first methodology), captured as schematic plus a first-principles system design document. Rather than fabricate that band, Rev B is now redefined as the **24 GHz I/Q radar**: the band moves to 24 GHz, the project adopts the BGT24MTR11 (so it now owns the RF front end, not just the baseband), the baseband goes complex I/Q, and the sensor splits into an RF module and a baseband board. The baseband modernization below carries forward intact.
+- **Rev C.** Additional receive channels for angle estimation, the original trilateration goal, on a proven single-channel Rev B.
+
+### Baseband modernization (carried forward from the 5.8 GHz Rev B)
+
+These corrections to the capstone baseband are band-agnostic and carry directly into the 24 GHz I/Q design.
+
+| Aspect | Rev A (2020) | Rev B baseband (carried forward) |
+| --- | --- | --- |
+| EDA | Eagle 9.5, flat single sheet | KiCad 9, hierarchical |
 | VGA | LT6230 + MCP4017 I²C digital pot | PGA113 (SPI, internal gain resistors) |
-| ADC | ADS1174 (16-bit, 64-pin QFP — solder bridges) | ADS8881 (18-bit, 10-pin VSSOP) |
-| SE→Diff | LTC6242 (improvised, no VOCM) | THS4531A (true FDA with VOCM pin) |
-| Power | Single 3.3V rail | 3V3A/3V3D split via ferrite bead |
-| Reference | Resistor divider | REF5025 (2.500V, 0.05%, 3 µVpp) |
+| ADC | ADS1174 (16-bit, 64-pin QFP, solder bridges) | ADS8881 (18-bit, 10-pin VSSOP) |
+| SE to Diff | LTC6242 (improvised, no VOCM) | THS4531A (true FDA with VOCM) |
+| Power | Single 3.3 V rail | 3V3A / 3V3D split via ferrite bead |
+| Reference | Resistor divider | REF5025 (2.500 V, 0.05%, 3 µVpp) |
 | DFT | None | J_DFT header, 17 TPs, 5 MMCX, 6 isolation resistors |
-| ERC | Never run | 0 errors, 0 warnings |
 
-## Repository Structure
-
-```
-├── hardware/
-│   ├── baseband-revB/          # Current design (KiCad 9)
-│   │   ├── kicad/              # Schematic and PCB files
-│   │   └── docs/               # Rev B specific documentation
-│   └── baseband-revA/          # Original design (Eagle 9.5) for reference
-│       └── eagle/              # Original schematic and board files
-│
-├── digital/
-│   └── spi-controller/         # SystemVerilog SPI master for ADS8881/PGA113
-│       ├── rtl/                # RTL source
-│       ├── tb/                 # Testbenches
-│       └── sim/                # Simulation scripts and results
-│
-└── docs/
-    ├── system-design/          # System design document (the "why" for every decision)
-    ├── block-diagrams/         # System and sheet-level block diagrams
-    ├── analysis/               # Filter analysis, schematic review
-    ├── specifications/         # Sheet specifications, IC pin wiring guides
-    └── images/                 # Photos, screenshots
-```
-
-### Related Repositories
-
-This project is one track of a broader engineering portfolio spanning processor architecture, modular instrumentation, and mixed-signal hardware design. Related repositories:
-
-| Repository | Description | Status |
-|-----------|-------------|--------|
-| [32-bit RISC Pipelined Processor](https://github.com/Pike1950/BradW_ECE4375_RISC_Pipeline) | 4-stage pipelined CPU refactored from Verilog to SystemVerilog. Data forwarding, hazard detection, 25 opcodes, signed multiply program. Tang Primer 25K (Gowin GW5A) is in hand; FPGA synthesis phase requires clock edge standardization, BSRAM memory fitting, and PLL clock generation. | SV conversion complete (14/14 CRs done), synthesis next |
-| *scpi-instrument-platform* (planned) | Modular SCPI-compliant test instrument platform. Pi 5 orchestration, Pico 2 W measurement modules (DIO, voltage, SMU-lite), FPGA modules on Tang Primer 25K (logic analyzer, protocol exerciser, frequency counter). PyVISA + USB-TMC automation. | Architecture defined |
+On top of this, the 24 GHz move adds an integrated-MMIC RF front end, a complex I/Q baseband (the chain above duplicated for I and Q with simultaneous sampling), and the two-board partition.
 
 ## Key Documents
 
 | Document | Description |
-|----------|-------------|
-| [System Design Document](https://pike1950.github.io/fmcw-radar-portfolio/docs/system-design/System_Design_Document.html) | First-principles design document following TI datasheet conventions. Features and specifications up front, followed by detailed per-sheet design rationale with physics derivations, then FMCW operating principles, layout rationale, and references. Includes Bode/phase plots, sensitivity analysis, power budgets, I/O specs, and embedded KiCad schematic SVGs. |
-| [Block Diagrams](https://pike1950.github.io/fmcw-radar-portfolio/docs/block-diagrams/RevB_Block_Diagrams.html) | Pin tables, signal maps, DFT reference, inter-sheet signal summary, hierarchical label directions. The "what" companion to the Design Rationale's "why." |
-| [Schematic Review](https://pike1950.github.io/fmcw-radar-portfolio/docs/analysis/SchematicReview.html) | Systematic review of all four schematic sheets. |
-| [Filter Analysis](https://pike1950.github.io/fmcw-radar-portfolio/docs/analysis/SheetC_Filter_Analysis.html) | Sheet C anti-alias filter analysis with transfer function derivation. |
+| --- | --- |
+| System Design Document | The 24 GHz radar system SDD, restyled to the PMVB module-doc schema with PHYSICS / DECISION / TRADEOFF / RISK reasoning callouts. Covers the two-board architecture, the carry-over analog design (power, references, gain, anti-alias filter, DFT), the FMCW principles, and an open decision register tracking the remaining 24 GHz choices. |
+| Block Diagrams | Pin tables, signal maps, DFT reference, inter-sheet signal summary. |
+| Schematic Review | Systematic review of the baseband schematic sheets. |
+| Filter Analysis | Anti-alias filter transfer-function derivation. |
 
 ## Technical Highlights
 
-### Analog Design
-- **Supply splitting via ferrite bead** — BLM18PG221SN1D (220Ω @ 100MHz) isolates analog from digital supply noise. Single ground plane with partitioned routing (no ground splits). First-principles impedance analysis in the design rationale.
-- **Paired decoupling capacitors** — Every supply and reference node uses matched cap pairs (e.g., 10µF + 100nF) with different self-resonant frequencies to provide low impedance across a wide frequency range.
-- **DFT-first methodology** — 17 test points, 5 MMCX probe connectors (DNP), 6× 10kΩ isolation resistors, and a 2×10 DFT header were designed before the signal chain, not as an afterthought.
+### Analog and mixed-signal design
 
-### System-Level Analysis
-- **Chirp rate correction** — Identified a fundamental parameter mismatch in Rev A: the 10 kHz chirp rate yielded only 5 ADC samples per ramp at 100 kSPS — insufficient for FFT-based range extraction. Rev B specifies ~100 Hz chirp rate (500 samples/ramp, 512-point FFT). Derived from first principles with sample-count-per-ramp analysis.
-- **ISM band upgrade path** — Documented a firmware-only upgrade from 30 MHz / 75 mW (FCC §15.245) to 125 MHz / 1W (FCC §15.247 ISM), improving range resolution from 5.0 m to 1.2 m with zero baseband hardware changes. Full system impact assessment showing every subsystem's change status.
-- **FCC regulatory landscape** — Comparative analysis of five unlicensed radar bands (§15.245, §15.247 ISM, UWB 3.1–10.6 GHz, 60 GHz, 76–81 GHz automotive) with bandwidth, power limits, resolution, and hardware implications for each.
-- **Adaptive chirp modes** — Multi-scale radar operation via time-division sweep bandwidth switching (narrow/medium/wide), analogous to the British Chain Home / Chain Home Low / Chain Home Extra Low layered defense concept from WWII. Includes multi-channel staggered filter bandwidth analysis (academic concept for 3-RX architecture).
+- **Supply splitting via ferrite bead.** BLM18PG221SN1D (220 Ω at 100 MHz) isolates analog from digital supply noise on a single continuous ground plane, with first-principles impedance analysis.
+- **Paired decoupling capacitors.** Matched cap pairs (for example 10 µF + 100 nF) with different self-resonant frequencies for low impedance across a wide band, placed per a derived trace-inductance budget.
+- **DFT-first methodology.** Test points, MMCX probes, and isolation resistors designed before the signal chain, now applied per channel for I and Q.
 
-### Digital Design (In Progress)
-- **FPGA digital backend** (planned) — SystemVerilog modules for the radar's digital subsystem, targeting Gowin GW5A (Tang Primer 25K, ~$35, in hand, 23K LUT4, 1008Kb BSRAM):
-  - SPI master controllers for ADS8881 (ADC readout) and PGA113 (gain control)
-  - DDS chirp waveform generator for VCO sweep control
-  - Configurable FIR digital filter (supplements the analog anti-alias filter)
-  - Timing controller for deterministic CONVST generation and adaptive gain scheduling
-  - UART/USB data streaming to host PC
-- All modules verified with self-checking testbenches using Verilator. See [`digital/spi-controller/`](digital/spi-controller/).
+### System-level analysis
 
-## Tools & Technologies
+- **Chirp-rate correction.** Identified the Rev A parameter mismatch (about 5 samples per ramp) and derived the corrected chirp plan from first principles (sample-count-per-ramp to FFT resolution). The analysis is carrier-independent and re-derives the 24 GHz filter and ADC plan.
+- **Band move to 24 GHz with complex I/Q.** Moving from 5.8 GHz to the 24 GHz ISM band raises range resolution from about 5 m to about 0.6 m and brings the RF front end into scope through an integrated MMIC. Complex I/Q sampling adds sign-of-velocity discrimination.
+- **Designed for validation.** The board is designed for standalone bring-up and characterization on a homebrew SCPI instrument platform (see Related Repositories).
 
-- **EDA:** KiCad 9 (schematic, PCB layout), Eagle 9.5 (Rev A reference)
-- **Simulation:** LTspice (analog), Verilator (digital), GTKWave (waveforms)
-- **HDL:** SystemVerilog (digital backend, verification)
-- **FPGA Targets:**
-  - *Phase 1:* Gowin GW5A (Sipeed Tang Primer 25K, ~$35, in hand) — 23K LUT4, 1008Kb BSRAM, 3 PMOD ports. Radar digital backend, RISC processor synthesis, SCPI diagnostic modules. Gowin EDA + open-source Yosys/Apicula.
-  - *Phase 2:* Gowin GW5AST-138 (Sipeed Tang Mega 138K Pro, ~$200) — 138K LUT4, PCIe 3.0 x4, dual SFP+, SerDes transceivers. High-speed interface validation and multi-gigabit protocol work.
-- **Documentation:** HTML with first-principles analysis, SVG block diagrams
-- **Test Automation:** PyVISA (planned integration with SCPI instrument platform)
+### Digital backend (planned)
+
+SystemVerilog modules targeting the Gowin GW5A (Tang Primer 25K): SPI masters for the ADS8881 and the MMIC, a chirp ramp / DDS generator, a configurable FIR, and a deterministic timing controller, all verified with self-checking Verilator testbenches. See `digital/spi-controller/`.
+
+## Related Repositories
+
+| Repository | Description | Status |
+| --- | --- | --- |
+| [32-bit RISC Pipelined Processor](https://github.com/Pike1950/BradW_ECE4375_RISC_Pipeline) | 4-stage pipelined CPU refactored from Verilog to SystemVerilog. Shares the Verilator-clean SystemVerilog methodology used for this radar's digital backend. | SV conversion complete, synthesis next |
+| [Poor Man's Validation Bench](https://github.com/Pike1950/poor-mans-validation-bench) | Modular SCPI + MCP instrument platform: Raspberry Pi 5 orchestration, Pico 2W USB-TMC modules, tiered FPGA. The bring-up and characterization platform for this radar. | Phase 0 complete; Module 1E (AWG) in build |
+
+## Tools and Technologies
+
+- **EDA:** KiCad 9. RF module on a controlled high-frequency stackup; baseband on FR4.
+- **Simulation:** LTspice (analog), Verilator (digital), GTKWave (waveforms).
+- **HDL:** SystemVerilog (digital backend, verification).
+- **FPGA target:** Gowin GW5A (Sipeed Tang Primer 25K) for the digital backend.
+- **Documentation:** Markdown rendered to HTML via Pandoc, PMVB-schema design docs with first-principles reasoning callouts.
+- **Test automation:** PyVISA, integrating with the Poor Man's Validation Bench.
 
 ## Background
 
-This project is part of a broader engineering portfolio spanning four interconnected tracks:
+This project is one of four interconnected portfolio tracks:
 
-1. **FMCW Radar PCB** (this repo) — Mixed-signal PCB design with first-principles documentation, DFT-first methodology, and system-level analysis including adaptive chirp modes and ISM band upgrade path.
+1. **FMCW Radar Sensor** (this repo). RF integration plus mixed-signal PCB plus digital, with first-principles documentation and DFT-first methodology.
+2. **Hardware Validation.** 4+ years at Texas Instruments (gate-driver characterization, automated test with LabVIEW / TestStand / PXI, DUT board design in Altium).
+3. **Digital Design.** A pipelined RISC processor in SystemVerilog.
+4. **Test Infrastructure.** The Poor Man's Validation Bench, a SCPI + MCP instrument platform.
 
-2. **Hardware Validation** — 4+ years at Texas Instruments (HVP-DB, Drivers & Bias) doing bench-level validation and characterization of high-power gate driver ICs, automated test systems (LabVIEW/TestStand/PXI), and DUT board design in Altium.
-
-3. **Digital Design** — Pipelined RISC processor in SystemVerilog (see [RISC Pipeline repo](https://github.com/Pike1950/BradW_ECE4375_RISC_Pipeline)), refactored from university coursework with data forwarding, hazard detection, and FPGA synthesis targeting Tang Primer 25K.
-
-4. **Test Infrastructure** — Modular SCPI instrument platform using Raspberry Pi 5 orchestration with Pico 2 W and FPGA measurement modules, PyVISA automation.
-
-The radar project connects all four tracks: it's a mixed-signal PCB (track 1) designed with validation-engineer discipline (track 2), with an FPGA digital backend (track 3) that can be characterized by the SCPI instrument platform (track 4).
+The radar connects all four: a mixed-signal and RF sensor (track 1), designed with validation-engineer discipline (track 2), with an FPGA backend (track 3) characterized on the homebrew bench (track 4).
 
 ## Status
 
-- [x] Rev B schematic capture (90 components, 4 sheets)
-- [x] System Design Document (TI datasheet format)
-  - [x] Features, specifications, and block diagrams up front
-  - [x] System parameter chain, power rail specs, current budget, I/O pin voltages
-  - [x] Per-sheet detailed design rationale with first-principles derivations
-  - [x] Filter analysis: transfer function, Bode/phase plots, sensitivity, impedance
-  - [x] FMCW operating principles, adaptive chirp, FCC regulatory landscape
-  - [x] Layout design rationale: stackup, placement, grounding, routing, DFT, manufacturing
-  - [x] KiCad schematic SVG exports embedded with annotated audit overlay
-- [ ] Schematic updates ([change plan](docs/planning/Schematic_Updates_Change_Plan.docx))
-  - [ ] SCH-00: Add GND power symbols to Sheet C (prerequisite)
-  - [ ] SCH-01: Connect filter capacitor pins (C13, C14, C15, C16 - all floating)
-  - [ ] SCH-02: Wire LTC6242 signal pins to filter network (7 isolated labels)
-  - [ ] SCH-03: Connect Stage 1 output to Stage 2 input (R5.Pin1 floating)
-  - [ ] SCH-04: Resolve ERC errors (recount after filter fixes)
-  - [ ] SCH-05: Add CS_PGA pull-up resistor
-  - [ ] SCH-06: Evaluate FPGA connector for Tang Primer 25K
-  - [ ] SCH-07: Add ISM band provisions (documentation only)
-  - [ ] SCH-08: Final ERC validation and schematic freeze
-- [ ] PCB layout ([change plan](docs/planning/PCB_Layout_Change_Plan.docx))
-  - [ ] PCB-01: Define 4-layer stackup (signal/GND/power/signal)
-  - [ ] PCB-02: Component placement following signal flow
-  - [ ] PCB-03: Ground plane strategy (single plane, partitioned routing)
-  - [ ] PCB-04: Critical trace routing (analog signal path)
-  - [ ] PCB-05: Power distribution routing (3V3A/3V3D zones)
-  - [ ] PCB-06: DFT connector and test point placement
-  - [ ] PCB-07: Design rule check and manufacturing review
-  - [ ] PCB-08: Silkscreen and documentation
-- [ ] FPGA digital backend: SPI controller RTL and verification
-- [ ] FPGA digital backend: DDS chirp generator
-- [ ] FPGA digital backend: Digital FIR filter
-- [ ] FPGA synthesis and bench validation
-- [ ] Integration with SCPI instrument platform for automated characterization
+- **5.8 GHz baseband foundation (complete).** First-principles system design document and schematic capture of the corrected single-channel baseband. Established the methodology, the analog signal chain, and the DFT infrastructure that all carry forward.
+- **24 GHz radar system design (in progress).**
+  - System SDD reframed to the radar scope and the PMVB schema.
+  - D1 resolved: BGT24MTR11 (1 TX / 1 RX), two-board partition (RF Front-End Module plus I/Q Baseband Board).
+  - Open: antenna and RF stackup, ADC arrangement, ramp generation, chirp plan, and digital backend (tracked in the SDD decision register).
+- **Next.** RF Front-End Module and I/Q Baseband Board schematics; digital backend RTL; bring-up and characterization on the Poor Man's Validation Bench.
 
 ## License
 
-This is a personal engineering portfolio project. The FMCW radar design originated as a senior capstone project at Texas Tech University (HOTRODS, Spring 2020). The Rev B redesign, documentation, and all new digital design work are by Bradley Ward.
+A personal engineering portfolio project. The FMCW radar originated as a Texas Tech senior capstone (HOTRODS, Spring 2020). The Rev B redesign, the 24 GHz radar system design, documentation, and all digital design work are by Bradley Ward.
 
 ## Contact
 
-Bradley Ward — [bradw858@gmail.com](mailto:bradw858@gmail.com) — [LinkedIn](https://linkedin.com/in/bradley-ward-49087766/)
+Bradley Ward, bradw858@gmail.com, [LinkedIn](https://linkedin.com/in/bradley-ward-49087766/)
