@@ -49,10 +49,7 @@ On top of this, the 24 GHz move adds an integrated-MMIC RF front end, a complex 
 
 | Document | Description |
 | --- | --- |
-| System Design Document | The 24 GHz radar system SDD, restyled to the PMVB module-doc schema with PHYSICS / DECISION / TRADEOFF / RISK reasoning callouts. Covers the two-board architecture, the carry-over analog design (power, references, gain, anti-alias filter, DFT), the FMCW principles, and an open decision register tracking the remaining 24 GHz choices. |
-| Block Diagrams | Pin tables, signal maps, DFT reference, inter-sheet signal summary. |
-| Schematic Review | Systematic review of the baseband schematic sheets. |
-| Filter Analysis | Anti-alias filter transfer-function derivation. |
+| [System Design Document](https://pike1950.github.io/fmcw-radar-portfolio/docs/system-design/System_Design_Document_RevB.html) | The 24 GHz radar system SDD, restyled to the PMVB module-doc schema with PHYSICS / DECISION / TRADEOFF / RISK reasoning callouts. Covers the two-board architecture, the carry-over analog design (power, references, gain, anti-alias filter, DFT), the FMCW principles, and an open decision register tracking the remaining 24 GHz choices. |
 
 ## Technical Highlights
 
