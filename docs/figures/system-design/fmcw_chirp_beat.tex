@@ -1,0 +1,61 @@
+% =============================================================================
+% fmcw_chirp_beat.tex - SDD Figure 5-1: the FMCW principle
+% =============================================================================
+% A target's round-trip delay tau = 2R/c shifts the received ramp in time.
+% Against the transmit ramp this appears as a constant beat frequency
+% f_beat = 2RS/c. Range is read straight off the beat.
+%
+% Compile:  pdflatex fmcw_chirp_beat.tex
+% Convert:  pdftocairo -svg fmcw_chirp_beat.pdf fmcw_chirp_beat.svg
+% =============================================================================
+\documentclass[border=8pt]{standalone}
+%
+\input{../style/pmvb-figures.sty}
+%
+\begin{document}
+\begin{tikzpicture}[>=Stealth, font=\sffamily]
+  %
+  % --- layout constants (cm); letter-only macro names ---
+  \def\Tc{5.0}     % chirp duration along x
+  \def\Hf{3.0}     % frequency span height (f0 .. f0+B)
+  \def\yo{0.7}     % baseline (f0) y-coordinate
+  \def\taud{0.85}  % round-trip delay, as an x-shift
+  \def\xmax{6.7}   % x-axis extent
+  \def\xb{3.1}     % time at which the beat gap is drawn
+  %
+  % --- axes ---
+  \draw[pmvbMuted, ->, line width=0.7pt] (-0.15,0) -- (\xmax,0)
+      node[anchor=north east, text=pmvbMuted, font=\scriptsize] {time};
+  \draw[pmvbMuted, ->, line width=0.7pt] (0,-0.15) -- (0,\Hf+1.05)
+      node[anchor=south west, text=pmvbMuted, font=\scriptsize] {frequency};
+  %
+  % --- y ticks: f0 and f0+B ---
+  \draw[pmvbMuted, line width=0.5pt] (-0.08,\yo) -- (0.08,\yo);
+  \node[anchor=east, text=pmvbMuted, font=\scriptsize] at (-0.12,\yo) {$f_0$};
+  \draw[pmvbMuted, line width=0.5pt] (-0.08,\yo+\Hf) -- (0.08,\yo+\Hf);
+  \node[anchor=east, text=pmvbMuted, font=\scriptsize] at (-0.12,\yo+\Hf) {$f_0+B$};
+  %
+  % --- TX ramp (transmit) ---
+  \draw[pmvbGreen, line width=1.3pt] (0,\yo) -- (\Tc,\yo+\Hf);
+  \node[anchor=south, text=pmvbGreen, font=\scriptsize, rotate=30] at (1.7,1.85) {TX (transmit)};
+  %
+  % --- RX ramp (echo, delayed by tau) ---
+  \draw[pmvbAmber, line width=1.3pt, dash pattern=on 4pt off 3pt]
+      (\taud,\yo) -- (\Tc+\taud,\yo+\Hf);
+  \node[anchor=north, text=pmvbAmber, font=\scriptsize, rotate=30] at (4.55,2.55) {RX (echo, delayed)};
+  %
+  % --- beat: vertical gap between TX and RX at x = xb ---
+  \pgfmathsetmacro{\ytx}{\yo + (\xb/\Tc)*\Hf}
+  \pgfmathsetmacro{\yrx}{\yo + ((\xb-\taud)/\Tc)*\Hf}
+  \draw[pmvbRed, <->, line width=1.0pt] (\xb,\yrx) -- (\xb,\ytx);
+  \node[anchor=west, text=pmvbRed, font=\scriptsize] at (\xb+0.18,{(\ytx+\yrx)/2})
+      {$f_\mathrm{beat}=\dfrac{2RS}{c}$};
+  %
+  % --- tau brace at the baseline ---
+  \draw[decorate, decoration={brace, amplitude=4pt, mirror}, pmvbMuted, line width=0.6pt]
+      (0,\yo-0.22) -- (\taud,\yo-0.22);
+  \node[anchor=north, text=pmvbMuted, font=\scriptsize] at ({\taud/2},\yo-0.30)
+      {$\tau=\dfrac{2R}{c}$};
+  %
+\end{tikzpicture}
+\end{document}

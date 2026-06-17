@@ -232,6 +232,8 @@ With the backend fixed as the Tang Primer 25K (D7), the interface is defined in 
 
 ## 5. Specifications
 
+This section locks the sensor's numbers, traces each to the relationship it comes from, and plots the three that dominate performance. The values here are carried in parity with the downstream summary tables as they lock.
+
 | Parameter | Value | Status |
 |-----------|-------|--------|
 | Carrier band | 24 GHz ISM, 24.0&ndash;24.25 GHz (~250 MHz usable) | Locked |
@@ -247,9 +249,9 @@ With the backend fixed as the Tang Primer 25K (D7), the interface is defined in 
 | I/Q gain and phase match target | sets image rejection | Design + calibration (matched VGAs) |
 | Digital backend | Tang Primer 25K (Gowin GW5A) FPGA, range-Doppler FFT, ~9 Mbps ingest | Locked (D7) |
 
-This table is kept in parity with any downstream summary table as values lock.
-
 ### 5.1 Governing equations
+
+Each locked value above traces to one relationship: range to the beat frequency, resolution to swept bandwidth, and the velocity pair to chirp and frame timing. The 24 GHz carrier sets only the wavelength, not the resolution, which is why the case for the band move is the bandwidth it opens up rather than the frequency itself.
 
 | Quantity | Equation | This design |
 |---|---|---|
@@ -263,92 +265,24 @@ This table is kept in parity with any downstream summary table as values lock.
 
 ### 5.2 Key relationships, visualized
 
+Three of these relationships set the headline performance. Each figure is generated from source in `docs/figures/system-design/` (the chirp sketch in TikZ, the two plots in matplotlib) and rebuilt by the figures pipeline, so nothing here is hand-drawn.
+
 <figure>
-<svg viewBox="0 0 720 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
-<rect x="1" y="1" width="718" height="318" rx="10" fill="#14181e" stroke="#2a2f3a"/>
-<text x="360" y="26" text-anchor="middle" fill="#e6e8eb" font-family="sans-serif" font-size="15" font-weight="700">FMCW: range delay becomes a beat frequency</text>
-<text x="360" y="44" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="12">f_beat = slope × round-trip delay = 2RS / c</text>
-<line x1="70" y1="270" x2="660" y2="270" stroke="#9aa3ad" stroke-width="1.5"/>
-<line x1="70" y1="270" x2="70" y2="58" stroke="#9aa3ad" stroke-width="1.5"/>
-<text x="365" y="302" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="12">time &#8594;</text>
-<text x="22" y="165" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="12" transform="rotate(-90 22 165)">frequency &#8594;</text>
-<line x1="70" y1="240" x2="460" y2="80" stroke="#2dd4bf" stroke-width="2.5"/>
-<line x1="160" y1="240" x2="550" y2="80" stroke="#fbbf24" stroke-width="2.5" stroke-dasharray="7 4"/>
-<text x="64" y="244" text-anchor="end" fill="#9aa3ad" font-family="sans-serif" font-size="11">f0</text>
-<text x="466" y="80" fill="#9aa3ad" font-family="sans-serif" font-size="11">f0 + B</text>
-<line x1="320" y1="138" x2="320" y2="174" stroke="#f87171" stroke-width="2"/>
-<polygon points="320,138 316,147 324,147" fill="#f87171"/>
-<polygon points="320,174 316,165 324,165" fill="#f87171"/>
-<text x="330" y="161" fill="#f87171" font-family="sans-serif" font-size="12">beat</text>
-<line x1="70" y1="255" x2="160" y2="255" stroke="#f87171" stroke-width="1.5"/>
-<text x="115" y="250" text-anchor="middle" fill="#f87171" font-family="sans-serif" font-size="11">&#964; = 2R/c</text>
-<line x1="90" y1="70" x2="114" y2="70" stroke="#2dd4bf" stroke-width="2.5"/>
-<text x="120" y="74" fill="#e6e8eb" font-family="sans-serif" font-size="11">TX (transmit)</text>
-<line x1="90" y1="90" x2="114" y2="90" stroke="#fbbf24" stroke-width="2.5" stroke-dasharray="7 4"/>
-<text x="120" y="94" fill="#e6e8eb" font-family="sans-serif" font-size="11">RX (echo, delayed)</text>
-</svg>
-<figcaption>Figure 5-1. FMCW principle: a target's round-trip delay &tau; = 2R/c shifts the received ramp in time, which against the transmit ramp appears as a constant beat frequency f<sub>beat</sub> = 2RS/c. Range is read straight off the beat.</figcaption>
+<img src="../figures/system-design/fmcw_chirp_beat.svg" alt="FMCW transmit and receive chirps and the constant beat frequency between them">
+<figcaption><strong>Figure 5-1.</strong> The FMCW principle: a target's round-trip delay &tau; = 2R/c shifts the received ramp in time, which against the transmit ramp appears as a constant beat frequency f<sub>beat</sub> = 2RS/c. Range is read straight off the beat.</figcaption>
 </figure>
 
 <figure>
-<svg viewBox="0 0 720 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
-<rect x="1" y="1" width="718" height="318" rx="10" fill="#14181e" stroke="#2a2f3a"/>
-<text x="360" y="26" text-anchor="middle" fill="#e6e8eb" font-family="sans-serif" font-size="15" font-weight="700">Beat frequency vs target range</text>
-<text x="360" y="44" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="12">slope 250 GHz/s &#8594; 1.67 kHz per metre</text>
-<line x1="75" y1="275" x2="660" y2="275" stroke="#9aa3ad" stroke-width="1.5"/>
-<line x1="75" y1="275" x2="75" y2="60" stroke="#9aa3ad" stroke-width="1.5"/>
-<text x="75" y="292" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="10">0</text>
-<text x="221" y="292" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="10">20</text>
-<text x="368" y="292" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="10">40</text>
-<text x="514" y="292" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="10">60</text>
-<text x="660" y="292" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="10">80</text>
-<text x="367" y="310" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="12">target range (m)</text>
-<text x="66" y="279" text-anchor="end" fill="#9aa3ad" font-family="sans-serif" font-size="10">0</text>
-<text x="66" y="204" text-anchor="end" fill="#9aa3ad" font-family="sans-serif" font-size="10">50</text>
-<text x="66" y="129" text-anchor="end" fill="#9aa3ad" font-family="sans-serif" font-size="10">100</text>
-<text x="22" y="168" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="12" transform="rotate(-90 22 168)">beat frequency (kHz)</text>
-<line x1="75" y1="83" x2="660" y2="83" stroke="#f87171" stroke-width="1.5" stroke-dasharray="6 4"/>
-<text x="180" y="78" fill="#f87171" font-family="sans-serif" font-size="11">Nyquist 128 kHz (256 kSPS)</text>
-<line x1="75" y1="275" x2="638" y2="83" stroke="#2dd4bf" stroke-width="2.5"/>
-<line x1="638" y1="83" x2="660" y2="75" stroke="#2dd4bf" stroke-width="2.5" stroke-dasharray="5 4"/>
-<line x1="441" y1="150" x2="441" y2="275" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4 3"/>
-<line x1="75" y1="150" x2="441" y2="150" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4 3"/>
-<circle cx="441" cy="150" r="5" fill="#fbbf24"/>
-<text x="450" y="144" fill="#fbbf24" font-family="sans-serif" font-size="11">50 m &#8594; 83 kHz (design)</text>
-<circle cx="638" cy="83" r="5" fill="#f87171"/>
-<text x="632" y="101" text-anchor="end" fill="#f87171" font-family="sans-serif" font-size="11">~77 m max unambiguous</text>
-</svg>
-<figcaption>Figure 5-2. Beat frequency versus target range at the design slope. The 50 m design point lands at 83 kHz, well under the 128 kHz Nyquist of 256 kSPS sampling; the line reaches Nyquist near 77 m, the unambiguous-range ceiling.</figcaption>
+<img src="../figures/system-design/beat_vs_range.svg" alt="Beat frequency versus target range with the 50 m design point below the 128 kHz Nyquist ceiling">
+<figcaption><strong>Figure 5-2.</strong> Beat frequency versus target range at the design slope. The 50 m design point lands at 83 kHz, well under the 128 kHz Nyquist of 256 kSPS sampling; the line reaches Nyquist near 77 m, the unambiguous-range ceiling.</figcaption>
 </figure>
 
 <figure>
-<svg viewBox="0 0 720 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
-<rect x="1" y="1" width="718" height="318" rx="10" fill="#14181e" stroke="#2a2f3a"/>
-<text x="360" y="26" text-anchor="middle" fill="#e6e8eb" font-family="sans-serif" font-size="15" font-weight="700">Range resolution vs sweep bandwidth</text>
-<text x="360" y="44" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="12">&#916;R = c / 2B</text>
-<line x1="75" y1="275" x2="660" y2="275" stroke="#9aa3ad" stroke-width="1.5"/>
-<line x1="75" y1="275" x2="75" y2="58" stroke="#9aa3ad" stroke-width="1.5"/>
-<text x="75" y="292" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="10">0</text>
-<text x="187" y="292" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="10">50</text>
-<text x="300" y="292" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="10">100</text>
-<text x="412" y="292" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="10">150</text>
-<text x="525" y="292" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="10">200</text>
-<text x="637" y="292" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="10">250</text>
-<text x="367" y="310" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="12">sweep bandwidth (MHz)</text>
-<text x="66" y="279" text-anchor="end" fill="#9aa3ad" font-family="sans-serif" font-size="10">0</text>
-<text x="66" y="174" text-anchor="end" fill="#9aa3ad" font-family="sans-serif" font-size="10">3</text>
-<text x="66" y="104" text-anchor="end" fill="#9aa3ad" font-family="sans-serif" font-size="10">5</text>
-<text x="22" y="168" text-anchor="middle" fill="#9aa3ad" font-family="sans-serif" font-size="12" transform="rotate(-90 22 168)">range resolution (m)</text>
-<polyline points="131,65 142,100 165,144 187,170 244,205 300,222 356,233 412,240 525,249 637,254" fill="none" stroke="#60a5fa" stroke-width="2.5"/>
-<line x1="142" y1="100" x2="142" y2="275" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4 3"/>
-<circle cx="142" cy="100" r="5" fill="#fbbf24"/>
-<text x="152" y="96" fill="#fbbf24" font-family="sans-serif" font-size="11">5.8 GHz mode: 30 MHz &#8594; 5 m</text>
-<line x1="637" y1="254" x2="637" y2="275" stroke="#4ade80" stroke-width="1" stroke-dasharray="4 3"/>
-<circle cx="637" cy="254" r="5" fill="#4ade80"/>
-<text x="628" y="248" text-anchor="end" fill="#4ade80" font-family="sans-serif" font-size="11">this design: 250 MHz &#8594; 0.6 m</text>
-</svg>
-<figcaption>Figure 5-3. Range resolution versus sweep bandwidth, &#916;R = c/2B. The full 250 MHz ISM band gives 0.6 m, about an 8x improvement over the 30 MHz / 5 m of the old 5.8 GHz mode.</figcaption>
+<img src="../figures/system-design/range_resolution.svg" alt="Range resolution versus sweep bandwidth, 30 MHz versus the 250 MHz design point">
+<figcaption><strong>Figure 5-3.</strong> Range resolution versus sweep bandwidth, &Delta;R = c/2B. The full 250 MHz ISM band gives 0.6 m, about an 8&times; improvement over the 30 MHz / 5 m of the old 5.8 GHz mode.</figcaption>
 </figure>
+
+Read together, the three trace the whole chain: Figure 5-1 is why range becomes a frequency, Figure 5-2 turns that into the sample-rate budget (the 50 m / 83 kHz design point under the 128 kHz Nyquist), and Figure 5-3 is the case for the 24 GHz band, the 250 MHz sweep that takes resolution from 5 m to 0.6 m.
 
 ---
 
