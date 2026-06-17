@@ -944,10 +944,15 @@ here is hand-drawn.</p>
 <figure>
 <img src="../figures/system-design/fmcw_chirp_beat.svg" alt="FMCW transmit and receive chirps and the constant beat frequency between them">
 <figcaption>
-<strong>Figure 5-1.</strong> The FMCW principle: a target’s round-trip
-delay τ = 2R/c shifts the received ramp in time, which against the
-transmit ramp appears as a constant beat frequency f<sub>beat</sub> =
-2RS/c. Range is read straight off the beat.
+<strong>Figure 5-1.</strong> The FMCW principle with several targets.
+<em>Top:</em> the transmit chirp (slope S = B/T<sub>C</sub>) and three
+echoes, each the same chirp delayed by its round-trip time τ<sub>i</sub>
+= 2R<sub>i</sub>/c. Because every echo shares the slope S, the
+transmit-to-echo gap is a constant beat frequency f<sub>bi</sub> =
+S·τ<sub>i</sub>. <em>Bottom:</em> each target shows up as one constant
+beat tone that switches on when its echo returns, so a longer range
+gives a higher beat. An FFT of the beat signal recovers these tones, and
+range is read straight off each.
 </figcaption>
 </figure>
 <figure>

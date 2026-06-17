@@ -37,9 +37,13 @@ function Build-OneFigure {
         }
 
         & pdftocairo -svg "$base.pdf" "$base.svg"
+        & pdftocairo -png -r 200 -singlefile "$base.pdf" "$base"
 
         if (Test-Path "$base.svg") {
             Write-Host "  -> $base.svg" -ForegroundColor Green
+        }
+        if (Test-Path "$base.png") {
+            Write-Host "  -> $base.png" -ForegroundColor Green
         }
 
         # Clean up LaTeX intermediate artifacts (keep .tex and .svg)
