@@ -265,11 +265,11 @@ Each locked value above traces to one relationship: range to the beat frequency,
 
 ### 5.2 Key relationships, visualized
 
-Three of these relationships set the headline performance. Each figure is generated from source in `docs/figures/system-design/` (the chirp sketch in TikZ, the two plots in matplotlib) and rebuilt by the figures pipeline, so nothing here is hand-drawn.
+Three of these relationships set the headline performance.
 
 <figure>
 <img src="../figures/system-design/fmcw_chirp_beat.svg" alt="FMCW transmit and receive chirps and the constant beat frequency between them">
-<figcaption><strong>Figure 5-1.</strong> The FMCW principle with several targets. <em>Top:</em> the transmit chirp (slope S = B/T<sub>C</sub>) and three echoes, each the same chirp delayed by its round-trip time &tau;<sub>i</sub> = 2R<sub>i</sub>/c. Because every echo shares the slope S, the transmit-to-echo gap is a constant beat frequency f<sub>bi</sub> = S&middot;&tau;<sub>i</sub>. <em>Bottom:</em> each target shows up as one constant beat tone that switches on when its echo returns, so a longer range gives a higher beat. An FFT of the beat signal recovers these tones, and range is read straight off each.</figcaption>
+<figcaption><strong>Figure 5-1.</strong> The FMCW principle. <em>Top:</em> the transmit chirp (slope S = B/T<sub>C</sub>) and its echo from one target, the same chirp delayed by the round-trip time &tau; = 2R/c. Because the echo shares the slope, the transmit-to-echo gap is a constant beat frequency f<sub>beat</sub> = S&middot;&tau; (equivalently 2RS/c). <em>Bottom:</em> that gap is one constant beat tone, switching on when the echo returns; its frequency sets the target's range.</figcaption>
 </figure>
 
 <figure>

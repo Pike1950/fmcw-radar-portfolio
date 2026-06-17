@@ -1,12 +1,11 @@
 % =============================================================================
-% fmcw_chirp_beat.tex - SDD Figure 5-1: FMCW principle, multiple targets
+% fmcw_chirp_beat.tex - SDD Figure 5-1: FMCW principle (single target)
 % =============================================================================
-% Top panel: the transmit chirp (slope S = B/T_C) and three echoes, each the
-% same chirp delayed by its round-trip time tau_i = 2 R_i / c. Because every
-% echo shares the slope S, the transmit-to-echo gap is a constant beat
-% frequency f_bi = S * tau_i.
-% Bottom panel: each target therefore appears as one constant beat tone that
-% switches on when its echo arrives; a longer range gives a higher beat.
+% Top panel: the transmit chirp (slope S = B/T_C) and its echo, the same chirp
+% delayed by the round-trip time tau = 2R/c. Because the echo shares the slope,
+% the transmit-to-echo gap is a constant beat frequency f_beat = S * tau.
+% Bottom panel: that gap drawn as one constant beat tone over the sweep, which
+% switches on when the echo returns.
 %
 % Compile:  pdflatex fmcw_chirp_beat.tex
 % Convert:  pdftocairo -svg fmcw_chirp_beat.pdf fmcw_chirp_beat.svg
@@ -17,84 +16,72 @@
 \input{../style/pmvb-figures.sty}
 %
 \begin{document}
-\begin{tikzpicture}[>=Stealth, font=\sffamily, scale=1.6, transform shape]
+\begin{tikzpicture}[>=Stealth, font=\sffamily, scale=1.7, transform shape]
   %
   % --- layout constants (letter-only macro names) ---
-  \def\Tc{8}        % chirp duration / time-axis length
-  \def\Bf{2.8}      % sweep bandwidth / freq-axis height (top panel)
-  \def\taua{1.0}    % near-target round-trip delay
-  \def\taub{2.0}    % mid-target
-  \def\tauc{3.0}    % far-target
-  \def\xa{3.5}      % x where beat f_b1 is drawn
-  \def\xb{4.7}
-  \def\xc{5.9}
-  \def\bb{-3.6}     % bottom-panel baseline (y)
-  \def\hbA{0.5}     % bottom-panel beat heights (ratio 1:2:3)
-  \def\hbB{1.0}
-  \def\hbC{1.5}
+  \def\Tc{7}        % chirp duration / time-axis length
+  \def\fo{0.75}     % f0 baseline (top panel)
+  \def\Bf{2.4}      % sweep bandwidth B (height above f0)
+  \def\taud{1.4}    % round-trip delay
+  \def\xbeat{3.8}   % x where the beat gap is drawn
+  \def\bb{-3.2}     % bottom-panel baseline (y)
+  \def\hbeat{0.95}  % bottom-panel beat-tone height
   \pgfmathsetmacro\Sg{\Bf/\Tc}
-  \pgfmathsetmacro\eaY{\Sg*(\Tc-\taua)}
-  \pgfmathsetmacro\ebY{\Sg*(\Tc-\taub)}
-  \pgfmathsetmacro\ecY{\Sg*(\Tc-\tauc)}
-  \pgfmathsetmacro\txa{\Sg*\xa}
-  \pgfmathsetmacro\eya{\Sg*(\xa-\taua)}
-  \pgfmathsetmacro\txb{\Sg*\xb}
-  \pgfmathsetmacro\eyb{\Sg*(\xb-\taub)}
-  \pgfmathsetmacro\txc{\Sg*\xc}
-  \pgfmathsetmacro\eyc{\Sg*(\xc-\tauc)}
+  \pgfmathsetmacro\echoEnd{\fo + \Sg*(\Tc-\taud)}
+  \pgfmathsetmacro\txbY{\fo + \Sg*\xbeat}
+  \pgfmathsetmacro\eybY{\fo + \Sg*(\xbeat-\taud)}
   %
   % =========================== TOP PANEL ====================================
   \draw[pmvbMuted, ->, line width=0.7pt] (-0.1,0) -- (\Tc+0.9,0)
       node[anchor=north east, font=\scriptsize, text=pmvbMuted] {time};
-  \draw[pmvbMuted, ->, line width=0.7pt] (0,-0.1) -- (0,\Bf+0.7)
+  \draw[pmvbMuted, ->, line width=0.7pt] (0,-0.1) -- (0,\fo+\Bf+0.6)
       node[anchor=south west, font=\scriptsize, text=pmvbMuted] {inst.\ frequency};
-  \draw[pmvbMuted, line width=0.5pt] (-0.08,\Bf) -- (0.08,\Bf);
-  \node[anchor=east, font=\scriptsize, text=pmvbMuted] at (-0.1,\Bf) {$B$};
+  % f0 and f0+B ticks
+  \draw[pmvbMuted, line width=0.5pt] (-0.08,\fo) -- (0.08,\fo);
+  \node[anchor=east, font=\scriptsize, text=pmvbMuted] at (-0.1,\fo) {$f_0$};
+  \draw[pmvbMuted, line width=0.5pt] (-0.08,\fo+\Bf) -- (0.08,\fo+\Bf);
+  \node[anchor=east, font=\scriptsize, text=pmvbMuted] at (-0.1,\fo+\Bf) {$f_0+B$};
   %
-  % transmit chirp
-  \draw[pmvbGreen, line width=1.2pt] (0,0) -- (\Tc,\Bf);
+  % transmit chirp + slope label
+  \draw[pmvbGreen, line width=1.2pt] (0,\fo) -- (\Tc,\fo+\Bf);
   \node[anchor=south, font=\scriptsize, text=pmvbGreen, rotate=19]
-      at (6.7,{\Sg*6.7+0.12}) {TX chirp};
+      at (5.6,{\fo+\Sg*5.6+0.12}) {TX (transmit)};
   \node[anchor=south, font=\scriptsize, text=pmvbMuted, rotate=19]
-      at (2.1,{\Sg*2.1+0.12}) {$S=B/T_C$};
+      at (2.0,{\fo+\Sg*2.0+0.12}) {$S=B/T_C$};
   %
-  % echoes (same slope, delayed)
-  \draw[pmvbAmber,  line width=1.0pt, dash pattern=on 4pt off 2.5pt] (\taua,0) -- (\Tc,\eaY);
-  \draw[pmvbBlue,   line width=1.0pt, dash pattern=on 4pt off 2.5pt] (\taub,0) -- (\Tc,\ebY);
-  \draw[pmvbViolet, line width=1.0pt, dash pattern=on 4pt off 2.5pt] (\tauc,0) -- (\Tc,\ecY);
-  \node[anchor=west, font=\scriptsize, text=pmvbMuted] at (\Tc+0.12,\ebY) {echoes};
+  % echo (same slope, delayed)
+  \draw[pmvbAmber, line width=1.1pt, dash pattern=on 4pt off 2.5pt] (\taud,\fo) -- (\Tc,\echoEnd);
+  \node[anchor=north, font=\scriptsize, text=pmvbAmber, rotate=19]
+      at (5.8,{\fo+\Sg*(5.8-\taud)-0.12}) {RX (echo, delayed)};
   %
-  % beat-frequency arrows (transmit-to-echo gap), staggered
-  \draw[pmvbRed, <->, line width=0.8pt] (\xa,\eya) -- (\xa,\txa);
-  \node[anchor=south, font=\tiny, text=pmvbRed] at (\xa,{\txa+0.05}) {$f_{b1}$};
-  \draw[pmvbRed, <->, line width=0.8pt] (\xb,\eyb) -- (\xb,\txb);
-  \node[anchor=south, font=\tiny, text=pmvbRed] at (\xb,{\txb+0.05}) {$f_{b2}$};
-  \draw[pmvbRed, <->, line width=0.8pt] (\xc,\eyc) -- (\xc,\txc);
-  \node[anchor=south, font=\tiny, text=pmvbRed] at (\xc,{\txc+0.05}) {$f_{b3}$};
+  % beat gap = S * tau
+  \draw[pmvbRed, <->, line width=0.9pt] (\xbeat,\eybY) -- (\xbeat,\txbY);
+  \node[anchor=south east, font=\scriptsize, text=pmvbRed]
+      at (\xbeat-0.06,{\txbY+0.10}) {$f_\mathrm{beat}=S\cdot\tau$};
   %
-  % tau ticks on the time axis
-  \foreach \tk/\lab in {\taua/{$\tau_1$}, \taub/{$\tau_2$}, \tauc/{$\tau_3$}} {
-     \draw[pmvbMuted, line width=0.4pt] (\tk,0.07) -- (\tk,-0.07);
-     \node[anchor=north, font=\tiny, text=pmvbMuted] at (\tk,-0.05) {\lab};
-  }
+  % tau brace = 2R/c
+  \draw[decorate, decoration={brace, amplitude=4pt, mirror}, pmvbMuted, line width=0.6pt]
+      (0,\fo-0.18) -- (\taud,\fo-0.18);
+  \node[anchor=west, font=\scriptsize, text=pmvbMuted] at (0.05,\fo-0.45) {$\tau = 2R/c$};
+  %
+  % T_C tick
   \draw[pmvbMuted, line width=0.4pt] (\Tc,0.07) -- (\Tc,-0.07);
   \node[anchor=north, font=\scriptsize, text=pmvbMuted] at (\Tc,-0.07) {$T_C$};
   %
   % =========================== BOTTOM PANEL =================================
   \draw[pmvbMuted, ->, line width=0.7pt] (-0.1,\bb) -- (\Tc+0.9,\bb)
       node[anchor=north east, font=\scriptsize, text=pmvbMuted] {time};
-  \draw[pmvbMuted, ->, line width=0.7pt] (0,\bb-0.1) -- (0,{\bb+2.0})
+  \draw[pmvbMuted, ->, line width=0.7pt] (0,\bb-0.1) -- (0,{\bb+1.7})
       node[anchor=south west, font=\scriptsize, text=pmvbMuted] {beat freq.};
   %
-  \draw[pmvbAmber,  line width=1.0pt] (\taua,\bb) -- (\taua,{\bb+\hbA}) -- (\Tc,{\bb+\hbA});
-  \draw[pmvbBlue,   line width=1.0pt] (\taub,\bb) -- (\taub,{\bb+\hbB}) -- (\Tc,{\bb+\hbB});
-  \draw[pmvbViolet, line width=1.0pt] (\tauc,\bb) -- (\tauc,{\bb+\hbC}) -- (\Tc,{\bb+\hbC});
-  \node[anchor=east, font=\tiny, text=pmvbAmber]  at (-0.1,{\bb+\hbA}) {$f_{b1}$};
-  \node[anchor=east, font=\tiny, text=pmvbBlue]   at (-0.1,{\bb+\hbB}) {$f_{b2}$};
-  \node[anchor=east, font=\tiny, text=pmvbViolet] at (-0.1,{\bb+\hbC}) {$f_{b3}$};
+  % constant beat tone, switches on at tau
+  \draw[pmvbRed, line width=1.1pt] (\taud,\bb) -- (\taud,{\bb+\hbeat}) -- (\Tc,{\bb+\hbeat});
+  \node[anchor=east, font=\scriptsize, text=pmvbRed] at (-0.1,{\bb+\hbeat}) {$f_\mathrm{beat}$};
+  \draw[pmvbMuted, line width=0.4pt] (\taud,{\bb+0.07}) -- (\taud,{\bb-0.07});
+  \node[anchor=north, font=\tiny, text=pmvbMuted] at (\taud,{\bb-0.05}) {$\tau$};
   \draw[pmvbMuted, line width=0.4pt] (\Tc,{\bb+0.07}) -- (\Tc,{\bb-0.07});
   \node[anchor=north, font=\scriptsize, text=pmvbMuted] at (\Tc,{\bb-0.07}) {$T_C$};
-  \node[font=\scriptsize, text=pmvbViolet] at (4.4,{\bb+1.85}) {Beat frequency: one tone per target};
+  \node[font=\scriptsize, text=pmvbRed] at (4.7,{\bb+1.45}) {one target $\rightarrow$ one constant beat tone};
   %
 \end{tikzpicture}
 \end{document}
