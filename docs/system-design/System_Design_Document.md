@@ -2,7 +2,7 @@
 
 ## Rev B: 24 GHz I/Q
 
-**Version:** 0.3 (June 2026, reframed to system scope: with the BGT24MTR11 the project now owns the RF front end, so this is the radar system SDD rather than a baseband-only document; decision D1 resolved)
+**Version:** 0.5 (June 2026, system-scope radar SDD in the PMVB schema; decisions D1 to D4 resolved, D5 to D7 open)
 **Project:** FMCW Radar Portfolio (`fmcw-radar-portfolio`)
 **Revision:** Rev B (24 GHz I/Q)
 **Status:** In Design
@@ -33,7 +33,7 @@ Per the PMVB rule, the body describes what is used. Where a 24-GHz choice is not
 ## Table of Contents
 
 - [1. Theory of Operation](#1-theory-of-operation)
-  - [1.1 What the baseband does](#11-what-the-baseband-does)
+  - [1.1 What the system does](#11-what-the-system-does)
   - [1.2 Signal chain](#12-signal-chain)
   - [1.3 Methodology: work backward from the ADC](#13-methodology-work-backward-from-the-adc)
   - [1.4 The coupled parameter chain](#14-the-coupled-parameter-chain)
@@ -146,7 +146,10 @@ The RF Front-End Module carries the BGT24MTR11 transceiver, its 24 GHz TX and RX
 <div class="callout callout-teal"><strong><span class="tag tag-decision">DECISION</span> The first gain stage lives on the RF module</strong>
 <p>The I and Q signals leaving the MMIC are low-level (microvolt to millivolt) and have to cross a board-to-board connector. A first gain stage on the RF module amplifies them before the crossing, so the inter-board interface carries a larger, lower-impedance signal and is far less vulnerable to pickup. The remaining gain and all of the filtering live on the baseband board.</p></div>
 
-<div class="pending"><strong>PENDING (D2, D5):</strong> the antenna implementation (24 GHz TX and RX patch antennas, and the laminate and stackup for the RF module) is D2; the chirp ramp source (FMCW ramp PLL versus DAC-driven VCO tune, kept local to this module for chirp linearity) is D5.</div>
+<div class="callout callout-teal"><strong><span class="tag tag-decision">DECISION</span> External patch array on 4-layer RO4350B (D2)</strong>
+<p>The RF module uses external PCB patch antennas (a small patch array), microstrip-fed from the BGT24MTR11, plus a build-option 2.92 mm connector launch (DNP) so an external 24 GHz antenna can drive first bring-up. The stackup is 4-layer RO4350B (L1 RF and antenna, L2 solid ground reference, L3 power, L4 control), fabricated at PCBWay, which runs 4-layer Rogers. RO4350B sits just above its sweet spot at 24 GHz, giving up a little patch efficiency versus RO3003, which is held as a later upgrade. ENIG finish for the fine-pitch MMIC and the patches.</p></div>
+
+<div class="pending"><strong>PENDING (D5):</strong> the chirp ramp source (FMCW ramp PLL versus DAC-driven VCO tune, kept local to this module for chirp linearity).</div>
 
 ### 3.1 Sheet A: Power and References
 
@@ -181,7 +184,7 @@ This is the most-changed sheet. The 5.8 GHz Sheet B was a single-ended, AC-coupl
 The gain and filter method carries over; the component values re-derive from the 24 GHz chirp plan (D6), and the whole chain duplicates for I and Q.
 
 <div class="callout callout-blue"><strong><span class="tag tag-physics">PHYSICS</span> Variable gain follows the R<sup>&minus;4</sup> range law</strong>
-<p>Received power varies as R<sup>&minus;4</sup> (the radar range equation): a target at 10 m returns 10,000&times; the power of the same target at 100 m. Without variable gain the ADC would clip on near targets or waste resolution on far ones. A PGA113 (SPI-controlled, internal laser-trimmed gain 1&ndash;200&times;) provides per-channel gain to fill the ADC window across the range span.</p></div>
+<p>Received power varies as R<sup>&minus;4</sup> (the radar range equation): a target at 10 m returns 10,000&times; the power of the same target at 100 m, about 40 dB, and a 100-to-1 span is roughly 80 dB, which approaches the ~84 dB an 18-bit SAR can usefully cover and is exceeded for wider spans. Without variable gain the ADC would clip on near targets or bury far ones in the noise. An SPI-controlled differential VGA per channel fills the ADC window for each range regime. (The Rev B PGA113 was a single-ended part; the differential I/Q here keeps the gain stage differential, so the adaptive-gain concept and the SPI control carry forward, but the part changes.)</p></div>
 
 <div class="callout callout-teal"><strong><span class="tag tag-decision">DECISION</span> Anti-alias before sampling, cutoff set by Nyquist not by the chirp</strong>
 <p>A 4th-order Sallen-Key Butterworth low-pass sits before each ADC. Its cutoff is set by f<sub>s</sub>/2 and the signal band, not by the chirp rate. Whether the chirp is fast or slow, energy above Nyquist must be kept from folding into the band. The topology and the singly-terminated design method carry over from the 5.8 GHz Sheet C; the cutoff and the L/C/R values are re-derived once the chirp plan (D6) sets f<sub>s</sub> and the beat band.</p></div>
@@ -189,19 +192,22 @@ The gain and filter method carries over; the component values re-derive from the
 <div class="callout"><strong><span class="tag tag-tradeoff">TRADEOFF</span> Duplicating for Q buys complex sampling at the cost of match</strong>
 <p>Adding a second identical gain-plus-filter chain for Q is what enables sign-of-velocity, but it introduces channel mismatch. Gain and phase match between the I and Q chains must be held through matched components and symmetric layout, or image rejection in the complex FFT degrades.</p></div>
 
-<div class="pending"><strong>PENDING (D4, D6):</strong> whether each channel uses a PGA113 VGA or a fixed-gain stage relying on the 18-bit dynamic range (D4); exact filter cutoff and values (D6).</div>
+<div class="callout callout-teal"><strong><span class="tag tag-decision">DECISION</span> Adaptive differential gain per channel (D4)</strong>
+<p>Each channel uses an SPI-controlled differential VGA rather than a fixed-gain stage, so the receiver fills the 18-bit ADC across the R<sup>&minus;4</sup> range swing instead of compromising between near-target clipping and far-target SNR. A differential VGA (not the single-ended PGA113) keeps the I/Q path differential through to the ADC; the part is chosen to match the BGT24MTR11 I/Q levels and the ADS8881 input range. I and Q use matched VGAs, with residual gain and phase mismatch calibrated on PMVB.</p></div>
+
+<div class="pending"><strong>PENDING (D6):</strong> exact anti-alias filter cutoff and component values, derived once the chirp plan sets f<sub>s</sub> and the beat band.</div>
 
 ### 3.4 Sheet D: I/Q Digitization
 
 This sheet changes from one ADC to a simultaneous-sampling I/Q pair. The ADS8881 and REF5025 rationale carry over; the count doubles and the convert is shared.
 
-<div class="callout callout-teal"><strong><span class="tag tag-decision">DECISION</span> Two ADCs on a shared convert, simultaneous I/Q</strong>
-<p>To preserve the complex phase relationship between I and Q, the two channels are sampled at the same instant. Two ADS8881 18-bit SAR ADCs share one CONVST line so their sample apertures coincide; the alternative is a single dual-channel simultaneous-sampling SAR (D3). Because the MMIC output is already differential, the THS4531A's old single-ended-to-differential role is revisited: it likely becomes a differential receiver and level-shifter into the ADC rather than an SE-to-Diff converter.</p></div>
+<div class="callout callout-teal"><strong><span class="tag tag-decision">DECISION</span> Two ADS8881 on a shared CONVST, simultaneous I/Q (D3)</strong>
+<p>To preserve the complex phase relationship between I and Q, the two channels are sampled at the same instant. Two ADS8881 18-bit SAR ADCs share one CONVST line so their sample apertures coincide. This reuses the proven Rev B converter, the REF5025 reference, and the existing SPI controller RTL; the one cost, a small inter-channel aperture skew, is negligible at the radar's low beat frequencies and is calibrated out on PMVB. Because the MMIC output is already differential, the THS4531A's old single-ended-to-differential role is revisited: it likely becomes a differential receiver and level-shifter into the ADC rather than an SE-to-Diff converter.</p></div>
 
 <div class="callout callout-blue"><strong><span class="tag tag-physics">PHYSICS</span> SAR, not sigma-delta</strong>
 <p>A SAR ADC samples at a discrete, deterministic instant. A sigma-delta averages over its decimation window, which would smear the instantaneous beat frequency and corrupt the range-Doppler FFT. The ADS8881 (18-bit, up to 1 MSPS, run well below its maximum) is the right converter class, and this rationale is unchanged from the 5.8 GHz design.</p></div>
 
-<div class="pending"><strong>PENDING (D3, D7):</strong> two-ADC versus dual-SAR (D3); the digital backend that ingests both streams and runs the FFT (D7).</div>
+<div class="pending"><strong>PENDING (D7):</strong> the digital backend that ingests both ADC streams and runs the range-Doppler FFT.</div>
 
 ### 3.5 DFT Infrastructure
 
@@ -211,7 +217,7 @@ Design-for-test is a first-class requirement and carries over, now per channel. 
 <p>A 10 kΩ isolation resistor with a ~15 pF scope-probe tip forms a low-pass at f = 1/(2&pi; &times; 10k &times; 15p) &approx; 1 MHz, well above the beat band, so the probe point never meaningfully loads the chain. The resistors are always populated; they protect the signal chain even when the header is unconnected.</p></div>
 
 <div class="callout callout-teal"><strong><span class="tag tag-decision">DECISION</span> Per-channel observability</strong>
-<p>With two chains, the monitor set (PGA output, filter output, ADC differential inputs, FDA outputs) is provided for both I and Q, so each path is independently observable. Bring-up and characterization run on the PMVB instrument platform rather than commercial bench gear.</p></div>
+<p>With two chains, the monitor set (VGA output, filter output, ADC differential inputs, FDA outputs) is provided for both I and Q, so each path is independently observable. Bring-up and characterization run on the PMVB instrument platform rather than commercial bench gear.</p></div>
 
 ---
 
@@ -228,11 +234,11 @@ Design-for-test is a first-class requirement and carries over, now per channel. 
 | Carrier band | 24 GHz ISM, 24.0&ndash;24.25 GHz (~250 MHz usable) | Locked |
 | Range resolution floor | ~0.6 m (&Delta;R = c/2B at 250 MHz) | Locked |
 | Baseband | Complex I/Q, two channels, simultaneous sampling | Locked |
-| ADC | 18-bit SAR, differential, 2.500 V reference | Locked |
+| ADC | Two ADS8881 (18-bit SAR), differential, shared CONVST for simultaneous I/Q, 2.500 V REF5025 | Locked |
 | Max range | derived from chirp plan | Pending D6 |
 | Beat-frequency band / sample rate | derived from chirp plan | Pending D6 |
 | Velocity resolution, max unambiguous velocity | derived from chirp plan and frame time | Pending D6 |
-| I/Q gain and phase match target | sets image rejection | Pending D3, D4 |
+| I/Q gain and phase match target | sets image rejection | Design + calibration (matched VGAs) |
 
 This table is kept in parity with any downstream summary table as values lock.
 
@@ -250,9 +256,9 @@ Outline; detailed once the digital backend (D7) is fixed.
 
 ## 7. Bill of Materials
 
-<div class="pending"><strong>PENDING (D1&ndash;D6):</strong> finalized when the parts are locked, sourced per the PMVB rule (Mouser &gt; Digi-Key &gt; Microcenter &gt; Amazon) with part numbers cited.</div>
+<div class="pending"><strong>PENDING (D5&ndash;D6):</strong> finalized when the remaining parts are locked, sourced per the PMVB rule (Mouser &gt; Digi-Key &gt; Microcenter &gt; Amazon) with part numbers cited.</div>
 
-Carries over: ADS8881 (now &times;2 or one dual SAR), REF5025, PGA113, THS4531A, OPA320, TPS7A2033 LDO, BLM18PG221SN1D ferrite. Adds: the 24 GHz transceiver MMIC (D1), the ramp PLL or DAC (D5), and second-channel duplicates of the conditioning chain.
+Carries over: ADS8881 (&times;2, one per I/Q channel), REF5025, THS4531A, OPA320, TPS7A2033 LDO, BLM18PG221SN1D ferrite. Changes: the single-ended PGA113 is replaced by a differential VGA per channel (D4). Adds: the BGT24MTR11 transceiver and its RF-module support, the ramp source (D5), and second-channel duplicates of the conditioning chain.
 
 ---
 
@@ -277,14 +283,14 @@ The layout rationale carries over almost wholesale. The original chapter notes t
 
 ## 10. Open Decisions and Known Issues
 
-D1 (the MMIC and board split) is resolved, which fixes the I/Q interface and unblocks D2, D3, and D5. Work the rest in dependency order.
+D1 through D4 are resolved. D5 (ramp generation) is the next open decision, followed by D6 (chirp plan) and D7 (digital backend). Work them in dependency order.
 
 | # | Decision | Options | Drives | Depends on |
 |---|----------|---------|--------|------------|
 | D1 | MMIC and board split | **RESOLVED:** BGT24MTR11 (1 TX / 1 RX); two boards (RF Front-End Module + I/Q Baseband Board), split at the low-frequency I/Q seam after a first gain stage on the RF module | I/Q interface, RF layout scope, connectors | done |
-| D2 | Antenna approach | antenna-in-package vs external PCB patch | RF layout, stackup, cost | D1 |
-| D3 | ADC arrangement | two synchronized ADS8881 vs one dual simultaneous SAR | I/Q phase fidelity, BOM, layout | D1 |
-| D4 | Front-end gain | PGA113 VGA per channel vs fixed gain | gain match, dynamic range | D1, D3 |
+| D2 | Antenna and RF stackup | **RESOLVED:** external PCB patch array + DNP 2.92 mm connector launch; 4-layer RO4350B at PCBWay (RO3003 held as a later efficiency upgrade), ENIG finish | RF layout, stackup, cost | done |
+| D3 | ADC arrangement | **RESOLVED:** two synchronized ADS8881 (18-bit SAR) on a shared CONVST; reuses the proven part, REF5025, and SPI RTL | I/Q phase fidelity, BOM, layout | done |
+| D4 | Front-end gain | **RESOLVED:** adaptive gain via an SPI-controlled differential VGA per channel (replaces the single-ended PGA113); matched I/Q, residual calibrated on PMVB | gain match, dynamic range | done |
 | D5 | Ramp generation | FMCW ramp PLL (ADF4159 class) vs DAC ramp + calibration | chirp linearity, parts, firmware | D1 |
 | D6 | Chirp plan | sweep BW, sweep time, max range, sample rate | filter cutoff, ADC rate, range/velocity | D1, D5 |
 | D7 | Digital backend | Tang Primer 25K FPGA vs MCU | throughput, second-Tang-Primer question, PMVB tier | D3, D6 |

@@ -1,17 +1,174 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>24 GHz FMCW Radar SDD (Rev B)</title>
   <style>
-    code{white-space: pre-wrap;}
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <style>
   :root{
@@ -50,47 +207,85 @@
   </style>
 </head>
 <body>
-<h1 id="ghz-fmcw-radar-system-design-document">24 GHz FMCW Radar System Design Document</h1>
+<h1 id="ghz-fmcw-radar-system-design-document">24 GHz FMCW Radar System
+Design Document</h1>
 <h2 id="rev-b-24-ghz-iq">Rev B: 24 GHz I/Q</h2>
-<p><strong>Version:</strong> 0.3 (June 2026, reframed to system scope: with the BGT24MTR11 the project now owns the RF front end, so this is the radar system SDD rather than a baseband-only document; decision D1 resolved) <strong>Project:</strong> FMCW Radar Portfolio (<code>fmcw-radar-portfolio</code>) <strong>Revision:</strong> Rev B (24 GHz I/Q) <strong>Status:</strong> In Design <strong>Engineer:</strong> Bradley Ward <strong>Scope:</strong> A complete 24 GHz FMCW radar sensor, partitioned into two boards: an <strong>RF Front-End Module</strong> (BGT24MTR11, 24 GHz antennas, chirp ramp, first gain stage) and an <strong>I/Q Baseband Board</strong> (gain, anti-alias filtering, dual simultaneous-sampling ADC, digital interface). The digital backend that runs the range-Doppler FFT is downstream of both. <strong>Supersedes:</strong> <code>System_Design_Document.html</code> (5.8 GHz single-ended baseband, v1.0, February 2026), retained in-repo as reference <strong>Format reference:</strong> PMVB System Design Document and Module Design Document Schema</p>
+<p><strong>Version:</strong> 0.5 (June 2026, system-scope radar SDD in
+the PMVB schema; decisions D1 to D4 resolved, D5 to D7 open)
+<strong>Project:</strong> FMCW Radar Portfolio
+(<code>fmcw-radar-portfolio</code>) <strong>Revision:</strong> Rev B (24
+GHz I/Q) <strong>Status:</strong> In Design <strong>Engineer:</strong>
+Bradley Ward <strong>Scope:</strong> A complete 24 GHz FMCW radar
+sensor, partitioned into two boards: an <strong>RF Front-End
+Module</strong> (BGT24MTR11, 24 GHz antennas, chirp ramp, first gain
+stage) and an <strong>I/Q Baseband Board</strong> (gain, anti-alias
+filtering, dual simultaneous-sampling ADC, digital interface). The
+digital backend that runs the range-Doppler FFT is downstream of both.
+<strong>Supersedes:</strong> <code>System_Design_Document.html</code>
+(5.8 GHz single-ended baseband, v1.0, February 2026), retained in-repo
+as reference <strong>Format reference:</strong> PMVB System Design
+Document and Module Design Document Schema</p>
 <hr />
 <h2 id="document-conventions">Document Conventions</h2>
-<p>This document follows the PMVB module-doc section schema. The reasoning style from the original FMCW SDD is preserved: load-bearing design choices are called out with one of four tags so the “why” is explicit and auditable.</p>
+<p>This document follows the PMVB module-doc section schema. The
+reasoning style from the original FMCW SDD is preserved: load-bearing
+design choices are called out with one of four tags so the “why” is
+explicit and auditable.</p>
 <div class="callout callout-blue">
-<strong><span class="tag tag-physics">PHYSICS</span> First-principles derivation or physical reasoning.</strong>
+<strong><span class="tag tag-physics">PHYSICS</span> First-principles
+derivation or physical reasoning.</strong>
 </div>
 <div class="callout callout-teal">
-<strong><span class="tag tag-decision">DECISION</span> A specific design choice with its rationale.</strong>
+<strong><span class="tag tag-decision">DECISION</span> A specific design
+choice with its rationale.</strong>
 </div>
 <div class="callout">
-<strong><span class="tag tag-tradeoff">TRADEOFF</span> What was gained versus what was given up.</strong>
+<strong><span class="tag tag-tradeoff">TRADEOFF</span> What was gained
+versus what was given up.</strong>
 </div>
 <div class="callout callout-red">
-<strong><span class="tag tag-risk">RISK</span> A known limitation or sensitivity requiring attention.</strong>
+<strong><span class="tag tag-risk">RISK</span> A known limitation or
+sensitivity requiring attention.</strong>
 </div>
-<p>A fifth marker is specific to this revision. Because the 24 GHz design is mid-definition, blocks that depend on an unresolved decision are flagged and cross-referenced to the decision register in section 10:</p>
+<p>A fifth marker is specific to this revision. Because the 24 GHz
+design is mid-definition, blocks that depend on an unresolved decision
+are flagged and cross-referenced to the decision register in section
+10:</p>
 <div class="pending">
-<strong>PENDING (Dx):</strong> content blocked on an open decision; see section 10.
+<strong>PENDING (Dx):</strong> content blocked on an open decision; see
+section 10.
 </div>
-<p>Per the PMVB rule, the body describes what is used. Where a 24-GHz choice is not yet locked, the section states what carries over from the 5.8 GHz design, what must change, and which decision gates it, rather than guessing values that will move.</p>
+<p>Per the PMVB rule, the body describes what is used. Where a 24-GHz
+choice is not yet locked, the section states what carries over from the
+5.8 GHz design, what must change, and which decision gates it, rather
+than guessing values that will move.</p>
 <hr />
 <h2 id="table-of-contents">Table of Contents</h2>
 <ul>
 <li><a href="#1-theory-of-operation">1. Theory of Operation</a>
 <ul>
-<li><a href="#11-what-the-baseband-does">1.1 What the baseband does</a></li>
+<li><a href="#11-what-the-system-does">1.1 What the system does</a></li>
 <li><a href="#12-signal-chain">1.2 Signal chain</a></li>
-<li><a href="#13-methodology-work-backward-from-the-adc">1.3 Methodology: work backward from the ADC</a></li>
-<li><a href="#14-the-coupled-parameter-chain">1.4 The coupled parameter chain</a></li>
-<li><a href="#15-the-baseband-is-set-by-the-chirp-plan-not-the-carrier">1.5 The baseband is set by the chirp plan, not the carrier</a></li>
+<li><a href="#13-methodology-work-backward-from-the-adc">1.3
+Methodology: work backward from the ADC</a></li>
+<li><a href="#14-the-coupled-parameter-chain">1.4 The coupled parameter
+chain</a></li>
+<li><a
+href="#15-the-baseband-is-set-by-the-chirp-plan-not-the-carrier">1.5 The
+baseband is set by the chirp plan, not the carrier</a></li>
 </ul></li>
-<li><a href="#2-functional-block-diagram">2. Functional Block Diagram</a></li>
+<li><a href="#2-functional-block-diagram">2. Functional Block
+Diagram</a></li>
 <li><a href="#3-schematic-notes">3. Schematic Notes</a>
 <ul>
-<li><a href="#31-sheet-a-power-and-references">3.1 Sheet A: Power and References</a></li>
-<li><a href="#32-sheet-b-iq-input-from-the-mmic">3.2 Sheet B: I/Q Input from the MMIC</a></li>
-<li><a href="#33-sheet-c-gain-and-anti-alias-filter">3.3 Sheet C: Gain and Anti-Alias Filter</a></li>
-<li><a href="#34-sheet-d-iq-digitization">3.4 Sheet D: I/Q Digitization</a></li>
+<li><a href="#31-sheet-a-power-and-references">3.1 Sheet A: Power and
+References</a></li>
+<li><a href="#32-sheet-b-iq-input-from-the-mmic">3.2 Sheet B: I/Q Input
+from the MMIC</a></li>
+<li><a href="#33-sheet-c-gain-and-anti-alias-filter">3.3 Sheet C: Gain
+and Anti-Alias Filter</a></li>
+<li><a href="#34-sheet-d-iq-digitization">3.4 Sheet D: I/Q
+Digitization</a></li>
 <li><a href="#35-dft-infrastructure">3.5 DFT Infrastructure</a></li>
 </ul></li>
 <li><a href="#4-pin-assignments">4. Pin Assignments</a></li>
@@ -98,29 +293,58 @@
 <li><a href="#6-sample-applications">6. Sample Applications</a></li>
 <li><a href="#7-bill-of-materials">7. Bill of Materials</a></li>
 <li><a href="#8-calibration-procedure">8. Calibration Procedure</a></li>
-<li><a href="#9-layout-design-rationale">9. Layout Design Rationale</a></li>
-<li><a href="#10-open-decisions-and-known-issues">10. Open Decisions and Known Issues</a></li>
+<li><a href="#9-layout-design-rationale">9. Layout Design
+Rationale</a></li>
+<li><a href="#10-open-decisions-and-known-issues">10. Open Decisions and
+Known Issues</a></li>
 <li><a href="#11-references">11. References</a></li>
 </ul>
 <hr />
 <h2 id="theory-of-operation">1. Theory of Operation</h2>
 <h3 id="what-the-system-does">1.1 What the system does</h3>
-<p>This is a complete short-range 24 GHz FMCW radar sensor. A transceiver MMIC transmits a frequency chirp, receives the reflection, and downconverts it on-chip to a complex baseband beat signal; the baseband then conditions and digitizes that signal into complex samples for a downstream range-Doppler FFT.</p>
-<p>The sensor is partitioned into two boards (decision D1, section 10):</p>
+<p>This is a complete short-range 24 GHz FMCW radar sensor. A
+transceiver MMIC transmits a frequency chirp, receives the reflection,
+and downconverts it on-chip to a complex baseband beat signal; the
+baseband then conditions and digitizes that signal into complex samples
+for a downstream range-Doppler FFT.</p>
+<p>The sensor is partitioned into two boards (decision D1, section
+10):</p>
 <ul>
-<li><strong>RF Front-End Module.</strong> The Infineon BGT24MTR11 (1 TX / 1 RX) integrated transceiver, its 24 GHz TX and RX antennas, the chirp ramp source, and a first gain stage. The MMIC contains the VCO, PA, LNA, and quadrature mixers and presents differential in-phase (I) and quadrature (Q) beat signals at zero IF.</li>
-<li><strong>I/Q Baseband Board.</strong> Per-channel gain and anti-alias filtering, simultaneous 18-bit sampling of I and Q, MMIC configuration over SPI, and the digital interface to the backend.</li>
+<li><strong>RF Front-End Module.</strong> The Infineon BGT24MTR11 (1 TX
+/ 1 RX) integrated transceiver, its 24 GHz TX and RX antennas, the chirp
+ramp source, and a first gain stage. The MMIC contains the VCO, PA, LNA,
+and quadrature mixers and presents differential in-phase (I) and
+quadrature (Q) beat signals at zero IF.</li>
+<li><strong>I/Q Baseband Board.</strong> Per-channel gain and anti-alias
+filtering, simultaneous 18-bit sampling of I and Q, MMIC configuration
+over SPI, and the digital interface to the backend.</li>
 </ul>
-<p>The two boards meet at a low-frequency analog I/Q interface, not a 24 GHz interface, because the MMIC has already downconverted on-chip. That is what makes the split practical (section 10, D1).</p>
-<p>The radar is a signal-acquisition path, not a signal processor: it transforms microvolt-to-millivolt beat signals into clean complex samples, and range and velocity extraction happen downstream in the FFT engine.</p>
+<p>The two boards meet at a low-frequency analog I/Q interface, not a 24
+GHz interface, because the MMIC has already downconverted on-chip. That
+is what makes the split practical (section 10, D1).</p>
+<p>The radar is a signal-acquisition path, not a signal processor: it
+transforms microvolt-to-millivolt beat signals into clean complex
+samples, and range and velocity extraction happen downstream in the FFT
+engine.</p>
 <div class="callout callout-teal">
-<strong><span class="tag tag-decision">DECISION</span> 24 GHz integrated MMIC, two-board partition</strong>
+<strong><span class="tag tag-decision">DECISION</span> 24 GHz integrated
+MMIC, two-board partition</strong>
 <p>
-The 5.8 GHz Rev B was baseband-only and treated the RF front end (a discrete free-running VCO, mixers, and LNA) as external. At 24 GHz the project adopts the BGT24MTR11, which collapses that discrete RF chain into a single MMIC, so the RF front end is now part of the design. The sensor is split into an RF Front-End Module and an I/Q Baseband Board because the inter-board seam is low-frequency analog I/Q: that keeps the costly 24 GHz material and the iteration-prone RF isolated to a small board while the baseband stays on cheap FR4 and can be validated standalone. The complex I/Q output is also what enables sign-of-velocity discrimination (sections 1.5 and 3.4).
+The 5.8 GHz Rev B was baseband-only and treated the RF front end (a
+discrete free-running VCO, mixers, and LNA) as external. At 24 GHz the
+project adopts the BGT24MTR11, which collapses that discrete RF chain
+into a single MMIC, so the RF front end is now part of the design. The
+sensor is split into an RF Front-End Module and an I/Q Baseband Board
+because the inter-board seam is low-frequency analog I/Q: that keeps the
+costly 24 GHz material and the iteration-prone RF isolated to a small
+board while the baseband stays on cheap FR4 and can be validated
+standalone. The complex I/Q output is also what enables sign-of-velocity
+discrimination (sections 1.5 and 3.4).
 </p>
 </div>
 <h3 id="signal-chain">1.2 Signal chain</h3>
-<p>Locked blocks are in plain text; blocks whose implementation depends on an open decision are flagged.</p>
+<p>Locked blocks are in plain text; blocks whose implementation depends
+on an open decision are flagged.</p>
 <pre><code>RF FRONT-END MODULE
   24 GHz MMIC (on-chip VCO, PA, LNA, I/Q mixers); TX and RX via 24 GHz antennas
   I, Q (zero IF) -&gt; first gain stage -&gt; [ I/Q interface connector ]
@@ -131,174 +355,400 @@ I/Q BASEBAND BOARD
      I and Q sampled simultaneously to preserve complex phase
   -&gt; digital backend (range-Doppler FFT) -&gt; host
   MMIC configuration + control over SPI (routed across the connector)</code></pre>
-<p>The two conditioning chains (I and Q) are nominally identical. Channel-to-channel gain and phase match is a first-class concern: I/Q imbalance maps directly to image-frequency leakage in the complex spectrum and corrupts the sign of the measured velocity.</p>
-<h3 id="methodology-work-backward-from-the-adc">1.3 Methodology: work backward from the ADC</h3>
-<p>This methodology carries over from the 5.8 GHz design unchanged, because it is independent of carrier frequency and of real-versus-complex sampling. Every analog decision is anchored to what the ADC needs to see.</p>
+<p>The two conditioning chains (I and Q) are nominally identical.
+Channel-to-channel gain and phase match is a first-class concern: I/Q
+imbalance maps directly to image-frequency leakage in the complex
+spectrum and corrupts the sign of the measured velocity.</p>
+<h3 id="methodology-work-backward-from-the-adc">1.3 Methodology: work
+backward from the ADC</h3>
+<p>This methodology carries over from the 5.8 GHz design unchanged,
+because it is independent of carrier frequency and of
+real-versus-complex sampling. Every analog decision is anchored to what
+the ADC needs to see.</p>
 <div class="callout callout-blue">
-<strong><span class="tag tag-physics">PHYSICS</span> The ADC defines the budget</strong>
+<strong><span class="tag tag-physics">PHYSICS</span> The ADC defines the
+budget</strong>
 <p>
-The ADS8881 digitizes a differential input against a 2.500 V reference (REF5025). One LSB at 18 bits over the differential full scale is V<sub>REF</sub> × 2 / 2<sup>18</sup> = 5.000 V / 262,144 ≈ 19 µV. Every upstream stage exists to deliver a clean signal into that window: the VGA fills the ADC range regardless of target distance, the anti-alias filter keeps out-of-band energy from folding in, and the reference and bias networks must hold stable to a small fraction of an LSB or they waste resolution. Noise or offset referred to the input is only meaningful relative to that ~19 µV step.
+The ADS8881 digitizes a differential input against a 2.500 V reference
+(REF5025). One LSB at 18 bits over the differential full scale is
+V<sub>REF</sub> × 2 / 2<sup>18</sup> = 5.000 V / 262,144 ≈ 19 µV. Every
+upstream stage exists to deliver a clean signal into that window: the
+VGA fills the ADC range regardless of target distance, the anti-alias
+filter keeps out-of-band energy from folding in, and the reference and
+bias networks must hold stable to a small fraction of an LSB or they
+waste resolution. Noise or offset referred to the input is only
+meaningful relative to that ~19 µV step.
 </p>
 </div>
-<h3 id="the-coupled-parameter-chain">1.4 The coupled parameter chain</h3>
-<p>The chirp timing, the sample rate, and the FFT size are not independent. They are bound by one relation that Rev A violated and Rev B respects.</p>
+<h3 id="the-coupled-parameter-chain">1.4 The coupled parameter
+chain</h3>
+<p>The chirp timing, the sample rate, and the FFT size are not
+independent. They are bound by one relation that Rev A violated and Rev
+B respects.</p>
 <div class="callout callout-blue">
-<strong><span class="tag tag-physics">PHYSICS</span> The three coupled parameters</strong>
+<strong><span class="tag tag-physics">PHYSICS</span> The three coupled
+parameters</strong>
 <p>
-f<sub>s</sub> × T<sub>sweep</sub> = N<sub>samples</sub>, and N<sub>samples</sub> must be at least N<sub>FFT</sub> for useful frequency resolution.
+f<sub>s</sub> × T<sub>sweep</sub> = N<sub>samples</sub>, and
+N<sub>samples</sub> must be at least N<sub>FFT</sub> for useful
+frequency resolution.
 </p>
 <p>
-Rev A set T<sub>sweep</sub> = 50 µs without checking: at 100 kS/s that is only 5 samples per ramp, and a 5-point FFT has no resolution. The corrected design sets T<sub>sweep</sub> in the millisecond range so that f<sub>s</sub> × T<sub>sweep</sub> yields several hundred samples per ramp, enough for a 512-point FFT. The ADC sample rate did not cause the Rev A failure; the chirp rate did.
+Rev A set T<sub>sweep</sub> = 50 µs without checking: at 100 kS/s that
+is only 5 samples per ramp, and a 5-point FFT has no resolution. The
+corrected design sets T<sub>sweep</sub> in the millisecond range so that
+f<sub>s</sub> × T<sub>sweep</sub> yields several hundred samples per
+ramp, enough for a 512-point FFT. The ADC sample rate did not cause the
+Rev A failure; the chirp rate did.
 </p>
 </div>
 <div class="callout callout-red">
-<strong><span class="tag tag-risk">RISK</span> The exact chirp plan is not yet fixed for 24 GHz</strong>
+<strong><span class="tag tag-risk">RISK</span> The exact chirp plan is
+not yet fixed for 24 GHz</strong>
 <p>
-The numbers above (sample rate, sweep time, samples per ramp, FFT size) are re-derived from the chosen 24 GHz chirp plan, which is decision D6. The methodology is locked; the values follow once D6 closes.
+The numbers above (sample rate, sweep time, samples per ramp, FFT size)
+are re-derived from the chosen 24 GHz chirp plan, which is decision D6.
+The methodology is locked; the values follow once D6 closes.
 </p>
 </div>
-<h3 id="the-baseband-is-set-by-the-chirp-plan-not-the-carrier">1.5 The baseband is set by the chirp plan, not the carrier</h3>
-<p>This is the point that makes the band move tractable: moving from 5.8 GHz to 24 GHz does not, by itself, change the baseband.</p>
+<h3 id="the-baseband-is-set-by-the-chirp-plan-not-the-carrier">1.5 The
+baseband is set by the chirp plan, not the carrier</h3>
+<p>This is the point that makes the band move tractable: moving from 5.8
+GHz to 24 GHz does not, by itself, change the baseband.</p>
 <div class="callout callout-blue">
-<strong><span class="tag tag-physics">PHYSICS</span> Beat frequency depends on slope and range, not carrier</strong>
+<strong><span class="tag tag-physics">PHYSICS</span> Beat frequency
+depends on slope and range, not carrier</strong>
 <p>
-For a target at range R, the beat frequency is f<sub>beat</sub> = 2·R·S / c, where S is the chirp slope (sweep bandwidth / sweep time). The carrier frequency f<sub>0</sub> does not appear. So the anti-alias filter cutoff and the ADC rate are governed by the maximum range beat, set by the chirp plan, and are re-derived with the same analysis used at 5.8 GHz.
+For a target at range R, the beat frequency is f<sub>beat</sub> = 2·R·S
+/ c, where S is the chirp slope (sweep bandwidth / sweep time). The
+carrier frequency f<sub>0</sub> does not appear. So the anti-alias
+filter cutoff and the ADC rate are governed by the maximum range beat,
+set by the chirp plan, and are re-derived with the same analysis used at
+5.8 GHz.
 </p>
 <p>
-Range resolution is set by usable sweep bandwidth: ΔR = c / (2B). Across the 24 GHz ISM band (~250 MHz usable) the floor is about 0.6 m, roughly an 8× improvement over the 30 MHz / 5.0 m of the 5.8 GHz §15.245 mode, and a hard limit independent of the ADC.
+Range resolution is set by usable sweep bandwidth: ΔR = c / (2B). Across
+the 24 GHz ISM band (~250 MHz usable) the floor is about 0.6 m, roughly
+an 8× improvement over the 30 MHz / 5.0 m of the 5.8 GHz §15.245 mode,
+and a hard limit independent of the ADC.
 </p>
 </div>
 <div class="callout callout-blue">
-<strong><span class="tag tag-physics">PHYSICS</span> What the carrier does change: Doppler</strong>
+<strong><span class="tag tag-physics">PHYSICS</span> What the carrier
+does change: Doppler</strong>
 <p>
-Doppler shift scales with carrier: f<sub>D</sub> = 2·v·f<sub>0</sub> / c. At 24 GHz the Doppler is about 4× that at 5.8 GHz for the same velocity. Doppler is resolved in the slow-time (chirp-to-chirp) FFT and sets velocity-axis scaling and maximum unambiguous velocity; it does not drive the fast-time anti-alias filter, which remains governed by the range beat.
+Doppler shift scales with carrier: f<sub>D</sub> = 2·v·f<sub>0</sub> /
+c. At 24 GHz the Doppler is about 4× that at 5.8 GHz for the same
+velocity. Doppler is resolved in the slow-time (chirp-to-chirp) FFT and
+sets velocity-axis scaling and maximum unambiguous velocity; it does not
+drive the fast-time anti-alias filter, which remains governed by the
+range beat.
 </p>
 </div>
 <div class="callout callout-teal">
-<strong><span class="tag tag-decision">DECISION</span> Complex I/Q resolves the sign of velocity</strong>
+<strong><span class="tag tag-decision">DECISION</span> Complex I/Q
+resolves the sign of velocity</strong>
 <p>
-A single real beat channel cannot tell an approaching target from a receding one; both fold to the same positive beat frequency. Sampling I and Q gives a complex baseband whose FFT is two-sided, so positive and negative Doppler are distinct. This is the architectural reason the board doubles to two channels (section 3.4) and the reason simultaneous sampling and I/Q match matter.
+A single real beat channel cannot tell an approaching target from a
+receding one; both fold to the same positive beat frequency. Sampling I
+and Q gives a complex baseband whose FFT is two-sided, so positive and
+negative Doppler are distinct. This is the architectural reason the
+board doubles to two channels (section 3.4) and the reason simultaneous
+sampling and I/Q match matter.
 </p>
 </div>
 <hr />
 <h2 id="functional-block-diagram">2. Functional Block Diagram</h2>
-<p>The system and sheet-level block diagrams live in <code>docs/block-diagrams/</code> (<code>block_diagram_system.svg</code>, <code>block_diagram_sheet_a.svg</code>, <code>block_diagram_sheets_bcd.svg</code>).</p>
-<p>The existing diagrams show the 5.8 GHz single real chain (one mixer input, one PGA, one filter, one FDA, one ADC). They are redrawn to show the two-board partition: the BGT24MTR11 with its antennas and first gain stage on the RF Front-End Module, the differential I and Q crossing the interface connector, and the two parallel conditioning chains into a simultaneous-sampling ADC stage on the I/Q Baseband Board.</p>
+<p>The system and sheet-level block diagrams live in
+<code>docs/block-diagrams/</code>
+(<code>block_diagram_system.svg</code>,
+<code>block_diagram_sheet_a.svg</code>,
+<code>block_diagram_sheets_bcd.svg</code>).</p>
+<p>The existing diagrams show the 5.8 GHz single real chain (one mixer
+input, one PGA, one filter, one FDA, one ADC). They are redrawn to show
+the two-board partition: the BGT24MTR11 with its antennas and first gain
+stage on the RF Front-End Module, the differential I and Q crossing the
+interface connector, and the two parallel conditioning chains into a
+simultaneous-sampling ADC stage on the I/Q Baseband Board.</p>
 <hr />
 <h2 id="schematic-notes">3. Schematic Notes</h2>
-<p>The design spans two boards. The notes below explain the intent behind each block; the full schematics live in the KiCad projects, and detailed per-board design documents (RF Front-End Module, I/Q Baseband Board) will sit under this system SDD as each board matures, mirroring the PMVB per-module docs. Section 3.0 summarizes the RF Front-End Module; sections 3.1 to 3.5 cover the I/Q Baseband Board, where Sheet A (power and references) and the DFT infrastructure carry over from the 5.8 GHz design and Sheets B, C, and D are reworked for the MMIC I/Q interface and the dual-channel architecture.</p>
+<p>The design spans two boards. The notes below explain the intent
+behind each block; the full schematics live in the KiCad projects, and
+detailed per-board design documents (RF Front-End Module, I/Q Baseband
+Board) will sit under this system SDD as each board matures, mirroring
+the PMVB per-module docs. Section 3.0 summarizes the RF Front-End
+Module; sections 3.1 to 3.5 cover the I/Q Baseband Board, where Sheet A
+(power and references) and the DFT infrastructure carry over from the
+5.8 GHz design and Sheets B, C, and D are reworked for the MMIC I/Q
+interface and the dual-channel architecture.</p>
 <h3 id="rf-front-end-module">3.0 RF Front-End Module</h3>
-<p>The RF Front-End Module carries the BGT24MTR11 transceiver, its 24 GHz TX and RX antennas, the chirp ramp source, a first gain stage on each of the I and Q outputs, and the connector to the baseband board.</p>
+<p>The RF Front-End Module carries the BGT24MTR11 transceiver, its 24
+GHz TX and RX antennas, the chirp ramp source, a first gain stage on
+each of the I and Q outputs, and the connector to the baseband
+board.</p>
 <div class="callout callout-teal">
-<strong><span class="tag tag-decision">DECISION</span> The first gain stage lives on the RF module</strong>
+<strong><span class="tag tag-decision">DECISION</span> The first gain
+stage lives on the RF module</strong>
 <p>
-The I and Q signals leaving the MMIC are low-level (microvolt to millivolt) and have to cross a board-to-board connector. A first gain stage on the RF module amplifies them before the crossing, so the inter-board interface carries a larger, lower-impedance signal and is far less vulnerable to pickup. The remaining gain and all of the filtering live on the baseband board.
+The I and Q signals leaving the MMIC are low-level (microvolt to
+millivolt) and have to cross a board-to-board connector. A first gain
+stage on the RF module amplifies them before the crossing, so the
+inter-board interface carries a larger, lower-impedance signal and is
+far less vulnerable to pickup. The remaining gain and all of the
+filtering live on the baseband board.
+</p>
+</div>
+<div class="callout callout-teal">
+<strong><span class="tag tag-decision">DECISION</span> External patch
+array on 4-layer RO4350B (D2)</strong>
+<p>
+The RF module uses external PCB patch antennas (a small patch array),
+microstrip-fed from the BGT24MTR11, plus a build-option 2.92 mm
+connector launch (DNP) so an external 24 GHz antenna can drive first
+bring-up. The stackup is 4-layer RO4350B (L1 RF and antenna, L2 solid
+ground reference, L3 power, L4 control), fabricated at PCBWay, which
+runs 4-layer Rogers. RO4350B sits just above its sweet spot at 24 GHz,
+giving up a little patch efficiency versus RO3003, which is held as a
+later upgrade. ENIG finish for the fine-pitch MMIC and the patches.
 </p>
 </div>
 <div class="pending">
-<strong>PENDING (D2, D5):</strong> the antenna implementation (24 GHz TX and RX patch antennas, and the laminate and stackup for the RF module) is D2; the chirp ramp source (FMCW ramp PLL versus DAC-driven VCO tune, kept local to this module for chirp linearity) is D5.
+<strong>PENDING (D5):</strong> the chirp ramp source (FMCW ramp PLL
+versus DAC-driven VCO tune, kept local to this module for chirp
+linearity).
 </div>
-<h3 id="sheet-a-power-and-references">3.1 Sheet A: Power and References</h3>
-<p>Sheet A is band-agnostic and carries over essentially intact, with one change: the common-mode and reference nets now fan out to two channels instead of one. The architecture is a single 5 V input, an on-board 3.3 V LDO, an analog/digital supply split via ferrite bead, a precision 2.500 V reference, and a buffered mid-supply common-mode rail.</p>
+<h3 id="sheet-a-power-and-references">3.1 Sheet A: Power and
+References</h3>
+<p>Sheet A is band-agnostic and carries over essentially intact, with
+one change: the common-mode and reference nets now fan out to two
+channels instead of one. The architecture is a single 5 V input, an
+on-board 3.3 V LDO, an analog/digital supply split via ferrite bead, a
+precision 2.500 V reference, and a buffered mid-supply common-mode
+rail.</p>
 <div class="callout callout-teal">
-<strong><span class="tag tag-decision">DECISION</span> Analog/digital split via ferrite bead, single ground plane</strong>
+<strong><span class="tag tag-decision">DECISION</span> Analog/digital
+split via ferrite bead, single ground plane</strong>
 <p>
-The 3V3A and 3V3D rails are separated by a BLM18PG221SN1D ferrite bead (220 Ω at 100 MHz, under 1 Ω DC). It passes DC cleanly to the analog rail while presenting high impedance to the digital switching spectrum, giving over 40 dB of attenuation to SPI-edge noise. The ground stays a single continuous plane; isolation is done on the supply, not by splitting the return (see section 9.3).
+The 3V3A and 3V3D rails are separated by a BLM18PG221SN1D ferrite bead
+(220 Ω at 100 MHz, under 1 Ω DC). It passes DC cleanly to the analog
+rail while presenting high impedance to the digital switching spectrum,
+giving over 40 dB of attenuation to SPI-edge noise. The ground stays a
+single continuous plane; isolation is done on the supply, not by
+splitting the return (see section 9.3).
 </p>
 </div>
 <div class="callout callout-blue">
-<strong><span class="tag tag-physics">PHYSICS</span> Why V<sub>CM</sub> = V<sub>DD</sub>/2 = 1.650 V</strong>
+<strong><span class="tag tag-physics">PHYSICS</span> Why V<sub>CM</sub>
+= V<sub>DD</sub>/2 = 1.650 V</strong>
 <p>
-All active parts run from a single 3.3 V supply with no negative rail, so an AC signal must be biased to the midpoint to maximize swing before clipping. At V<sub>CM</sub> = 1.650 V the signal gets symmetric ±1.65 V headroom (less op-amp saturation, ~100–200 mV per rail). This common-mode voltage appears everywhere: it biases the I/Q inputs, sets the PGA reference, and drives each FDA’s VOCM pin. A single buffered, low-impedance source (an OPA320 on Sheet A) feeds all stages so they share one common mode; any mismatch becomes a DC offset that wastes ADC range. With two channels, the same buffered V<sub>CM</sub> and V<sub>REF</sub> nets fan out to both I and Q.
+All active parts run from a single 3.3 V supply with no negative rail,
+so an AC signal must be biased to the midpoint to maximize swing before
+clipping. At V<sub>CM</sub> = 1.650 V the signal gets symmetric ±1.65 V
+headroom (less op-amp saturation, ~100–200 mV per rail). This
+common-mode voltage appears everywhere: it biases the I/Q inputs, sets
+the PGA reference, and drives each FDA’s VOCM pin. A single buffered,
+low-impedance source (an OPA320 on Sheet A) feeds all stages so they
+share one common mode; any mismatch becomes a DC offset that wastes ADC
+range. With two channels, the same buffered V<sub>CM</sub> and
+V<sub>REF</sub> nets fan out to both I and Q.
 </p>
 </div>
 <div class="callout callout-blue">
-<strong><span class="tag tag-physics">PHYSICS</span> Reference error is gain error</strong>
+<strong><span class="tag tag-physics">PHYSICS</span> Reference error is
+gain error</strong>
 <p>
-REF5025 (2.500 V, 0.05%, 3 µV<sub>pp</sub> noise) sets the ADC full scale. Any error in V<sub>REF</sub> maps directly to a gain error on every reading: gain error = ΔV<sub>REF</sub> / V<sub>REF,nom</sub>. The reference therefore gets a paired-capacitor decoupling network (10 µF bulk + 100 nF high-frequency, different self-resonant frequencies) at the ADC reference pin, as the ADS8881 datasheet recommends.
+REF5025 (2.500 V, 0.05%, 3 µV<sub>pp</sub> noise) sets the ADC full
+scale. Any error in V<sub>REF</sub> maps directly to a gain error on
+every reading: gain error = ΔV<sub>REF</sub> / V<sub>REF,nom</sub>. The
+reference therefore gets a paired-capacitor decoupling network (10 µF
+bulk + 100 nF high-frequency, different self-resonant frequencies) at
+the ADC reference pin, as the ADS8881 datasheet recommends.
 </p>
 </div>
 <div class="callout callout-teal">
-<strong><span class="tag tag-decision">DECISION</span> Decoupling placement is a derived budget, not a guideline</strong>
+<strong><span class="tag tag-decision">DECISION</span> Decoupling
+placement is a derived budget, not a guideline</strong>
 <p>
-Trace inductance is ~1 nH/mm. The placement distance for each bypass capacitor follows from the frequency it must serve and the acceptable trace impedance: the higher the frequency, the shorter the trace. The design’s rules (100 nF within 2 mm, 1 µF within 5 mm, 10 µF within 10 mm) are the quantitative result of that inductance-versus-impedance analysis, not copied from a reference design. This carries over unchanged.
+Trace inductance is ~1 nH/mm. The placement distance for each bypass
+capacitor follows from the frequency it must serve and the acceptable
+trace impedance: the higher the frequency, the shorter the trace. The
+design’s rules (100 nF within 2 mm, 1 µF within 5 mm, 10 µF within 10
+mm) are the quantitative result of that inductance-versus-impedance
+analysis, not copied from a reference design. This carries over
+unchanged.
 </p>
 </div>
-<h3 id="sheet-b-iq-input-from-the-mmic">3.2 Sheet B: I/Q Input from the MMIC</h3>
-<p>This is the most-changed sheet. The 5.8 GHz Sheet B was a single-ended, AC-coupled input: an SMA from a discrete mixer, a series current-limit resistor, an ESD diode, a 100 nF C0G capacitor to strip the mixer’s undefined DC, and a 47 kΩ bias to V<sub>CM</sub> (high-pass corner ~34 Hz). For a 24 GHz zero-IF I/Q front end that topology is largely replaced.</p>
+<h3 id="sheet-b-iq-input-from-the-mmic">3.2 Sheet B: I/Q Input from the
+MMIC</h3>
+<p>This is the most-changed sheet. The 5.8 GHz Sheet B was a
+single-ended, AC-coupled input: an SMA from a discrete mixer, a series
+current-limit resistor, an ESD diode, a 100 nF C0G capacitor to strip
+the mixer’s undefined DC, and a 47 kΩ bias to V<sub>CM</sub> (high-pass
+corner ~34 Hz). For a 24 GHz zero-IF I/Q front end that topology is
+largely replaced.</p>
 <div class="pending">
-<strong>Input interface (D1 resolved):</strong> The BGT24MTR11 presents differential I and Q at zero IF. The baseband-board input interfaces to two differential pairs arriving over the interconnect from the RF module’s first gain stage, not a single-ended SMA. The exact termination, common-mode handling, and ESD network follow the BGT24MTR11 I/Q output specification.
+<strong>Input interface (D1 resolved):</strong> The BGT24MTR11 presents
+differential I and Q at zero IF. The baseband-board input interfaces to
+two differential pairs arriving over the interconnect from the RF
+module’s first gain stage, not a single-ended SMA. The exact
+termination, common-mode handling, and ESD network follow the BGT24MTR11
+I/Q output specification.
 </div>
 <div class="callout callout-red">
-<strong><span class="tag tag-risk">RISK</span> Zero-IF DC must not be blocked</strong>
+<strong><span class="tag tag-risk">RISK</span> Zero-IF DC must not be
+blocked</strong>
 <p>
-The old Sheet B AC-coupled specifically to remove the mixer’s undefined DC bias. At zero IF the beat band extends down to DC, so a stationary or slow-moving target sits near DC. The Rev B input cannot high-pass the way the 5.8 GHz design did. DC offset is handled instead (per-channel calibration or a servo), and 1/f (flicker) noise now sits in-band and must be budgeted. This is the single biggest conceptual change from the old input stage.
+The old Sheet B AC-coupled specifically to remove the mixer’s undefined
+DC bias. At zero IF the beat band extends down to DC, so a stationary or
+slow-moving target sits near DC. The Rev B input cannot high-pass the
+way the 5.8 GHz design did. DC offset is handled instead (per-channel
+calibration or a servo), and 1/f (flicker) noise now sits in-band and
+must be budgeted. This is the single biggest conceptual change from the
+old input stage.
 </p>
 </div>
 <div class="callout callout-teal">
-<strong><span class="tag tag-decision">DECISION</span> Keep ESD and current-limiting, adapted to differential</strong>
+<strong><span class="tag tag-decision">DECISION</span> Keep ESD and
+current-limiting, adapted to differential</strong>
 <p>
-The connector/interface ESD protection (TPD1E10B06 class) and the per-line series current-limit concept carry over, applied to each leg of the differential I and Q pairs rather than a single-ended line.
+The connector/interface ESD protection (TPD1E10B06 class) and the
+per-line series current-limit concept carry over, applied to each leg of
+the differential I and Q pairs rather than a single-ended line.
 </p>
 </div>
-<h3 id="sheet-c-gain-and-anti-alias-filter">3.3 Sheet C: Gain and Anti-Alias Filter</h3>
-<p>The gain and filter method carries over; the component values re-derive from the 24 GHz chirp plan (D6), and the whole chain duplicates for I and Q.</p>
+<h3 id="sheet-c-gain-and-anti-alias-filter">3.3 Sheet C: Gain and
+Anti-Alias Filter</h3>
+<p>The gain and filter method carries over; the component values
+re-derive from the 24 GHz chirp plan (D6), and the whole chain
+duplicates for I and Q.</p>
 <div class="callout callout-blue">
-<strong><span class="tag tag-physics">PHYSICS</span> Variable gain follows the R<sup>−4</sup> range law</strong>
+<strong><span class="tag tag-physics">PHYSICS</span> Variable gain
+follows the R<sup>−4</sup> range law</strong>
 <p>
-Received power varies as R<sup>−4</sup> (the radar range equation): a target at 10 m returns 10,000× the power of the same target at 100 m. Without variable gain the ADC would clip on near targets or waste resolution on far ones. A PGA113 (SPI-controlled, internal laser-trimmed gain 1–200×) provides per-channel gain to fill the ADC window across the range span.
+Received power varies as R<sup>−4</sup> (the radar range equation): a
+target at 10 m returns 10,000× the power of the same target at 100 m,
+about 40 dB, and a 100-to-1 span is roughly 80 dB, which approaches the
+~84 dB an 18-bit SAR can usefully cover and is exceeded for wider spans.
+Without variable gain the ADC would clip on near targets or bury far
+ones in the noise. An SPI-controlled differential VGA per channel fills
+the ADC window for each range regime. (The Rev B PGA113 was a
+single-ended part; the differential I/Q here keeps the gain stage
+differential, so the adaptive-gain concept and the SPI control carry
+forward, but the part changes.)
 </p>
 </div>
 <div class="callout callout-teal">
-<strong><span class="tag tag-decision">DECISION</span> Anti-alias before sampling, cutoff set by Nyquist not by the chirp</strong>
+<strong><span class="tag tag-decision">DECISION</span> Anti-alias before
+sampling, cutoff set by Nyquist not by the chirp</strong>
 <p>
-A 4th-order Sallen-Key Butterworth low-pass sits before each ADC. Its cutoff is set by f<sub>s</sub>/2 and the signal band, not by the chirp rate. Whether the chirp is fast or slow, energy above Nyquist must be kept from folding into the band. The topology and the singly-terminated design method carry over from the 5.8 GHz Sheet C; the cutoff and the L/C/R values are re-derived once the chirp plan (D6) sets f<sub>s</sub> and the beat band.
+A 4th-order Sallen-Key Butterworth low-pass sits before each ADC. Its
+cutoff is set by f<sub>s</sub>/2 and the signal band, not by the chirp
+rate. Whether the chirp is fast or slow, energy above Nyquist must be
+kept from folding into the band. The topology and the singly-terminated
+design method carry over from the 5.8 GHz Sheet C; the cutoff and the
+L/C/R values are re-derived once the chirp plan (D6) sets f<sub>s</sub>
+and the beat band.
 </p>
 </div>
 <div class="callout">
-<strong><span class="tag tag-tradeoff">TRADEOFF</span> Duplicating for Q buys complex sampling at the cost of match</strong>
+<strong><span class="tag tag-tradeoff">TRADEOFF</span> Duplicating for Q
+buys complex sampling at the cost of match</strong>
 <p>
-Adding a second identical gain-plus-filter chain for Q is what enables sign-of-velocity, but it introduces channel mismatch. Gain and phase match between the I and Q chains must be held through matched components and symmetric layout, or image rejection in the complex FFT degrades.
+Adding a second identical gain-plus-filter chain for Q is what enables
+sign-of-velocity, but it introduces channel mismatch. Gain and phase
+match between the I and Q chains must be held through matched components
+and symmetric layout, or image rejection in the complex FFT degrades.
+</p>
+</div>
+<div class="callout callout-teal">
+<strong><span class="tag tag-decision">DECISION</span> Adaptive
+differential gain per channel (D4)</strong>
+<p>
+Each channel uses an SPI-controlled differential VGA rather than a
+fixed-gain stage, so the receiver fills the 18-bit ADC across the
+R<sup>−4</sup> range swing instead of compromising between near-target
+clipping and far-target SNR. A differential VGA (not the single-ended
+PGA113) keeps the I/Q path differential through to the ADC; the part is
+chosen to match the BGT24MTR11 I/Q levels and the ADS8881 input range. I
+and Q use matched VGAs, with residual gain and phase mismatch calibrated
+on PMVB.
 </p>
 </div>
 <div class="pending">
-<strong>PENDING (D4, D6):</strong> whether each channel uses a PGA113 VGA or a fixed-gain stage relying on the 18-bit dynamic range (D4); exact filter cutoff and values (D6).
+<strong>PENDING (D6):</strong> exact anti-alias filter cutoff and
+component values, derived once the chirp plan sets f<sub>s</sub> and the
+beat band.
 </div>
 <h3 id="sheet-d-iq-digitization">3.4 Sheet D: I/Q Digitization</h3>
-<p>This sheet changes from one ADC to a simultaneous-sampling I/Q pair. The ADS8881 and REF5025 rationale carry over; the count doubles and the convert is shared.</p>
+<p>This sheet changes from one ADC to a simultaneous-sampling I/Q pair.
+The ADS8881 and REF5025 rationale carry over; the count doubles and the
+convert is shared.</p>
 <div class="callout callout-teal">
-<strong><span class="tag tag-decision">DECISION</span> Two ADCs on a shared convert, simultaneous I/Q</strong>
+<strong><span class="tag tag-decision">DECISION</span> Two ADS8881 on a
+shared CONVST, simultaneous I/Q (D3)</strong>
 <p>
-To preserve the complex phase relationship between I and Q, the two channels are sampled at the same instant. Two ADS8881 18-bit SAR ADCs share one CONVST line so their sample apertures coincide; the alternative is a single dual-channel simultaneous-sampling SAR (D3). Because the MMIC output is already differential, the THS4531A’s old single-ended-to-differential role is revisited: it likely becomes a differential receiver and level-shifter into the ADC rather than an SE-to-Diff converter.
+To preserve the complex phase relationship between I and Q, the two
+channels are sampled at the same instant. Two ADS8881 18-bit SAR ADCs
+share one CONVST line so their sample apertures coincide. This reuses
+the proven Rev B converter, the REF5025 reference, and the existing SPI
+controller RTL; the one cost, a small inter-channel aperture skew, is
+negligible at the radar’s low beat frequencies and is calibrated out on
+PMVB. Because the MMIC output is already differential, the THS4531A’s
+old single-ended-to-differential role is revisited: it likely becomes a
+differential receiver and level-shifter into the ADC rather than an
+SE-to-Diff converter.
 </p>
 </div>
 <div class="callout callout-blue">
-<strong><span class="tag tag-physics">PHYSICS</span> SAR, not sigma-delta</strong>
+<strong><span class="tag tag-physics">PHYSICS</span> SAR, not
+sigma-delta</strong>
 <p>
-A SAR ADC samples at a discrete, deterministic instant. A sigma-delta averages over its decimation window, which would smear the instantaneous beat frequency and corrupt the range-Doppler FFT. The ADS8881 (18-bit, up to 1 MSPS, run well below its maximum) is the right converter class, and this rationale is unchanged from the 5.8 GHz design.
+A SAR ADC samples at a discrete, deterministic instant. A sigma-delta
+averages over its decimation window, which would smear the instantaneous
+beat frequency and corrupt the range-Doppler FFT. The ADS8881 (18-bit,
+up to 1 MSPS, run well below its maximum) is the right converter class,
+and this rationale is unchanged from the 5.8 GHz design.
 </p>
 </div>
 <div class="pending">
-<strong>PENDING (D3, D7):</strong> two-ADC versus dual-SAR (D3); the digital backend that ingests both streams and runs the FFT (D7).
+<strong>PENDING (D7):</strong> the digital backend that ingests both ADC
+streams and runs the range-Doppler FFT.
 </div>
 <h3 id="dft-infrastructure">3.5 DFT Infrastructure</h3>
-<p>Design-for-test is a first-class requirement and carries over, now per channel. The 5.8 GHz board used a J_DFT header, 17 test points, 5 MMCX probe connectors, and six 10 kΩ isolation resistors on the analog monitor nets.</p>
+<p>Design-for-test is a first-class requirement and carries over, now
+per channel. The 5.8 GHz board used a J_DFT header, 17 test points, 5
+MMCX probe connectors, and six 10 kΩ isolation resistors on the analog
+monitor nets.</p>
 <div class="callout callout-blue">
-<strong><span class="tag tag-physics">PHYSICS</span> An isolation resistor plus a probe is a harmless low-pass</strong>
+<strong><span class="tag tag-physics">PHYSICS</span> An isolation
+resistor plus a probe is a harmless low-pass</strong>
 <p>
-A 10 kΩ isolation resistor with a ~15 pF scope-probe tip forms a low-pass at f = 1/(2π × 10k × 15p) ≈ 1 MHz, well above the beat band, so the probe point never meaningfully loads the chain. The resistors are always populated; they protect the signal chain even when the header is unconnected.
+A 10 kΩ isolation resistor with a ~15 pF scope-probe tip forms a
+low-pass at f = 1/(2π × 10k × 15p) ≈ 1 MHz, well above the beat band, so
+the probe point never meaningfully loads the chain. The resistors are
+always populated; they protect the signal chain even when the header is
+unconnected.
 </p>
 </div>
 <div class="callout callout-teal">
-<strong><span class="tag tag-decision">DECISION</span> Per-channel observability</strong>
+<strong><span class="tag tag-decision">DECISION</span> Per-channel
+observability</strong>
 <p>
-With two chains, the monitor set (PGA output, filter output, ADC differential inputs, FDA outputs) is provided for both I and Q, so each path is independently observable. Bring-up and characterization run on the PMVB instrument platform rather than commercial bench gear.
+With two chains, the monitor set (VGA output, filter output, ADC
+differential inputs, FDA outputs) is provided for both I and Q, so each
+path is independently observable. Bring-up and characterization run on
+the PMVB instrument platform rather than commercial bench gear.
 </p>
 </div>
 <hr />
 <h2 id="pin-assignments">4. Pin Assignments</h2>
 <div class="pending">
-<strong>PENDING (D5, D7):</strong> populated once the ramp source (D5) and the digital backend (D7) are fixed; the MMIC SPI/control and I/Q pinout follow the BGT24MTR11 datasheet (D1 resolved). Carries over: the SPI bus structure (shared SCLK and SDI, per-device chip-select) and the J_DFT pinout concept, both extended for the second channel and the MMIC control interface.
+<strong>PENDING (D5, D7):</strong> populated once the ramp source (D5)
+and the digital backend (D7) are fixed; the MMIC SPI/control and I/Q
+pinout follow the BGT24MTR11 datasheet (D1 resolved). Carries over: the
+SPI bus structure (shared SCLK and SDI, per-device chip-select) and the
+J_DFT pinout concept, both extended for the second channel and the MMIC
+control interface.
 </div>
 <hr />
 <h2 id="specifications">5. Specifications</h2>
@@ -309,90 +759,128 @@ With two chains, the monitor set (PGA output, filter output, ADC differential in
 <col style="width: 30%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Parameter</th>
 <th>Value</th>
 <th>Status</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>Carrier band</td>
 <td>24 GHz ISM, 24.0–24.25 GHz (~250 MHz usable)</td>
 <td>Locked</td>
 </tr>
-<tr class="even">
+<tr>
 <td>Range resolution floor</td>
 <td>~0.6 m (ΔR = c/2B at 250 MHz)</td>
 <td>Locked</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>Baseband</td>
 <td>Complex I/Q, two channels, simultaneous sampling</td>
 <td>Locked</td>
 </tr>
-<tr class="even">
+<tr>
 <td>ADC</td>
-<td>18-bit SAR, differential, 2.500 V reference</td>
+<td>Two ADS8881 (18-bit SAR), differential, shared CONVST for
+simultaneous I/Q, 2.500 V REF5025</td>
 <td>Locked</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>Max range</td>
 <td>derived from chirp plan</td>
 <td>Pending D6</td>
 </tr>
-<tr class="even">
+<tr>
 <td>Beat-frequency band / sample rate</td>
 <td>derived from chirp plan</td>
 <td>Pending D6</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>Velocity resolution, max unambiguous velocity</td>
 <td>derived from chirp plan and frame time</td>
 <td>Pending D6</td>
 </tr>
-<tr class="even">
+<tr>
 <td>I/Q gain and phase match target</td>
 <td>sets image rejection</td>
-<td>Pending D3, D4</td>
+<td>Design + calibration (matched VGAs)</td>
 </tr>
 </tbody>
 </table>
-<p>This table is kept in parity with any downstream summary table as values lock.</p>
+<p>This table is kept in parity with any downstream summary table as
+values lock.</p>
 <hr />
 <h2 id="sample-applications">6. Sample Applications</h2>
 <p>Outline; detailed once the digital backend (D7) is fixed.</p>
 <ol type="1">
-<li><strong>Single moving target.</strong> Transmit a chirp frame, capture I and Q, run the range-Doppler FFT, read the occupied range bin and the sign of the Doppler (approaching versus receding).</li>
-<li><strong>Two targets at different ranges.</strong> Demonstrate range separation at the ~0.6 m resolution floor.</li>
-<li><strong>Bench characterization on PMVB.</strong> Stimulus and measurement recipe for noise floor, I/Q gain and phase match, and chirp linearity using PMVB Tier 1 / Tier 2 modules.</li>
+<li><strong>Single moving target.</strong> Transmit a chirp frame,
+capture I and Q, run the range-Doppler FFT, read the occupied range bin
+and the sign of the Doppler (approaching versus receding).</li>
+<li><strong>Two targets at different ranges.</strong> Demonstrate range
+separation at the ~0.6 m resolution floor.</li>
+<li><strong>Bench characterization on PMVB.</strong> Stimulus and
+measurement recipe for noise floor, I/Q gain and phase match, and chirp
+linearity using PMVB Tier 1 / Tier 2 modules.</li>
 </ol>
 <hr />
 <h2 id="bill-of-materials">7. Bill of Materials</h2>
 <div class="pending">
-<strong>PENDING (D1–D6):</strong> finalized when the parts are locked, sourced per the PMVB rule (Mouser &gt; Digi-Key &gt; Microcenter &gt; Amazon) with part numbers cited.
+<strong>PENDING (D5–D6):</strong> finalized when the remaining parts are
+locked, sourced per the PMVB rule (Mouser &gt; Digi-Key &gt; Microcenter
+&gt; Amazon) with part numbers cited.
 </div>
-<p>Carries over: ADS8881 (now ×2 or one dual SAR), REF5025, PGA113, THS4531A, OPA320, TPS7A2033 LDO, BLM18PG221SN1D ferrite. Adds: the 24 GHz transceiver MMIC (D1), the ramp PLL or DAC (D5), and second-channel duplicates of the conditioning chain.</p>
+<p>Carries over: ADS8881 (×2, one per I/Q channel), REF5025, THS4531A,
+OPA320, TPS7A2033 LDO, BLM18PG221SN1D ferrite. Changes: the single-ended
+PGA113 is replaced by a differential VGA per channel (D4). Adds: the
+BGT24MTR11 transceiver and its RF-module support, the ramp source (D5),
+and second-channel duplicates of the conditioning chain.</p>
 <hr />
 <h2 id="calibration-procedure">8. Calibration Procedure</h2>
-<p>Targets (outline; detailed once the chain and backend lock): I/Q gain match, I/Q phase match (image rejection), per-channel DC offset (the zero-IF concern from section 3.2), chirp linearity, and range accuracy. Each references the SCPI commands the bring-up firmware exposes.</p>
+<p>Targets (outline; detailed once the chain and backend lock): I/Q gain
+match, I/Q phase match (image rejection), per-channel DC offset (the
+zero-IF concern from section 3.2), chirp linearity, and range accuracy.
+Each references the SCPI commands the bring-up firmware exposes.</p>
 <hr />
 <h2 id="layout-design-rationale">9. Layout Design Rationale</h2>
-<p>The layout rationale carries over almost wholesale. The original chapter notes that at a DC-to-tens-of-kHz beat band, transmission-line impedance and wavelength effects are irrelevant; the real layout drivers are confining return current and isolating digital (SPI) noise. Those drivers are unchanged at 24 GHz, because the high-frequency RF is inside the MMIC, not on this board.</p>
+<p>The layout rationale carries over almost wholesale. The original
+chapter notes that at a DC-to-tens-of-kHz beat band, transmission-line
+impedance and wavelength effects are irrelevant; the real layout drivers
+are confining return current and isolating digital (SPI) noise. Those
+drivers are unchanged at 24 GHz, because the high-frequency RF is inside
+the MMIC, not on this board.</p>
 <ul>
-<li><strong>Stackup (carries over).</strong> 4-layer: L1 signal and components, L2 continuous ground with no splits, L3 power (3V3A pour with a small 3V3D island), L4 secondary signal.</li>
-<li><strong>Ground plane (carries over).</strong> One continuous unbroken ground; the split-plane approach is rejected on a worked loop-area noise calculation (a split forces a large return loop and tens of LSBs of induced noise; the continuous plane keeps it to a fraction of an LSB).</li>
-<li><strong>Placement (carries over, duplicated).</strong> Signal-flow zones left to right, bypass placement per the derived budget, FDA-to-ADC pin-to-pin under 5 mm. The analog chain zone is duplicated for the Q path.</li>
+<li><strong>Stackup (carries over).</strong> 4-layer: L1 signal and
+components, L2 continuous ground with no splits, L3 power (3V3A pour
+with a small 3V3D island), L4 secondary signal.</li>
+<li><strong>Ground plane (carries over).</strong> One continuous
+unbroken ground; the split-plane approach is rejected on a worked
+loop-area noise calculation (a split forces a large return loop and tens
+of LSBs of induced noise; the continuous plane keeps it to a fraction of
+an LSB).</li>
+<li><strong>Placement (carries over, duplicated).</strong> Signal-flow
+zones left to right, bypass placement per the derived budget, FDA-to-ADC
+pin-to-pin under 5 mm. The analog chain zone is duplicated for the Q
+path.</li>
 </ul>
 <div class="callout callout-teal">
-<strong><span class="tag tag-decision">DECISION</span> Dual I/Q differential routing</strong>
+<strong><span class="tag tag-decision">DECISION</span> Dual I/Q
+differential routing</strong>
 <p>
-Two matched differential pairs run into the two ADCs, each length-matched (the original ~0.4 ns skew budget transfers). New for I/Q: inter-pair separation (3W or a guard trace) so the I and Q pairs do not couple, and channel-to-channel layout symmetry so the gain and phase match the design depends on actually holds on the board.
+Two matched differential pairs run into the two ADCs, each
+length-matched (the original ~0.4 ns skew budget transfers). New for
+I/Q: inter-pair separation (3W or a guard trace) so the I and Q pairs do
+not couple, and channel-to-channel layout symmetry so the gain and phase
+match the design depends on actually holds on the board.
 </p>
 </div>
 <hr />
-<h2 id="open-decisions-and-known-issues">10. Open Decisions and Known Issues</h2>
-<p>D1 (the MMIC and board split) is resolved, which fixes the I/Q interface and unblocks D2, D3, and D5. Work the rest in dependency order.</p>
+<h2 id="open-decisions-and-known-issues">10. Open Decisions and Known
+Issues</h2>
+<p>D1 through D4 are resolved. D5 (ramp generation) is the next open
+decision, followed by D6 (chirp plan) and D7 (digital backend). Work
+them in dependency order.</p>
 <table>
 <colgroup>
 <col style="width: 7%" />
@@ -402,7 +890,7 @@ Two matched differential pairs run into the two ADCs, each length-matched (the o
 <col style="width: 28%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>#</th>
 <th>Decision</th>
 <th>Options</th>
@@ -411,49 +899,108 @@ Two matched differential pairs run into the two ADCs, each length-matched (the o
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>D1</td>
 <td>MMIC and board split</td>
-<td><strong>RESOLVED:</strong> BGT24MTR11 (1 TX / 1 RX); two boards (RF Front-End Module + I/Q Baseband Board), split at the low-frequency I/Q seam after a first gain stage on the RF module</td>
+<td><strong>RESOLVED:</strong> BGT24MTR11 (1 TX / 1 RX); two boards (RF
+Front-End Module + I/Q Baseband Board), split at the low-frequency I/Q
+seam after a first gain stage on the RF module</td>
 <td>I/Q interface, RF layout scope, connectors</td>
 <td>done</td>
 </tr>
-<tr class="even">
+<tr>
 <td>D2</td>
-<td>Antenna approach</td>
-<td>antenna-in-package vs external PCB patch</td>
+<td>Antenna and RF stackup</td>
+<td><strong>RESOLVED:</strong> external PCB patch array + DNP 2.92 mm
+connector launch; 4-layer RO4350B at PCBWay (RO3003 held as a later
+efficiency upgrade), ENIG finish</td>
 <td>RF layout, stackup, cost</td>
-<td>D1</td>
+<td>done</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>D3</td>
 <td>ADC arrangement</td>
-<td>two synchronized ADS8881 vs one dual simultaneous SAR</td>
+<td><strong>RESOLVED:</strong> two synchronized ADS8881 (18-bit SAR) on
+a shared CONVST; reuses the proven part, REF5025, and SPI RTL</td>
 <td>I/Q phase fidelity, BOM, layout</td>
-<td>D1</td>
+<td>done</td>
 </tr>
-<tr class="even">
+<tr>
 <td>D4</td>
 <td>Front-end gain</td>
-<td>PGA113 VGA per channel vs fixed gain</td>
+<td><strong>RESOLVED:</strong> adaptive gain via an SPI-controlled
+differential VGA per channel (replaces the single-ended PGA113); matched
+I/Q, residual calibrated on PMVB</td>
 <td>gain match, dynamic range</td>
-<td>D1, D3</td>
+<td>done</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>D5</td>
 <td>Ramp generation</td>
 <td>FMCW ramp PLL (ADF4159 class) vs DAC ramp + calibration</td>
 <td>chirp linearity, parts, firmware</td>
 <td>D1</td>
 </tr>
-<tr class="even">
+<tr>
 <td>D6</td>
 <td>Chirp plan</td>
 <td>sweep BW, sweep time, max range, sample rate</td>
-<td></td>
-<td></td>
+<td>filter cutoff, ADC rate, range/velocity</td>
+<td>D1, D5</td>
+</tr>
+<tr>
+<td>D7</td>
+<td>Digital backend</td>
+<td>Tang Primer 25K FPGA vs MCU</td>
+<td>throughput, second-Tang-Primer question, PMVB tier</td>
+<td>D3, D6</td>
 </tr>
 </tbody>
 </table>
+<p><strong>Known issues / future work.</strong> Rev C adds receive
+channels for angle estimation (the original 1 TX / 3 RX trilateration
+goal) on a proven single-channel Rev B front end.</p>
+<div class="callout callout-red">
+<strong><span class="tag tag-risk">RISK</span> The 5.8 GHz design
+already flagged the chirp-linearity path</strong>
+<p>
+The original SDD noted that the free-running HMC431LP4E VCO was
+acceptable only because the 30 MHz mode used ~5% of its tuning range,
+and that wider sweeps would reveal nonlinearity for which a PLL-based
+control loop was the recommended upgrade. At 24 GHz over ~250 MHz the
+fractional bandwidth is again about 1%, so a free-running ramp may be
+acceptable, but D5 carries the option of a proper FMCW ramp PLL (ADF4159
+class) for clean chirp linearity.
+</p>
+</div>
+<hr />
+<h2 id="references">11. References</h2>
+<p>Carried over from the 5.8 GHz SDD:</p>
+<ul>
+<li>Eric Bogatin, <em>Signal and Power Integrity, Simplified</em>
+(Prentice Hall).</li>
+<li>Henry Ott, <em>Electromagnetic Compatibility Engineering</em>
+(Wiley), Ch. 17–18.</li>
+<li>TI SLYT499 / SLYT512, grounding in mixed-signal systems.</li>
+<li>TI SLTA055, bypass capacitor selection for high-speed ADCs; Murata
+capacitor impedance library.</li>
+<li>TI SLOA024B, analysis of the Sallen-Key architecture.</li>
+<li>TI SLOA054, fully differential amplifiers; THS4531A and ADS8881
+datasheets.</li>
+<li>Merrill Skolnik, <em>Introduction to Radar Systems</em>
+(McGraw-Hill).</li>
+</ul>
+<p>Added for Rev B (24 GHz I/Q):</p>
+<ul>
+<li>Infineon BGT24MTR11 24 GHz transceiver datasheet (front-end
+candidate, D1).</li>
+<li>Analog Devices ADF4159 FMCW ramp-generating PLL datasheet (ramp
+candidate, D5).</li>
+<li>FCC rules for the 24 GHz ISM band (regulatory limits, to be cited in
+a regulatory subsection).</li>
+<li>TI REF5025 voltage reference datasheet.</li>
+<li>PMVB System Design Document and Module Design Document Schema
+(documentation format reference).</li>
+</ul>
 </body>
 </html>
