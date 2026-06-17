@@ -2,7 +2,7 @@
 
 ## Rev B: 24 GHz I/Q
 
-**Version:** 0.6 (June 2026, system-scope radar SDD in the PMVB schema; decisions D1 to D5 resolved, D6 and D7 open)
+**Version:** 0.7 (June 2026, system-scope radar SDD in the PMVB schema; decisions D1 to D6 resolved, only D7 open)
 **Project:** FMCW Radar Portfolio (`fmcw-radar-portfolio`)
 **Revision:** Rev B (24 GHz I/Q)
 **Status:** In Design
@@ -108,8 +108,8 @@ The chirp timing, the sample rate, and the FFT size are not independent. They ar
 <p>f<sub>s</sub> &times; T<sub>sweep</sub> = N<sub>samples</sub>, and N<sub>samples</sub> must be at least N<sub>FFT</sub> for useful frequency resolution.</p>
 <p>Rev A set T<sub>sweep</sub> = 50 &micro;s without checking: at 100 kS/s that is only 5 samples per ramp, and a 5-point FFT has no resolution. The corrected design sets T<sub>sweep</sub> in the millisecond range so that f<sub>s</sub> &times; T<sub>sweep</sub> yields several hundred samples per ramp, enough for a 512-point FFT. The ADC sample rate did not cause the Rev A failure; the chirp rate did.</p></div>
 
-<div class="callout callout-red"><strong><span class="tag tag-risk">RISK</span> The exact chirp plan is not yet fixed for 24 GHz</strong>
-<p>The numbers above (sample rate, sweep time, samples per ramp, FFT size) are re-derived from the chosen 24 GHz chirp plan, which is decision D6. The methodology is locked; the values follow once D6 closes.</p></div>
+<div class="callout callout-teal"><strong><span class="tag tag-decision">DECISION</span> Chirp plan (D6)</strong>
+<p>Sweep 250 MHz over a 1 ms chirp (slope 250 GHz/s), 50 m design range, sampled at 256 kSPS for 256 samples per chirp and a 256-point range FFT (~83 range bins of 0.6 m). 128 chirps per frame give a 128 ms frame (~8 frames/s), ~5 cm/s velocity resolution, and ±3.1 m/s unambiguous velocity. The max beat at 50 m is 83 kHz, well inside the 128 kHz Nyquist, leaving the anti-alias filter an 83-to-128 kHz transition band. More range is paid for with sample rate (the ADS8881 reaches 1 MSPS), not chirp time, so velocity is unaffected.</p></div>
 
 ### 1.5 The baseband is set by the chirp plan, not the carrier
 
@@ -188,7 +188,7 @@ The gain and filter method carries over; the component values re-derive from the
 <p>Received power varies as R<sup>&minus;4</sup> (the radar range equation): a target at 10 m returns 10,000&times; the power of the same target at 100 m, about 40 dB, and a 100-to-1 span is roughly 80 dB, which approaches the ~84 dB an 18-bit SAR can usefully cover and is exceeded for wider spans. Without variable gain the ADC would clip on near targets or bury far ones in the noise. An SPI-controlled differential VGA per channel fills the ADC window for each range regime. (The Rev B PGA113 was a single-ended part; the differential I/Q here keeps the gain stage differential, so the adaptive-gain concept and the SPI control carry forward, but the part changes.)</p></div>
 
 <div class="callout callout-teal"><strong><span class="tag tag-decision">DECISION</span> Anti-alias before sampling, cutoff set by Nyquist not by the chirp</strong>
-<p>A 4th-order Sallen-Key Butterworth low-pass sits before each ADC. Its cutoff is set by f<sub>s</sub>/2 and the signal band, not by the chirp rate. Whether the chirp is fast or slow, energy above Nyquist must be kept from folding into the band. The topology and the singly-terminated design method carry over from the 5.8 GHz Sheet C; the cutoff and the L/C/R values are re-derived once the chirp plan (D6) sets f<sub>s</sub> and the beat band.</p></div>
+<p>A 4th-order Sallen-Key Butterworth low-pass sits before each ADC. Its cutoff is set by f<sub>s</sub>/2 and the signal band, not by the chirp rate. Whether the chirp is fast or slow, energy above Nyquist must be kept from folding into the band. The topology and the singly-terminated design method carry over from the 5.8 GHz Sheet C. With the chirp plan set (D6: 256 kSPS, 83 kHz max beat), the cutoff lands near 100 kHz, inside the 83-to-128 kHz window between the max beat and Nyquist; the L/C/R values follow from a Butterworth synthesis at that cutoff.</p></div>
 
 <div class="callout"><strong><span class="tag tag-tradeoff">TRADEOFF</span> Duplicating for Q buys complex sampling at the cost of match</strong>
 <p>Adding a second identical gain-plus-filter chain for Q is what enables sign-of-velocity, but it introduces channel mismatch. Gain and phase match between the I and Q chains must be held through matched components and symmetric layout, or image rejection in the complex FFT degrades.</p></div>
@@ -196,7 +196,7 @@ The gain and filter method carries over; the component values re-derive from the
 <div class="callout callout-teal"><strong><span class="tag tag-decision">DECISION</span> Adaptive differential gain per channel (D4)</strong>
 <p>Each channel uses an SPI-controlled differential VGA rather than a fixed-gain stage, so the receiver fills the 18-bit ADC across the R<sup>&minus;4</sup> range swing instead of compromising between near-target clipping and far-target SNR. A differential VGA (not the single-ended PGA113) keeps the I/Q path differential through to the ADC; the part is chosen to match the BGT24MTR11 I/Q levels and the ADS8881 input range. I and Q use matched VGAs, with residual gain and phase mismatch calibrated on PMVB.</p></div>
 
-<div class="pending"><strong>PENDING (D6):</strong> exact anti-alias filter cutoff and component values, derived once the chirp plan sets f<sub>s</sub> and the beat band.</div>
+The only open item on this sheet is the component synthesis at that cutoff, which is design work, not a gated decision.
 
 ### 3.4 Sheet D: I/Q Digitization
 
@@ -236,9 +236,12 @@ Design-for-test is a first-class requirement and carries over, now per channel. 
 | Range resolution floor | ~0.6 m (&Delta;R = c/2B at 250 MHz) | Locked |
 | Baseband | Complex I/Q, two channels, simultaneous sampling | Locked |
 | ADC | Two ADS8881 (18-bit SAR), differential, shared CONVST for simultaneous I/Q, 2.500 V REF5025 | Locked |
-| Max range | derived from chirp plan | Pending D6 |
-| Beat-frequency band / sample rate | derived from chirp plan | Pending D6 |
-| Velocity resolution, max unambiguous velocity | derived from chirp plan and frame time | Pending D6 |
+| Sweep bandwidth / chirp duration / slope | 250 MHz / 1 ms / 250 GHz/s | Locked (D6) |
+| Max range (design) | 50 m (sample rate gives headroom; far detection is link-budget-limited) | Locked (D6) |
+| Max beat frequency / sample rate | 83 kHz at 50 m / 256 kSPS | Locked (D6) |
+| Samples per chirp / range FFT | 256 / 256-point (~83 range bins) | Locked (D6) |
+| Chirps per frame / frame rate | 128 / ~8 frames per second | Locked (D6) |
+| Velocity resolution / max unambiguous velocity | ~5 cm/s / ±3.1 m/s | Locked (D6) |
 | I/Q gain and phase match target | sets image rejection | Design + calibration (matched VGAs) |
 
 This table is kept in parity with any downstream summary table as values lock.
@@ -257,7 +260,7 @@ Outline; detailed once the digital backend (D7) is fixed.
 
 ## 7. Bill of Materials
 
-<div class="pending"><strong>PENDING (D6):</strong> finalized when the remaining parts are locked, sourced per the PMVB rule (Mouser &gt; Digi-Key &gt; Microcenter &gt; Amazon) with part numbers cited.</div>
+<div class="pending"><strong>PENDING (D7):</strong> the analog chain is now fully specified; only the backend parts (FPGA or MCU) finalize with D7. Sourced per the PMVB rule (Mouser &gt; Digi-Key &gt; Microcenter &gt; Amazon) with part numbers cited.</div>
 
 Carries over: ADS8881 (&times;2, one per I/Q channel), REF5025, THS4531A, OPA320, TPS7A2033 LDO, BLM18PG221SN1D ferrite. Changes: the single-ended PGA113 is replaced by a differential VGA per channel (D4). Adds: the BGT24MTR11 transceiver and its RF-module support, a ramp DAC for the VCO tune (D5), and second-channel duplicates of the conditioning chain.
 
@@ -284,7 +287,7 @@ The layout rationale carries over almost wholesale. The original chapter notes t
 
 ## 10. Open Decisions and Known Issues
 
-D1 through D5 are resolved. D6 (chirp plan) is the next open decision, followed by D7 (digital backend).
+D1 through D6 are resolved. Only D7 (digital backend) remains, and the ~9 Mbps the chirp plan produces (256 kSPS x 18 bits x 2 channels) makes it an easy choice.
 
 | # | Decision | Options | Drives | Depends on |
 |---|----------|---------|--------|------------|
@@ -293,7 +296,7 @@ D1 through D5 are resolved. D6 (chirp plan) is the next open decision, followed 
 | D3 | ADC arrangement | **RESOLVED:** two synchronized ADS8881 (18-bit SAR) on a shared CONVST; reuses the proven part, REF5025, and SPI RTL | I/Q phase fidelity, BOM, layout | done |
 | D4 | Front-end gain | **RESOLVED:** adaptive gain via an SPI-controlled differential VGA per channel (replaces the single-ended PGA113); matched I/Q, residual calibrated on PMVB | gain match, dynamic range | done |
 | D5 | Ramp generation | **RESOLVED:** DAC-driven VCO tune with calibration (open-loop, adequate at ~1% fractional BW); ADF4159-class ramp PLL noted as the upgrade if linearity limits range | chirp linearity, parts, firmware | done |
-| D6 | Chirp plan | sweep BW, sweep time, max range, sample rate | filter cutoff, ADC rate, range/velocity | D1, D5 |
+| D6 | Chirp plan | **RESOLVED:** 250 MHz / 1 ms (250 GHz/s), 50 m, 256 kSPS, 256-pt FFT, 128 chirps/frame; 0.6 m range res, ±3.1 m/s, ~5 cm/s, ~8 fps | filter cutoff, ADC rate, range/velocity | done |
 | D7 | Digital backend | Tang Primer 25K FPGA vs MCU | throughput, second-Tang-Primer question, PMVB tier | D3, D6 |
 
 **Known issues / future work.** Rev C adds receive channels for angle estimation (the original 1 TX / 3 RX trilateration goal) on a proven single-channel Rev B front end.
