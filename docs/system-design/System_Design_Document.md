@@ -2,7 +2,7 @@
 
 ## Rev B: 24 GHz I/Q
 
-**Version:** 0.7 (June 2026, system-scope radar SDD in the PMVB schema; decisions D1 to D6 resolved, only D7 open)
+**Version:** 0.8 (June 2026, system-scope radar SDD in the PMVB schema; all architecture decisions D1 to D7 resolved; schematic capture is the next phase)
 **Project:** FMCW Radar Portfolio (`fmcw-radar-portfolio`)
 **Revision:** Rev B (24 GHz I/Q)
 **Status:** In Design
@@ -87,7 +87,7 @@ RF FRONT-END MODULE
 I/Q BASEBAND BOARD
   [ I/Q interface connector ] -> per channel: VGA -> anti-alias filter -> SAR ADC
      I and Q sampled simultaneously to preserve complex phase
-  -> digital backend (range-Doppler FFT) -> host
+  -> digital backend: Tang Primer 25K FPGA (range-Doppler FFT) -> host
   MMIC configuration + control over SPI (routed across the connector)
 ```
 
@@ -208,7 +208,8 @@ This sheet changes from one ADC to a simultaneous-sampling I/Q pair. The ADS8881
 <div class="callout callout-blue"><strong><span class="tag tag-physics">PHYSICS</span> SAR, not sigma-delta</strong>
 <p>A SAR ADC samples at a discrete, deterministic instant. A sigma-delta averages over its decimation window, which would smear the instantaneous beat frequency and corrupt the range-Doppler FFT. The ADS8881 (18-bit, up to 1 MSPS, run well below its maximum) is the right converter class, and this rationale is unchanged from the 5.8 GHz design.</p></div>
 
-<div class="pending"><strong>PENDING (D7):</strong> the digital backend that ingests both ADC streams and runs the range-Doppler FFT.</div>
+<div class="callout callout-teal"><strong><span class="tag tag-decision">DECISION</span> Tang Primer 25K FPGA backend (D7)</strong>
+<p>A Gowin GW5A (Tang Primer 25K) ingests both ADC streams over SPI and runs the range-Doppler FFT, reusing the SPI controller RTL and the Verilator-clean SystemVerilog methodology shared with the RISC CPU project. The ~9 Mbps data rate is light for the part; the FPGA is chosen over an MCU for the digital-design showcase and the RTL reuse, with a board dedicated per radar (additional Tang Primers planned rather than time-sharing the PMVB unit).</p></div>
 
 ### 3.5 DFT Infrastructure
 
@@ -224,7 +225,7 @@ Design-for-test is a first-class requirement and carries over, now per channel. 
 
 ## 4. Pin Assignments
 
-<div class="pending"><strong>PENDING (D7):</strong> populated once the digital backend (D7) is fixed; the MMIC SPI/control and I/Q pinout follow the BGT24MTR11 datasheet, and the ramp interface is a DAC driving the VCO tune (D5 resolved). Carries over: the SPI bus structure (shared SCLK and SDI, per-device chip-select) and the J_DFT pinout concept, both extended for the second channel and the MMIC control interface.</div>
+With the backend fixed as the Tang Primer 25K (D7), the interface is defined in kind and the detailed pin map is now a design task. The two ADS8881 and the MMIC sit on a shared SPI bus (shared SCLK and SDI, per-device chip-select), the ramp DAC drives the VCO tune, and the FPGA generates CONVST and the chirp timing. The J_DFT pinout concept carries over, extended for the second channel and the MMIC control interface.
 
 ---
 
@@ -243,6 +244,7 @@ Design-for-test is a first-class requirement and carries over, now per channel. 
 | Chirps per frame / frame rate | 128 / ~8 frames per second | Locked (D6) |
 | Velocity resolution / max unambiguous velocity | ~5 cm/s / ±3.1 m/s | Locked (D6) |
 | I/Q gain and phase match target | sets image rejection | Design + calibration (matched VGAs) |
+| Digital backend | Tang Primer 25K (Gowin GW5A) FPGA, range-Doppler FFT, ~9 Mbps ingest | Locked (D7) |
 
 This table is kept in parity with any downstream summary table as values lock.
 
@@ -250,7 +252,7 @@ This table is kept in parity with any downstream summary table as values lock.
 
 ## 6. Sample Applications
 
-Outline; detailed once the digital backend (D7) is fixed.
+Outline; the backend is the Tang Primer 25K FPGA (D7), and these recipes detail out as the firmware and RTL come up.
 
 1. **Single moving target.** Transmit a chirp frame, capture I and Q, run the range-Doppler FFT, read the occupied range bin and the sign of the Doppler (approaching versus receding).
 2. **Two targets at different ranges.** Demonstrate range separation at the ~0.6 m resolution floor.
@@ -260,9 +262,9 @@ Outline; detailed once the digital backend (D7) is fixed.
 
 ## 7. Bill of Materials
 
-<div class="pending"><strong>PENDING (D7):</strong> the analog chain is now fully specified; only the backend parts (FPGA or MCU) finalize with D7. Sourced per the PMVB rule (Mouser &gt; Digi-Key &gt; Microcenter &gt; Amazon) with part numbers cited.</div>
+The architecture parts are now fully specified across both boards and the backend. The final BOM with exact passives and part numbers is produced at schematic capture, sourced per the PMVB rule (Mouser &gt; Digi-Key &gt; Microcenter &gt; Amazon).
 
-Carries over: ADS8881 (&times;2, one per I/Q channel), REF5025, THS4531A, OPA320, TPS7A2033 LDO, BLM18PG221SN1D ferrite. Changes: the single-ended PGA113 is replaced by a differential VGA per channel (D4). Adds: the BGT24MTR11 transceiver and its RF-module support, a ramp DAC for the VCO tune (D5), and second-channel duplicates of the conditioning chain.
+Carries over: ADS8881 (&times;2, one per I/Q channel), REF5025, THS4531A, OPA320, TPS7A2033 LDO, BLM18PG221SN1D ferrite. Changes: the single-ended PGA113 is replaced by a differential VGA per channel (D4). Adds: the BGT24MTR11 transceiver and its RF-module support, a ramp DAC for the VCO tune (D5), a Tang Primer 25K FPGA backend (D7), and second-channel duplicates of the conditioning chain.
 
 ---
 
@@ -287,7 +289,7 @@ The layout rationale carries over almost wholesale. The original chapter notes t
 
 ## 10. Open Decisions and Known Issues
 
-D1 through D6 are resolved. Only D7 (digital backend) remains, and the ~9 Mbps the chirp plan produces (256 kSPS x 18 bits x 2 channels) makes it an easy choice.
+All seven architecture decisions (D1 through D7) are resolved. The register below is the settled record; the next phase is schematic capture, not further architecture decisions.
 
 | # | Decision | Options | Drives | Depends on |
 |---|----------|---------|--------|------------|
@@ -297,7 +299,7 @@ D1 through D6 are resolved. Only D7 (digital backend) remains, and the ~9 Mbps t
 | D4 | Front-end gain | **RESOLVED:** adaptive gain via an SPI-controlled differential VGA per channel (replaces the single-ended PGA113); matched I/Q, residual calibrated on PMVB | gain match, dynamic range | done |
 | D5 | Ramp generation | **RESOLVED:** DAC-driven VCO tune with calibration (open-loop, adequate at ~1% fractional BW); ADF4159-class ramp PLL noted as the upgrade if linearity limits range | chirp linearity, parts, firmware | done |
 | D6 | Chirp plan | **RESOLVED:** 250 MHz / 1 ms (250 GHz/s), 50 m, 256 kSPS, 256-pt FFT, 128 chirps/frame; 0.6 m range res, ±3.1 m/s, ~5 cm/s, ~8 fps | filter cutoff, ADC rate, range/velocity | done |
-| D7 | Digital backend | Tang Primer 25K FPGA vs MCU | throughput, second-Tang-Primer question, PMVB tier | D3, D6 |
+| D7 | Digital backend | **RESOLVED:** Tang Primer 25K (Gowin GW5A) FPGA running the range-Doppler FFT, reusing the SPI controller RTL and SystemVerilog methodology; dedicated board per radar (more Tang Primers planned) | throughput, FPGA acquisition | done |
 
 **Known issues / future work.** Rev C adds receive channels for angle estimation (the original 1 TX / 3 RX trilateration goal) on a proven single-channel Rev B front end.
 
