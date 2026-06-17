@@ -32,4 +32,23 @@ th{background:#161a21;}
 .tag-tradeoff { background: #1a2a3a; color: var(--blue); }
 .tag-risk { background: #3a1a1a; color: var(--red); }
 .pending { background: #2a2420; border-left: 4px solid var(--amber); padding: 0.6rem 1rem; margin: 0.8rem 0; border-radius: 0 6px 6px 0; font-style: italic; color:var(--muted); }
+figure{margin:1.5rem 0;text-align:center;}
+figure svg{max-width:100%;height:auto;}
+figcaption{color:var(--muted);font-size:0.88rem;margin-top:0.5rem;text-align:left;}
+#widthctl{position:fixed;top:10px;right:10px;z-index:1000;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:12px;color:var(--muted);box-shadow:0 2px 10px rgba(0,0,0,.35);}
+#widthctl input[type=range]{width:120px;}
+@media print{#widthctl{display:none;}}
 </style>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  var c=document.createElement('div');c.id='widthctl';
+  c.innerHTML='<span>Width</span><input id="ww" type="range" min="36" max="100" step="1"><span id="wv"></span>';
+  document.body.appendChild(c);
+  var r=document.getElementById('ww'),v=document.getElementById('wv');
+  function ap(w){document.body.style.maxWidth=w+'rem';v.textContent=w+' rem';}
+  var s=null;try{s=localStorage.getItem('sddWidth');}catch(e){}
+  if(!s){s='62';}
+  r.value=s;ap(s);
+  r.addEventListener('input',function(){ap(r.value);try{localStorage.setItem('sddWidth',r.value);}catch(e){}});
+});
+</script>
