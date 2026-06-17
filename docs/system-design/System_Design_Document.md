@@ -2,7 +2,7 @@
 
 ## Rev B: 24 GHz I/Q
 
-**Version:** 0.5 (June 2026, system-scope radar SDD in the PMVB schema; decisions D1 to D4 resolved, D5 to D7 open)
+**Version:** 0.6 (June 2026, system-scope radar SDD in the PMVB schema; decisions D1 to D5 resolved, D6 and D7 open)
 **Project:** FMCW Radar Portfolio (`fmcw-radar-portfolio`)
 **Revision:** Rev B (24 GHz I/Q)
 **Status:** In Design
@@ -82,7 +82,7 @@ Locked blocks are in plain text; blocks whose implementation depends on an open 
 RF FRONT-END MODULE
   24 GHz MMIC (on-chip VCO, PA, LNA, I/Q mixers); TX and RX via 24 GHz antennas
   I, Q (zero IF) -> first gain stage -> [ I/Q interface connector ]
-  chirp ramp -> MMIC VCO tune (kept local to this board)     (ramp source PENDING D5)
+  chirp ramp -> MMIC VCO tune (kept local to this board)     (DAC ramp, calibrated)
 
 I/Q BASEBAND BOARD
   [ I/Q interface connector ] -> per channel: VGA -> anti-alias filter -> SAR ADC
@@ -149,7 +149,8 @@ The RF Front-End Module carries the BGT24MTR11 transceiver, its 24 GHz TX and RX
 <div class="callout callout-teal"><strong><span class="tag tag-decision">DECISION</span> External patch array on 4-layer RO4350B (D2)</strong>
 <p>The RF module uses external PCB patch antennas (a small patch array), microstrip-fed from the BGT24MTR11, plus a build-option 2.92 mm connector launch (DNP) so an external 24 GHz antenna can drive first bring-up. The stackup is 4-layer RO4350B (L1 RF and antenna, L2 solid ground reference, L3 power, L4 control), fabricated at PCBWay, which runs 4-layer Rogers. RO4350B sits just above its sweet spot at 24 GHz, giving up a little patch efficiency versus RO3003, which is held as a later upgrade. ENIG finish for the fine-pitch MMIC and the patches.</p></div>
 
-<div class="pending"><strong>PENDING (D5):</strong> the chirp ramp source (FMCW ramp PLL versus DAC-driven VCO tune, kept local to this module for chirp linearity).</div>
+<div class="callout callout-teal"><strong><span class="tag tag-decision">DECISION</span> DAC-driven chirp ramp with calibration (D5)</strong>
+<p>The VCO tune voltage is generated open-loop by a DAC and pre-distorted from a measured frequency-versus-voltage curve, rather than closed-loop with an FMCW ramp PLL. Over the ~250 MHz sweep at 24 GHz the fractional bandwidth is about 1%, the same regime in which the original 5.8 GHz design ran its VCO, so the residual nonlinearity is modest and a calibrated open-loop ramp is adequate. The ramp source stays local to the RF module so the tune line is short. The accepted cost is open-loop drift with temperature and the calibration table to maintain; an ADF4159-class ramp PLL is the upgrade path if bench measurement shows linearity is limiting range accuracy.</p></div>
 
 ### 3.1 Sheet A: Power and References
 
@@ -223,7 +224,7 @@ Design-for-test is a first-class requirement and carries over, now per channel. 
 
 ## 4. Pin Assignments
 
-<div class="pending"><strong>PENDING (D5, D7):</strong> populated once the ramp source (D5) and the digital backend (D7) are fixed; the MMIC SPI/control and I/Q pinout follow the BGT24MTR11 datasheet (D1 resolved). Carries over: the SPI bus structure (shared SCLK and SDI, per-device chip-select) and the J_DFT pinout concept, both extended for the second channel and the MMIC control interface.</div>
+<div class="pending"><strong>PENDING (D7):</strong> populated once the digital backend (D7) is fixed; the MMIC SPI/control and I/Q pinout follow the BGT24MTR11 datasheet, and the ramp interface is a DAC driving the VCO tune (D5 resolved). Carries over: the SPI bus structure (shared SCLK and SDI, per-device chip-select) and the J_DFT pinout concept, both extended for the second channel and the MMIC control interface.</div>
 
 ---
 
@@ -256,9 +257,9 @@ Outline; detailed once the digital backend (D7) is fixed.
 
 ## 7. Bill of Materials
 
-<div class="pending"><strong>PENDING (D5&ndash;D6):</strong> finalized when the remaining parts are locked, sourced per the PMVB rule (Mouser &gt; Digi-Key &gt; Microcenter &gt; Amazon) with part numbers cited.</div>
+<div class="pending"><strong>PENDING (D6):</strong> finalized when the remaining parts are locked, sourced per the PMVB rule (Mouser &gt; Digi-Key &gt; Microcenter &gt; Amazon) with part numbers cited.</div>
 
-Carries over: ADS8881 (&times;2, one per I/Q channel), REF5025, THS4531A, OPA320, TPS7A2033 LDO, BLM18PG221SN1D ferrite. Changes: the single-ended PGA113 is replaced by a differential VGA per channel (D4). Adds: the BGT24MTR11 transceiver and its RF-module support, the ramp source (D5), and second-channel duplicates of the conditioning chain.
+Carries over: ADS8881 (&times;2, one per I/Q channel), REF5025, THS4531A, OPA320, TPS7A2033 LDO, BLM18PG221SN1D ferrite. Changes: the single-ended PGA113 is replaced by a differential VGA per channel (D4). Adds: the BGT24MTR11 transceiver and its RF-module support, a ramp DAC for the VCO tune (D5), and second-channel duplicates of the conditioning chain.
 
 ---
 
@@ -283,7 +284,7 @@ The layout rationale carries over almost wholesale. The original chapter notes t
 
 ## 10. Open Decisions and Known Issues
 
-D1 through D4 are resolved. D5 (ramp generation) is the next open decision, followed by D6 (chirp plan) and D7 (digital backend). Work them in dependency order.
+D1 through D5 are resolved. D6 (chirp plan) is the next open decision, followed by D7 (digital backend).
 
 | # | Decision | Options | Drives | Depends on |
 |---|----------|---------|--------|------------|
@@ -291,14 +292,14 @@ D1 through D4 are resolved. D5 (ramp generation) is the next open decision, foll
 | D2 | Antenna and RF stackup | **RESOLVED:** external PCB patch array + DNP 2.92 mm connector launch; 4-layer RO4350B at PCBWay (RO3003 held as a later efficiency upgrade), ENIG finish | RF layout, stackup, cost | done |
 | D3 | ADC arrangement | **RESOLVED:** two synchronized ADS8881 (18-bit SAR) on a shared CONVST; reuses the proven part, REF5025, and SPI RTL | I/Q phase fidelity, BOM, layout | done |
 | D4 | Front-end gain | **RESOLVED:** adaptive gain via an SPI-controlled differential VGA per channel (replaces the single-ended PGA113); matched I/Q, residual calibrated on PMVB | gain match, dynamic range | done |
-| D5 | Ramp generation | FMCW ramp PLL (ADF4159 class) vs DAC ramp + calibration | chirp linearity, parts, firmware | D1 |
+| D5 | Ramp generation | **RESOLVED:** DAC-driven VCO tune with calibration (open-loop, adequate at ~1% fractional BW); ADF4159-class ramp PLL noted as the upgrade if linearity limits range | chirp linearity, parts, firmware | done |
 | D6 | Chirp plan | sweep BW, sweep time, max range, sample rate | filter cutoff, ADC rate, range/velocity | D1, D5 |
 | D7 | Digital backend | Tang Primer 25K FPGA vs MCU | throughput, second-Tang-Primer question, PMVB tier | D3, D6 |
 
 **Known issues / future work.** Rev C adds receive channels for angle estimation (the original 1 TX / 3 RX trilateration goal) on a proven single-channel Rev B front end.
 
 <div class="callout callout-red"><strong><span class="tag tag-risk">RISK</span> The 5.8 GHz design already flagged the chirp-linearity path</strong>
-<p>The original SDD noted that the free-running HMC431LP4E VCO was acceptable only because the 30 MHz mode used ~5% of its tuning range, and that wider sweeps would reveal nonlinearity for which a PLL-based control loop was the recommended upgrade. At 24 GHz over ~250 MHz the fractional bandwidth is again about 1%, so a free-running ramp may be acceptable, but D5 carries the option of a proper FMCW ramp PLL (ADF4159 class) for clean chirp linearity.</p></div>
+<p>The original SDD noted that the free-running HMC431LP4E VCO was acceptable only because the 30 MHz mode used ~5% of its tuning range, and that wider sweeps would reveal nonlinearity for which a PLL-based control loop was the recommended upgrade. At 24 GHz over ~250 MHz the fractional bandwidth is again about 1%, so D5 takes the calibrated open-loop DAC ramp, with an ADF4159-class FMCW ramp PLL held as the upgrade if bench measurement shows chirp linearity is limiting range accuracy.</p></div>
 
 ---
 
